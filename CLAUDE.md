@@ -93,7 +93,7 @@ section below, then commit.
 | 1 | Scaffolding — structure, config, stubs, CLAUDE.md | `config.py`, `requirements.txt`, `.gitignore`, all stubs | ✅ done |
 | 2 | INSEE idBank resolver | `fetchers/insee_idbank_resolver.py` | ✅ done |
 | 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `unedic.py` | ✅ done |
-| 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ⬜ pending |
+| 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ✅ done |
 | 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ⬜ pending |
 | 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ⬜ pending |
 | 7 | Integration test | Full `python run_pipeline.py --mode full`, fix any API surprises | ⬜ pending |
@@ -195,6 +195,19 @@ Runtime discoveries below.
   run from a residential or French/EU IP. Shared helpers `save_raw` and `fetch_ods_records`
   live in `fetchers/__init__.py`. `fetch_all_insee_series` fetches all ~27 idBanks in one
   BDM call (well under the 400-idBank API limit).
+
+- **Session 4 — processors read raw cache, never re-fetch.** Shared helpers live in
+  `processors/__init__.py`: `load_insee_series()` rebuilds the logical_name → DataFrame
+  mapping from the latest `data/raw/insee_bdm_*.json` plus `insee_idbanks.json` (reuses
+  `_parse_sdmx_json` from the fetcher); `annual_values`, `build_latest`, `write_output`,
+  `now_iso`, `to_year`, `latest_raw` round it out. `cofog.py` exposes `bucket_cofog()`
+  (sums GF01–GF10 into the three buckets per year) and `base_break_note()` (flags the
+  2020 base change when the year range spans it). All three KPI processors verified
+  deterministic against a synthetic SDMX fixture. **Peer comparison deferred:** per the
+  user's call, the Administrative Overhead Rate emits `peers: {}` for now — OECD peer
+  series will be wired up in Session 7 when live OECD column layouts are inspectable.
+  The Productive Spend and Pension/Investment KPIs are France-only by design (PRD names
+  no peer source). `requirements.txt` lists `pandas` — processors need it at runtime.
 
 ---
 
