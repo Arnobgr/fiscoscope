@@ -91,7 +91,7 @@ section below, then commit.
 | # | Scope | Key files | Status |
 |---|-------|-----------|--------|
 | 1 | Scaffolding — structure, config, stubs, CLAUDE.md | `config.py`, `requirements.txt`, `.gitignore`, all stubs | ✅ done |
-| 2 | INSEE idBank resolver | `fetchers/insee_idbank_resolver.py` | ⬜ pending |
+| 2 | INSEE idBank resolver | `fetchers/insee_idbank_resolver.py` | ✅ done |
 | 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `unedic.py` | ⬜ pending |
 | 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ⬜ pending |
 | 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ⬜ pending |
@@ -178,7 +178,14 @@ Runtime discoveries below.
 
 > Fill this in as sessions progress. These notes persist across sessions.
 
-- (none yet)
+- **Session 2 — INSEE CDN blocks datacenter IPs.** Both `www.insee.fr` and `api.insee.fr`
+  return `403 x-deny-reason: host_not_allowed` from cloud/VPS environments.
+  The resolver code is correct; live verification of idBank resolution must be run from a
+  residential IP or a French/EU VPS. The `download_mapping()` function already includes a
+  `User-Agent` header; if the block persists on the target VPS, try adding a `Referer:
+  https://www.insee.fr` header or downloading the mapping CSV manually once and placing it
+  at `data/raw/insee_idbank_mapping.csv` (the resolver will use the cache and skip the
+  download for up to 30 days).
 
 ---
 
