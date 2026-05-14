@@ -92,7 +92,7 @@ section below, then commit.
 |---|-------|-----------|--------|
 | 1 | Scaffolding — structure, config, stubs, CLAUDE.md | `config.py`, `requirements.txt`, `.gitignore`, all stubs | ✅ done |
 | 2 | INSEE idBank resolver | `fetchers/insee_idbank_resolver.py` | ✅ done |
-| 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `unedic.py` | ⬜ pending |
+| 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `unedic.py` | ✅ done |
 | 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ⬜ pending |
 | 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ⬜ pending |
 | 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ⬜ pending |
@@ -186,6 +186,15 @@ Runtime discoveries below.
   https://www.insee.fr` header or downloading the mapping CSV manually once and placing it
   at `data/raw/insee_idbank_mapping.csv` (the resolver will use the cache and skip the
   download for up to 30 days).
+
+- **Session 3 — all five data sources block datacenter IPs.** Standalone runs of every
+  fetcher returned `403 Forbidden` from this environment: OECD (`sdmx.oecd.org`),
+  `data.economie.gouv.fr`, `open.urssaf.fr`, and `data.gouv.fr` — same pattern as INSEE.
+  The fetcher code is implemented and its offline paths (`_parse_sdmx_json`, `save_raw`,
+  `fetch_ods_records` pagination) are verified, but live verification of all fetchers must
+  run from a residential or French/EU IP. Shared helpers `save_raw` and `fetch_ods_records`
+  live in `fetchers/__init__.py`. `fetch_all_insee_series` fetches all ~27 idBanks in one
+  BDM call (well under the 400-idBank API limit).
 
 ---
 
