@@ -1,4 +1,64 @@
-# Session 4: implement this module.
-# KPI: Administrative Overhead Rate = D1_S13 / total APU expenditure × 100.
-# See PRD §5.2 for formula, sources, and output JSON schema.
-raise NotImplementedError("kpi_overhead not yet implemented — see Session 4")
+"""
+KPI: Administrative Overhead Rate — see PRD §5.2.
+
+Formula: public sector wage bill (D1_S13) / total APU expenditure × 100.
+France series from INSEE BDM. Peer comparison is deferred (see Runtime
+discoveries in CLAUDE.md): emitted as an empty `peers` block until OECD
+column layouts can be confirmed against a live fetch.
+"""
+
+import logging
+
+from processors import (
+    annual_values,
+    build_latest,
+    load_insee_series,
+    now_iso,
+    write_output,
+)
+
+log = logging.getLogger(__name__)
+
+
+def compute_overhead_rate() -> dict:
+    """Compute the Administrative Overhead Rate and write kpi_overhead_rate.json."""
+    series = load_insee_series()
+    wage = annual_values(series["wage_bill_apu"])
+    total = annual_values(series["total_apu_expenditure"])
+
+    france = [
+        {"year": year, "value": round(wage[year] / total[year] * 100, 2)}
+        for year in sorted(set(wage) & set(total))
+        if total[year]
+    ]
+
+    payload = {
+        "kpi_id": "overhead_rate",
+        "kpi_name": "Administrative Overhead Rate",
+        "description": (
+            "Public sector wage bill as % of total public expenditure. Measures "
+            "how much of every euro spent goes to running the administrative "
+            "apparatus rather than delivering services or transfers."
+        ),
+        "unit": "percent",
+        "source": "INSEE BDM — Comptes des APU",
+        "methodology": (
+            "D1_S13 (compensation of employees, all APU) / total APU expenditure "
+            "× 100. Based on INSEE national accounts. Peer comparison deferred — "
+            "no OECD peer series wired up yet."
+        ),
+        "last_updated": now_iso(),
+        "france": france,
+        "peers": {},
+        "latest": build_latest(france),
+    }
+    write_output("kpi_overhead_rate.json", payload)
+    return payload
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    result = compute_overhead_rate()
+    print(f"\nOverhead rate: {len(result['france'])} France data points")
+    if result["latest"]:
+        print(f"Latest: {result['latest']}")
