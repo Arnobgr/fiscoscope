@@ -94,7 +94,7 @@ section below, then commit.
 | 2 | INSEE idBank resolver | `fetchers/insee_idbank_resolver.py` | ✅ done |
 | 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `unedic.py` | ✅ done |
 | 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ✅ done |
-| 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ⬜ pending |
+| 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ✅ done |
 | 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ⬜ pending |
 | 7 | Integration test | Full `python run_pipeline.py --mode full`, fix any API surprises | ⬜ pending |
 
@@ -208,6 +208,27 @@ Runtime discoveries below.
   series will be wired up in Session 7 when live OECD column layouts are inspectable.
   The Productive Spend and Pension/Investment KPIs are France-only by design (PRD names
   no peer source). `requirements.txt` lists `pandas` — processors need it at runtime.
+
+---
+
+- **Session 5 — three PRD/data mismatches resolved with the user.** (1) *Friction Ratio*:
+  PRD §5.3 names "total taxes collected" as the denominator, but no tax-revenue series is
+  resolved in the INSEE idBanks. Per the user's call, total revenue is derived as
+  `total_apu_expenditure + fiscal_balance (B9)`; friction spend is the administrative COFOG
+  bucket (GF01+GF02+GF03), with debt interest left inside GF01 rather than added again.
+  France-only. (2) *kpi_sustainability* and *kpi_outcomes* are OECD-heavy — same deferral as
+  Session 4's overhead peers. `kpi_sustainability` emits the France deficit series (B9/GDP)
+  with `peers: {}` and omits debt; `kpi_outcomes` emits a well-formed placeholder
+  (`france: []`, `peers: {}`) since its outcome side (life expectancy, PISA) is entirely
+  OECD-sourced — both to be wired up in Session 7. (3) *Tax Expenditure* (§5.8) has no
+  fetcher module (the five fetchers are INSEE/budget/OECD/urssaf/unedic); per the user,
+  `compute_tax_expenditure()` raises `NotImplementedError` until a PLF "dépenses fiscales"
+  fetcher (PRD §3.6) is built — `run_pipeline.py` must account for this gap in Session 6.
+  **kpi_monthly** reshapes the cached `budget_execution` ODS dataset; its OpenDataSoft
+  field names are only confirmed at runtime, so `_resolve_column` raises a detailed,
+  resolver-style error listing the actual columns if the candidate `*_FIELDS` lists don't
+  match — adjust them on the first live run. All four processors verified deterministic
+  against synthetic SDMX + budget-execution fixtures.
 
 ---
 
