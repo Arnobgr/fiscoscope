@@ -95,7 +95,7 @@ section below, then commit.
 | 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `unedic.py` | ✅ done |
 | 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ✅ done |
 | 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ✅ done |
-| 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ⬜ pending |
+| 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ✅ done |
 | 7 | Integration test | Full `python run_pipeline.py --mode full`, fix any API surprises | ⬜ pending |
 
 ---
@@ -229,6 +229,25 @@ Runtime discoveries below.
   resolver-style error listing the actual columns if the candidate `*_FIELDS` lists don't
   match — adjust them on the first live run. All four processors verified deterministic
   against synthetic SDMX + budget-execution fixtures.
+
+---
+
+- **Session 6 — orchestrator is fail-soft; one outage doesn't abort the run.** Each
+  fetcher and processor runs inside `_run_step`, which records `status: ok | skipped |
+  error` (with the exception message) into the `meta.json` `sources` block but never
+  re-raises. `kpi_tax_expenditure` therefore lands as `skipped` rather than crashing the
+  pipeline (Session 5 gap). `run_pipeline.py` adds a `--no-upload` flag for local dry runs
+  and calls `load_dotenv()` from the repo-root `.env` *before* importing `config`, so R2
+  credentials are picked up at config-load time. `publishers/r2_upload.py` validates all
+  four R2 env vars upfront and raises a single `RuntimeError` listing the missing names —
+  no boto3 stack trace if `.env` is empty. Verified end-to-end with `python run_pipeline.py
+  --mode full --no-upload`: from this datacenter IP every live source 403s (expected per
+  Sessions 2/3), `compute_outcomes` writes its placeholder, and `meta.json` is well-formed
+  with all 16 steps recorded. **`meta.json` schema deviates slightly from PRD §9**: it
+  reports `status` per step (one entry per fetcher *and* per processor) rather than per
+  data source only, and omits `latest_year`/`latest_month` extraction. The richer
+  per-step status was more useful while every source is still 403'ing; revisit in
+  Session 7 once live runs make `latest_year` cheap to compute.
 
 ---
 
