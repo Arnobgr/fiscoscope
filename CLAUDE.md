@@ -277,6 +277,42 @@ Runtime discoveries below.
 
 ---
 
+- **Session 7a — INSEE resolver ported to the new ZIP / positional schema.** The new
+  mapping CSV has only 4 columns (`famille`, `idbank`, `list_mod`, `list_var`); every
+  dimension is decoded by zipping `list_var.split('.')` with `list_mod.split('.')` per
+  row. `download_mapping()` now scrapes
+  `https://www.insee.fr/fr/information/2862759` for the latest
+  `*_correspondance_idbank_dimension.zip` link and extracts the CSV from the ZIP.
+  **Final SERIES_SEARCH_RULES surprises** (worth flagging because they're not derivable
+  from the dimension-rename table alone):
+    1. The `DEP-APU` family has **no `B9` or `D41` OPERATION** — only aggregate codes
+       (`D1, D3, D4, D6M, D7, D9, OTE, P2, P5K2, D2951, SO`). `fiscal_balance` and
+       `debt_interest` are resolved against `famille = "CNA-2014-CSI"` (sector accounts
+       satellite) using `OPERATION=B9NF` / `D41` with `COMPTE=EA` (employments) — not
+       `DEP-APU`.
+    2. `FONCTION` accepts a synthetic value **`FONTOTAL`** that aggregates over all
+       COFOG functions; APU-wide totals (D1, P5K2, D6M, OTE, …) need `FONCTION=FONTOTAL`
+       to match a single row, not an empty/`SO` value.
+    3. PRD's `OPERATION=P51` (gross fixed capital formation) appears in `DEP-APU` as
+       **`P5K2`** (P5 + K2 aggregate); `OPERATION=P51` only exists in CNT-quarterly
+       families. We map `public_investment → P5K2` from `CNA-2014-DEP-APU`.
+    4. PRD's `social_benefits ≡ D62` is mapped to **`D6M`** in `CNA-2014-DEP-APU`
+       (D6M = social benefits in cash + in-kind via market producers, the DEP-APU
+       aggregate). A pure-D62 alternative is available from `CNA-2014-CSI` if a future
+       processor needs the strict ESA D.62 series.
+    5. `gdp_nominal` uses `famille = "CNA-2020-PIB"` (newest active base; CNA-2014-PIB
+       has `SERIE_ARRETEE=TRUE`) with `PRIX_REF=VAL`, `NATURE=VALEUR_ABSOLUE`,
+       `UNITE=EUROS_COURANTS`.
+    6. `cpi` lives in `famille = "IPC-2025"`. It has no `OPERATION` dimension — match
+       on `INDICATEUR=IPC`, `COICOP2018=00`, `PRIX_CONSO=00`, `NATURE=INDICE`,
+       `MENAGES_IPC=ENSEMBLE`, `ZONE_GEO=FE`, `CORRECTION=BRUT`, `PERIODICITE=M`.
+  All 19 logical series resolve to a single 9-digit idBank; `insee_idbanks.json` written
+  successfully from the cached ZIP. Live-fetch path (metadata scrape + ZIP download)
+  unverified in this session because the cache was warm — first scheduled refresh in
+  ≤30 days will exercise it.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
