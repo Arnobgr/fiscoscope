@@ -4,7 +4,7 @@ from io import StringIO
 import pandas as pd
 import requests
 
-from fetchers import save_raw
+from fetchers import DEFAULT_HEADERS, save_raw
 
 log = logging.getLogger(__name__)
 DATAGOUV_API = "https://www.data.gouv.fr/api/1"
@@ -18,7 +18,7 @@ def fetch_unedic_allocataires() -> pd.DataFrame:
     """
     search_url = f"{DATAGOUV_API}/datasets/"
     params = {"q": "unedic allocataires assurance chomage mensuel", "page_size": 5}
-    response = requests.get(search_url, params=params, timeout=30)
+    response = requests.get(search_url, params=params, headers=DEFAULT_HEADERS, timeout=30)
     response.raise_for_status()
 
     datasets = response.json().get("data", [])
@@ -28,7 +28,7 @@ def fetch_unedic_allocataires() -> pd.DataFrame:
     dataset_id = datasets[0]["id"]
     log.info(f"Resolved Unédic dataset: {datasets[0].get('title')} ({dataset_id})")
     dataset_url = f"{DATAGOUV_API}/datasets/{dataset_id}/"
-    resources = requests.get(dataset_url, timeout=30).json().get("resources", [])
+    resources = requests.get(dataset_url, headers=DEFAULT_HEADERS, timeout=30).json().get("resources", [])
 
     csv_resource = next(
         (r for r in resources if (r.get("format") or "").lower() == "csv"), None
@@ -36,7 +36,7 @@ def fetch_unedic_allocataires() -> pd.DataFrame:
     if not csv_resource:
         raise ValueError("No CSV resource found for Unédic dataset")
 
-    response = requests.get(csv_resource["url"], timeout=60)
+    response = requests.get(csv_resource["url"], headers=DEFAULT_HEADERS, timeout=60)
     response.raise_for_status()
     df = pd.read_csv(StringIO(response.text), sep=";", encoding="utf-8")
     save_raw("unedic", df.to_dict(orient="records"))

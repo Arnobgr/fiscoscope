@@ -6,6 +6,7 @@ import pandas as pd
 import requests
 
 from config import RAW_DATA_DIR
+from fetchers import DEFAULT_HEADERS
 
 log = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ def download_mapping(force_refresh: bool = False) -> pd.DataFrame:
             return _parse_mapping_csv(cache_path)
 
     log.info("Downloading INSEE idBank mapping file...")
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; fisc-o-scope/1.0; +https://github.com/arnobgr/french-efficiency-dashboard)"}
+    headers = {**DEFAULT_HEADERS, "Referer": "https://www.insee.fr/"}
     response = requests.get(MAPPING_URL, headers=headers, timeout=120)
     response.raise_for_status()
 

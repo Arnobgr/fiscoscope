@@ -96,7 +96,7 @@ section below, then commit.
 | 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ✅ done |
 | 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ✅ done |
 | 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ✅ done |
-| 7 | Integration test | Full `python run_pipeline.py --mode full`, fix any API surprises | ⬜ pending |
+| 7 | Integration test | Full `python run_pipeline.py --mode full`, fix any API surprises | 🟡 in progress — see `docs/superpowers/plans/2026-05-15-upstream-data-source-fixes.md` (split into 7a–7d) |
 
 ---
 
@@ -248,6 +248,32 @@ Runtime discoveries below.
   data source only, and omits `latest_year`/`latest_month` extraction. The richer
   per-step status was more useful while every source is still 403'ing; revisit in
   Session 7 once live runs make `latest_year` cheap to compute.
+
+---
+
+- **Session 7 prep (2026-05-15) — IP block lifted on this VPS; four upstream breakages
+  found, split into follow-up sessions.** Datacenter `403`s are gone from every host
+  (INSEE, OECD, data.gouv.fr, data.economie.gouv.fr, open.urssaf.fr), so the original
+  Session 2/3 blockers no longer apply. Standalone re-runs surfaced four real upstream
+  changes between the prior sessions and today: (1) **INSEE** migrated the idBank
+  mapping from a flat CSV to a monthly ZIP (`YYYYMM_correspondance_idbank_dimension.zip`)
+  whose CSV has 4 columns (`famille,idbank,list_mod,list_var`) with dimensions packed
+  positionally into `list_mod` and names in `list_var`; dimension names also changed
+  (`FREQ`→`PERIODICITE`, `SECT_INST`→`SECT-INST`, `COFOG`→`FONCTION`). (2) **OECD**
+  `DSD_GOV_COFOG@DF_GOV_COFOG_2025` and `DSD_GOV_TRANSACTION@DF_GOV_TRANSACTION_2025`
+  now require 8 key dimensions instead of 5 (`422 Not enough key values in query`);
+  the endpoint is reachable, only the filter string needs rebuilding. (3) **Unédic**
+  data is now hosted by **France Travail** (id `561fa8bbc751df54a1cdbb48`); the search
+  query "unedic" no longer matches and resources are **XLSX only**, no CSV. (4) `urssaf`
+  and `budget_execution` work as-is (verified: 116 Urssaf rows; budget data through
+  03/2026). **This session's prep work**: centralized a generic Firefox UA in
+  `fetchers/__init__.py` (`DEFAULT_HEADERS`) and threaded it through every `requests.get`
+  call (replacing the custom `fisc-o-scope/1.0` UA, which is more fingerprintable);
+  pinned `requirements.txt` to exact versions ≥ 1 week old
+  (`requests==2.33.1`, `pandas==2.3.3`, `boto3==1.43.6`, `python-dotenv==1.2.2`);
+  cached the INSEE ZIP + extracted CSV at `data/raw/insee_idbank_mapping.{zip,csv}`
+  so Session 7a can develop offline. **Plan for sessions 7a–7d** lives in
+  `docs/superpowers/plans/2026-05-15-upstream-data-source-fixes.md`.
 
 ---
 

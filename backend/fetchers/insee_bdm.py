@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 
 from config import RAW_DATA_DIR, INSEE_START_YEAR
-from fetchers import save_raw
+from fetchers import DEFAULT_HEADERS, save_raw
 from fetchers.insee_idbank_resolver import run_idbank_resolver
 
 log = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ def fetch_insee_series(idbanks: list[str], start_year: int = INSEE_START_YEAR) -
     ids = "+".join(idbanks)
     url = f"{BDM_BASE}/{ids}"
     params = {"startPeriod": str(start_year), "format": "sdmx-json"}
-    headers = {"Accept": "application/json"}
+    headers = {**DEFAULT_HEADERS, "Accept": "application/json"}
 
     response = requests.get(url, params=params, headers=headers, timeout=60)
     response.raise_for_status()

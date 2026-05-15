@@ -9,6 +9,14 @@ from config import RAW_DATA_DIR
 
 log = logging.getLogger(__name__)
 
+# Generic browser-style headers — several public data hosts (INSEE CDN, OECD, ODS
+# portals) refuse the default `python-requests/X.Y.Z` UA from datacenter IPs.
+DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0",
+    "Accept-Language": "en-US,en;q=0.9,fr;q=0.8",
+    "Accept": "*/*",
+}
+
 
 def save_raw(source: str, data) -> Path:
     """Write a fetcher's raw response to data/raw/{source}_{YYYY-MM-DD}.json."""
@@ -30,7 +38,7 @@ def fetch_ods_records(base: str, dataset_id: str, page_size: int = 100) -> list:
     offset = 0
     while True:
         params = {"limit": page_size, "offset": offset, "timezone": "UTC"}
-        response = requests.get(url, params=params, timeout=30)
+        response = requests.get(url, params=params, headers=DEFAULT_HEADERS, timeout=30)
         response.raise_for_status()
         data = response.json()
         records = data.get("results", [])

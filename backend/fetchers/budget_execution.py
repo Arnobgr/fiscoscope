@@ -4,7 +4,7 @@ from io import StringIO
 import pandas as pd
 import requests
 
-from fetchers import fetch_ods_records, save_raw
+from fetchers import DEFAULT_HEADERS, fetch_ods_records, save_raw
 
 log = logging.getLogger(__name__)
 BASE = "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets"
@@ -30,7 +30,7 @@ def fetch_plrg_execution(year: int) -> pd.DataFrame:
     dataset_id = f"projet-de-loi-relatif-aux-resultats-de-la-gestion-{year}"
     url = f"{BASE}/{dataset_id}/exports/csv"
     log.info(f"Fetching PLRG execution: {dataset_id}")
-    response = requests.get(url, timeout=60)
+    response = requests.get(url, headers=DEFAULT_HEADERS, timeout=60)
     response.raise_for_status()
     df = pd.read_csv(StringIO(response.text), sep=";", encoding="utf-8")
     save_raw(f"budget_plrg_{year}", df.to_dict(orient="records"))

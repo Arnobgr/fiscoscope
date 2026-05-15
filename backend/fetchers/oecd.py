@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 
 from config import OECD_COUNTRIES, OECD_START_YEAR
-from fetchers import save_raw
+from fetchers import DEFAULT_HEADERS, save_raw
 
 log = logging.getLogger(__name__)
 OECD_BASE = "https://sdmx.oecd.org/public/rest/data"
@@ -24,7 +24,7 @@ def _fetch_oecd_csv(dataset: str, filter_expr: str, start_year: int) -> pd.DataF
     url = f"{OECD_BASE}/{dataset}/{filter_expr}"
     params = {"startPeriod": str(start_year), "format": "csvfilewithlabels"}
     log.info(f"Fetching OECD dataset {dataset} (filter: {filter_expr})")
-    response = requests.get(url, params=params, timeout=60)
+    response = requests.get(url, params=params, headers=DEFAULT_HEADERS, timeout=60)
     response.raise_for_status()
     time.sleep(RATE_LIMIT_SLEEP)
     return pd.read_csv(StringIO(response.text))
