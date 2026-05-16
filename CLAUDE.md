@@ -331,6 +331,35 @@ Runtime discoveries below.
 
 ---
 
+- **Session 7c — Unédic fetcher repointed at France Travail XLSX.** Dataset
+  `561fa8bbc751df54a1cdbb48` ("Allocataires de l'assurance chômage") is now
+  XLSX-only and its title no longer contains "unedic", so the old keyword
+  search returns nothing. Resolver now hits the data.gouv.fr dataset endpoint
+  directly and picks the national XLSX resource (`format=excel`, URL
+  contains `indem`, title without `region`). The published URL
+  (`https://statistiques.francetravail.org/indem/teleindemalloc`) redirects
+  cleanly 302→301→200 to a `pr-rooms.com` CDN — no cookies, no anti-bot,
+  `DEFAULT_HEADERS` alone is enough; no `Referer` needed beyond what
+  `data.gouv.fr` already provides via the resource record. The XLSX
+  (`backend/data/raw/france_travail_indemnisation.xlsx`, ~630 KB) has 12
+  sheets. The PRD-relevant one is **"Brut France"** (France métropolitaine
+  + Dom, données brutes — the CVS variants are seasonally adjusted; "Brut
+  France métropolitaine" excludes the Dom). Header layout is unusual: row 3
+  carries top-level groupings (AC / ETAT / FORMATION / PRE RETRAITE /
+  ASSURANCE CHOMAGE / ETAT / AUTRES), row 4 is blank, **row 5 carries the
+  48 individual allocation columns** (header offset = 5, 0-indexed). Data
+  starts row 6 and runs monthly from 2006-01 through the most recent month
+  (verified: 240 rows × 49 cols). The sheet exposes **`indemnisés` per
+  allocation**, not `allocataires` in the strict Unédic sense; it includes
+  a final **`Total (1+2+3)`** column that aggregates all allocations and
+  is the right column to read for the headline national indemnisés count.
+  The fetcher returns the full wide DataFrame (no aggregation) so future
+  KPIs can slice by allocation type if needed. `openpyxl==3.1.5` pinned
+  (released 2024-06-28; PyPI's `pip index` confirms it's the latest stable
+  and 22 months old, well past the project's ≥1-week pinning rule).
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
