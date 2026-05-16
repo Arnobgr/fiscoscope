@@ -313,6 +313,24 @@ Runtime discoveries below.
 
 ---
 
+- **Session 7b — OECD 2025-edition DSDs use 8 dimensions; "% of GDP" code renamed.**
+  Both Government-at-a-Glance 2025 dataflows now expose 8 key dimensions (was 5) in
+  this order, confirmed live against the SDMX structure endpoint
+  (`/public/rest/dataflow/OECD.GOV.GIP/<dsd>/latest?references=descendants`):
+    - `DSD_GOV_COFOG`:       `FREQ . REF_AREA . MEASURE . UNIT_MEASURE . SECTOR . EXPENDITURE . EDITION . CATEGORY`
+    - `DSD_GOV_TRANSACTION`: `FREQ . REF_AREA . MEASURE . UNIT_MEASURE . SECTOR . TRANSACTION . EDITION . CATEGORY`
+  Filter strings now use 7 dots (`A.{peers}..PT_B1GQ....`). The plan's `PT_GDP` value
+  was wrong: the actual SDMX `UNIT_MEASURE` code for "% of GDP" is **`PT_B1GQ`**
+  (B1GQ is the SDMX concept for GDP at market prices). Other UNIT_MEASURE values
+  available are `PT_OTE_S13*` (% of expenditure), `PT_PCOS_S13`, `PT_TAX_REV`,
+  `USD_PPP`, etc. — switch as needed for non-ratio KPIs. Both fetchers verified
+  live: COFOG → 4025 rows × 32 columns, fiscal → 1764 rows × 32 columns; raw cached
+  at `data/raw/oecd_{cofog,fiscal}_2026-05-16.json`. When the 2027 edition ships,
+  re-run the structure-discovery probe — dimension order is not guaranteed stable
+  between editions.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
