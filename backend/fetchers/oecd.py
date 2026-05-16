@@ -15,6 +15,12 @@ OECD_BASE = "https://sdmx.oecd.org/public/rest/data"
 COFOG_DATASET = "OECD.GOV.GIP,DSD_GOV_COFOG@DF_GOV_COFOG_2025"
 FISCAL_DATASET = "OECD.GOV.GIP,DSD_GOV_TRANSACTION@DF_GOV_TRANSACTION_2025"
 
+# Both 2025-edition DSDs expose 8 key dimensions in this order:
+#   FREQ . REF_AREA . MEASURE . UNIT_MEASURE . SECTOR . (EXPENDITURE|TRANSACTION) . EDITION . CATEGORY
+# Filter must therefore contain 7 dots. UNIT_MEASURE=PT_B1GQ selects "% of GDP"
+# (B1GQ is the SDMX code for GDP at market prices); the legacy PT_GDP code is gone.
+UNIT_PCT_GDP = "PT_B1GQ"
+
 # OECD rate limit is 20 requests/minute — pause between calls.
 RATE_LIMIT_SLEEP = 3
 
@@ -33,7 +39,7 @@ def _fetch_oecd_csv(dataset: str, filter_expr: str, start_year: int) -> pd.DataF
 def fetch_oecd_cofog(countries: list[str] = None, start_year: int = OECD_START_YEAR) -> pd.DataFrame:
     """Fetch COFOG expenditure by function as % of GDP for the peer countries."""
     countries = countries or OECD_COUNTRIES
-    filter_expr = f"A.{'+'.join(countries)}..PT_GDP."
+    filter_expr = f"A.{'+'.join(countries)}..{UNIT_PCT_GDP}...."
     df = _fetch_oecd_csv(COFOG_DATASET, filter_expr, start_year)
     save_raw("oecd_cofog", df.to_dict(orient="records"))
     return df
@@ -42,7 +48,7 @@ def fetch_oecd_cofog(countries: list[str] = None, start_year: int = OECD_START_Y
 def fetch_oecd_fiscal(countries: list[str] = None, start_year: int = OECD_START_YEAR) -> pd.DataFrame:
     """Fetch fiscal balance, revenue and expenditure indicators for the peer countries."""
     countries = countries or OECD_COUNTRIES
-    filter_expr = f"A.{'+'.join(countries)}..."
+    filter_expr = f"A.{'+'.join(countries)}..{UNIT_PCT_GDP}...."
     df = _fetch_oecd_csv(FISCAL_DATASET, filter_expr, start_year)
     save_raw("oecd_fiscal", df.to_dict(orient="records"))
     return df
