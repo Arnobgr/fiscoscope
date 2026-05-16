@@ -96,7 +96,7 @@ section below, then commit.
 | 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ✅ done |
 | 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ✅ done |
 | 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ✅ done |
-| 7 | Integration test | Full `python run_pipeline.py --mode full`, fix any API surprises | 🟡 in progress — see `docs/superpowers/plans/2026-05-15-upstream-data-source-fixes.md` (split into 7a–7d) |
+| 7 | Integration test | Full `python run_pipeline.py --mode full`, fix any API surprises | ✅ done |
 
 ---
 
@@ -357,6 +357,70 @@ Runtime discoveries below.
   KPIs can slice by allocation type if needed. `openpyxl==3.1.5` pinned
   (released 2024-06-28; PyPI's `pip index` confirms it's the latest stable
   and 22 months old, well past the project's ≥1-week pinning rule).
+
+---
+
+- **Session 7d — full-pipeline integration; three upstream changes patched.**
+  Every step now reports `status: ok` except the two by-design `skipped`
+  entries (`kpi_tax_expenditure`, `budget_plrg`). Final fixes:
+    1. **INSEE BDM dropped JSON entirely.** `api.insee.fr/series/BDM/V1/data/...`
+       no longer honours the `?format=sdmx-json` query param (returns `400
+       "Unknown query parameter 'format'"`) and ignores `Accept:
+       application/...+json` content negotiation, always serving SDMX 2.1
+       `StructureSpecificData` XML. Rewrote `fetchers/insee_bdm.py` to drop the
+       `format` param, parse the XML with `xml.etree.ElementTree`, and save
+       pre-parsed `[{idbank, date, value}]` records (instead of the raw API
+       blob). Key XML quirk: the root element declares prefixed namespaces only
+       (`xmlns:message`, `xmlns:ss`, …) with no default xmlns, so the
+       `<Series>` and `<Obs>` elements live in the **empty namespace** — use
+       `root.iter("Series")` / `series.iter("Obs")`, *not*
+       `iter("{<ss-uri>}Series")`. `_parse_sdmx_json` kept as a one-line
+       `pd.DataFrame(cached_list)` shim so `processors/__init__.py::
+       load_insee_series()` doesn't need to change.
+    2. **`budget_plrg` is PDF-only now.** The slug varies year-to-year
+       (`plrg-2024`, `projet-de-loi-relatif-aux-resultats-de-la-gestion-...-plrg-2025`)
+       but every recent PLRG dataset on data.economie.gouv.fr exposes a single
+       PDF "notice explicative" — the tabular CSV/Excel export of
+       mission/program/title spending was discontinued. No KPI processor
+       consumes PLRG, so `fetch_plrg_execution()` now raises
+       `NotImplementedError` with a clear message; the orchestrator's existing
+       `NotImplementedError → skipped` branch surfaces it cleanly (same
+       pattern as `compute_tax_expenditure`).
+    3. **`kpi_monthly` ODS dataset is wide-format.**
+       `situations-mensuelles-budgetaires-series-longues` no longer exposes a
+       long `(date, label, value)` shape. It's now one row per
+       **`ligne_d_information`** label (26 rows) with one column per month-end
+       named **`DD_MM_YYYY`** (e.g. `31_01_2024`, `29_02_2024`, …, `31_03_2026`).
+       Other id columns: `niveau_hierarchique`, `niveau_hierarchique_de_la_ligne`,
+       `categorie`, `sous_categorie`. Replaced the `DATE_FIELDS` / `LABEL_FIELDS`
+       / `VALUE_FIELDS` resolver with: detect date columns via
+       `re.compile(r"^\d{2}_\d{2}_\d{4}$")`, melt them, and parse `DD_MM_YYYY`
+       → `YYYY-MM`. Updated `LABEL_FIELD = "ligne_d_information"` and the
+       classifier substrings to match the dataset's actual line labels —
+       `REVENUE_TOTAL_KEYS = ["total recettes nettes du budget général"]` and
+       `SPENDING_TOTAL_KEYS = ["total dépenses nettes du budget général"]`
+       (was previously a list of variant spellings; only the exact label
+       appears in the data). Dropped `"tva"` from the TVA category keys because
+       the dataset uses the spelled-out form `"Taxe sur la valeur ajoutée"`
+       and `"tva"` would match nothing while inviting accidental false
+       positives if a future row mentions e.g. `"sous-TVA"`. Run verified end
+       to end: revenue / spending / balance series populate, YoY %s computed.
+    4. **`meta.json` now carries `latest_year` / `latest_month`.** New
+       `_extract_latest_period(output_path)` helper in `run_pipeline.py`
+       best-effort reads `data/output/<step_name>.json`, peeks at
+       `france[-1]["year"]` (and the payload-root `last_month` for the
+       monthly KPI), and merges those keys into the per-step status dict
+       inside `_run_step`. Wrapped in `try/except Exception: return {}` so
+       fetcher steps (no output JSON) and any malformed file leave the
+       existing `status` untouched — fail-soft contract preserved.
+  **Known data gap (out of 7d scope):** The base-2014 APU series in
+  `CNA-2014-DEP-APU` (used for `wage_bill_apu`, `social_benefits`,
+  `total_apu_expenditure`, `public_investment`, and all `cofog_gf*`) end at
+  **2020**, so `kpi_overhead_rate` / `kpi_friction_ratio` /
+  `kpi_productive_spend` / `kpi_pension_investment` stop at 2020 (visible in
+  `meta.json.sources.*.latest_year`). `gdp_nominal` is already on
+  `CNA-2020-PIB` per the Session 7a fix; the matching `CNA-2020-DEP-APU`
+  rebase for the COFOG / aggregate series is a separate follow-up.
 
 ---
 
