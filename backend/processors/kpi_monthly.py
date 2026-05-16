@@ -8,14 +8,14 @@ series for the most recent year, plus a year-on-year comparison.
 The values in that dataset are already cumulated from January 1 (PRD §5.6), so
 this processor only normalises and reshapes — it does not re-cumulate.
 
-The OpenDataSoft field names for this dataset are only confirmed at runtime.
-The candidate lists below cover the expected names; if none match,
-`_resolve_column` raises a detailed error listing the columns actually present
-(same pattern as the INSEE idBank resolver).
+The dataset is wide: one row per `ligne_d_information` (label), one column per
+month-end formatted `DD_MM_YYYY` (e.g. `31_01_2024`). We melt these into a
+long (month, label, value) frame before classification.
 """
 
 import json
 import logging
+import re
 
 import pandas as pd
 
@@ -23,32 +23,17 @@ from processors import latest_raw, now_iso, write_output
 
 log = logging.getLogger(__name__)
 
-# Candidate OpenDataSoft field names — verify on first live run and adjust if
-# _resolve_column raises "no column found".
-DATE_FIELDS = ["date", "mois", "periode", "date_mois", "annee_mois"]
-LABEL_FIELDS = ["libelle", "indicateur", "intitule", "libelle_poste", "poste"]
-VALUE_FIELDS = ["valeur", "montant", "value"]
+LABEL_FIELD = "ligne_d_information"
+_DATE_COL_RE = re.compile(r"^(\d{2})_(\d{2})_(\d{4})$")
 
 # Label substrings (case-insensitive) used to classify each row.
 REVENUE_CATEGORIES = {
-    "TVA": ["tva", "valeur ajout"],
+    "TVA": ["valeur ajout"],
     "IR": ["impot sur le revenu", "impôt sur le revenu"],
     "IS": ["impot sur les societes", "impôt sur les sociétés"],
 }
-REVENUE_TOTAL_KEYS = ["total des recettes", "recettes totales", "recettes nettes"]
-SPENDING_TOTAL_KEYS = ["total des depenses", "total des dépenses", "depenses nettes", "dépenses nettes"]
-
-
-def _resolve_column(columns: set, candidates: list[str], role: str) -> str:
-    """Return the first candidate present in `columns`, else raise a detailed error."""
-    for name in candidates:
-        if name in columns:
-            return name
-    raise RuntimeError(
-        f"Monthly execution: no '{role}' column found. Tried {candidates}; "
-        f"available columns: {sorted(columns)}. Update the *_FIELDS lists in "
-        f"processors/kpi_monthly.py to match the dataset."
-    )
+REVENUE_TOTAL_KEYS = ["total recettes nettes du budget général"]
+SPENDING_TOTAL_KEYS = ["total dépenses nettes du budget général"]
 
 
 def _matches(label, keys: list[str]) -> bool:
@@ -75,17 +60,27 @@ def compute_monthly_execution() -> dict:
     df = pd.DataFrame(records)
     if df.empty:
         raise ValueError(f"{raw_path} contains no records")
+    if LABEL_FIELD not in df.columns:
+        raise RuntimeError(
+            f"Monthly execution: expected label column '{LABEL_FIELD}'; "
+            f"available columns: {sorted(df.columns)}."
+        )
 
-    cols = set(df.columns)
-    date_col = _resolve_column(cols, DATE_FIELDS, "date")
-    label_col = _resolve_column(cols, LABEL_FIELDS, "label")
-    value_col = _resolve_column(cols, VALUE_FIELDS, "value")
+    date_cols = [c for c in df.columns if _DATE_COL_RE.match(c)]
+    if not date_cols:
+        raise RuntimeError(
+            "Monthly execution: no DD_MM_YYYY date columns found; "
+            f"available columns: {sorted(df.columns)}."
+        )
 
-    df = df[[date_col, label_col, value_col]].copy()
-    df.columns = ["month", "label", "value"]
-    df["month"] = df["month"].astype(str).str.slice(0, 7)  # YYYY-MM
-    df["value"] = pd.to_numeric(df["value"], errors="coerce")
-    df = df.dropna(subset=["value"])
+    long = df[[LABEL_FIELD, *date_cols]].melt(
+        id_vars=[LABEL_FIELD], var_name="raw_date", value_name="value"
+    )
+    long.columns = ["label", "raw_date", "value"]
+    parsed = long["raw_date"].str.extract(_DATE_COL_RE)
+    long["month"] = parsed[2] + "-" + parsed[1]  # YYYY-MM
+    long["value"] = pd.to_numeric(long["value"], errors="coerce")
+    df = long.dropna(subset=["value"]).copy()
     df["year"] = df["month"].str.slice(0, 4).astype(int)
 
     latest_year = int(df["year"].max())
