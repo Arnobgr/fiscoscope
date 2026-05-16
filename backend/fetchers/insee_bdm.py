@@ -1,5 +1,6 @@
 import json
 import logging
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +12,9 @@ from fetchers.insee_idbank_resolver import run_idbank_resolver
 
 log = logging.getLogger(__name__)
 BDM_BASE = "https://api.insee.fr/series/BDM/V1/data/SERIES_BDM"
+# BDM V1 returns SDMX 2.1 StructureSpecificData XML; the JSON variant was removed.
+# In that schema, <Series>/<Obs> are in the empty namespace — only message:*/ss:*
+# wrapper elements use prefixed namespaces.
 
 
 def load_idbanks() -> dict:
@@ -25,19 +29,19 @@ def load_idbanks() -> dict:
 def fetch_insee_series(idbanks: list[str], start_year: int = INSEE_START_YEAR) -> pd.DataFrame:
     """
     Fetch one or more BDM time series by idBank list (BDM API limit: 400 per call).
-    Saves the raw SDMX-JSON response, then returns a DataFrame with columns:
+    Parses the SDMX-XML response into [{idbank, date, value}] records, saves
+    those records as JSON, and returns a DataFrame with columns:
     idbank, date, value.
     """
     ids = "+".join(idbanks)
     url = f"{BDM_BASE}/{ids}"
-    params = {"startPeriod": str(start_year), "format": "sdmx-json"}
-    headers = {**DEFAULT_HEADERS, "Accept": "application/json"}
+    params = {"startPeriod": str(start_year)}
 
-    response = requests.get(url, params=params, headers=headers, timeout=60)
+    response = requests.get(url, params=params, headers=DEFAULT_HEADERS, timeout=60)
     response.raise_for_status()
-    raw = response.json()
-    save_raw("insee_bdm", raw)
-    return _parse_sdmx_json(raw, idbanks)
+    records = _parse_sdmx_xml(response.text)
+    save_raw("insee_bdm", records)
+    return pd.DataFrame(records)
 
 
 def fetch_all_insee_series() -> dict[str, pd.DataFrame]:
@@ -57,37 +61,40 @@ def fetch_all_insee_series() -> dict[str, pd.DataFrame]:
     }
 
 
-def _parse_sdmx_json(data: dict, requested_idbanks: list[str]) -> pd.DataFrame:
-    """Parse INSEE SDMX-JSON response into a flat DataFrame."""
-    try:
-        series_data = data["dataSets"][0]["series"]
-        structure = data["structure"]
-        time_periods = [
-            obs["id"]
-            for obs in structure["dimensions"]["observation"][0]["values"]
-        ]
-        idbank_values = [
-            v["id"]
-            for v in structure["dimensions"]["series"][0]["values"]
-        ]
-    except (KeyError, IndexError) as e:
-        raise ValueError(
-            f"Unexpected SDMX-JSON structure: {e}. Response keys: {list(data.keys())}"
-        )
-
+def _parse_sdmx_xml(xml_text: str) -> list[dict]:
+    """Parse SDMX 2.1 StructureSpecificData XML into [{idbank, date, value}]."""
+    root = ET.fromstring(xml_text)
     rows = []
-    for series_key, series_values in series_data.items():
-        series_idx = int(series_key.split(":")[0])
-        idbank = idbank_values[series_idx] if series_idx < len(idbank_values) else series_key
-        for obs_key, obs_values in series_values["observations"].items():
-            idx = int(obs_key)
+    for series in root.iter("Series"):
+        idbank = series.attrib.get("IDBANK")
+        if not idbank:
+            continue
+        for obs in series.iter("Obs"):
+            time_period = obs.attrib.get("TIME_PERIOD")
+            obs_value = obs.attrib.get("OBS_VALUE")
+            if time_period is None:
+                continue
             rows.append({
                 "idbank": idbank,
-                "date": time_periods[idx],
-                "value": float(obs_values[0]) if obs_values[0] is not None else None,
+                "date": time_period,
+                "value": float(obs_value) if obs_value not in (None, "") else None,
             })
+    return rows
 
-    return pd.DataFrame(rows)
+
+def _parse_sdmx_json(cached, requested_idbanks: list[str] | None = None) -> pd.DataFrame:
+    """
+    Build a DataFrame from the cached BDM payload. After the BDM JSON variant was
+    removed, the fetcher stores pre-parsed [{idbank, date, value}] records, so this
+    function just wraps them. Name preserved for backward compatibility with
+    processors/__init__.py::load_insee_series().
+    """
+    if isinstance(cached, list):
+        return pd.DataFrame(cached)
+    raise ValueError(
+        "Cached insee_bdm payload has unexpected shape "
+        f"({type(cached).__name__}); expected list of records."
+    )
 
 
 if __name__ == "__main__":
