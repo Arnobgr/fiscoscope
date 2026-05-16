@@ -50,12 +50,36 @@ def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _extract_latest_period(output_path: Path) -> dict:
+    """Best-effort: read the output JSON and pull the most recent year/month."""
+    try:
+        data = json.loads(output_path.read_text())
+        france = data.get("france") or data.get("data") or []
+        out = {}
+        if france:
+            last = france[-1]
+            if "year" in last:
+                out["latest_year"] = last["year"]
+            if "month" in last:
+                out["latest_month"] = last["month"]
+        # Monthly KPI carries last_month at the payload root, not in france[].
+        if "last_month" in data:
+            out["latest_month"] = data["last_month"]
+        if "year" in data and "latest_year" not in out:
+            out["latest_year"] = data["year"]
+        return out
+    except Exception:
+        return {}
+
+
 def _run_step(name: str, fn, sources: dict, *args, **kwargs) -> None:
     """Run one fetcher/processor and record its outcome in `sources`."""
     log.info(f"→ {name}")
     try:
         fn(*args, **kwargs)
-        sources[name] = {"last_fetched": _now(), "status": "ok"}
+        status = {"last_fetched": _now(), "status": "ok"}
+        status.update(_extract_latest_period(Path(OUTPUT_DATA_DIR) / f"{name}.json"))
+        sources[name] = status
     except NotImplementedError as e:
         log.warning(f"{name} skipped: {e}")
         sources[name] = {"last_fetched": _now(), "status": "skipped", "error": str(e)}
