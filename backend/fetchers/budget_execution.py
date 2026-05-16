@@ -1,10 +1,8 @@
 import logging
-from io import StringIO
 
 import pandas as pd
-import requests
 
-from fetchers import DEFAULT_HEADERS, fetch_ods_records, save_raw
+from fetchers import fetch_ods_records, save_raw
 
 log = logging.getLogger(__name__)
 BASE = "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets"
@@ -24,17 +22,20 @@ def fetch_monthly_execution() -> pd.DataFrame:
 
 def fetch_plrg_execution(year: int) -> pd.DataFrame:
     """
-    Fetch the annual final budget execution (PLRG) for a given year:
-    spending by mission, program, title, category.
+    Fetch the annual final budget execution (PLRG) for a given year.
+
+    As of Session 7d the ODS publishes only a PDF "notice explicative" under each
+    PLRG dataset (slug varies: `plrg-2024`, `projet-de-loi-...-plrg-2025`, …);
+    the CSV/Excel mission-program-title breakdown is no longer offered. Until a
+    tabular republish appears (or a PDF parser is written), raise
+    NotImplementedError so the orchestrator marks this step `skipped` — matching
+    the tax_expenditure convention. No KPI processor currently consumes PLRG.
     """
-    dataset_id = f"projet-de-loi-relatif-aux-resultats-de-la-gestion-{year}"
-    url = f"{BASE}/{dataset_id}/exports/csv"
-    log.info(f"Fetching PLRG execution: {dataset_id}")
-    response = requests.get(url, headers=DEFAULT_HEADERS, timeout=60)
-    response.raise_for_status()
-    df = pd.read_csv(StringIO(response.text), sep=";", encoding="utf-8")
-    save_raw(f"budget_plrg_{year}", df.to_dict(orient="records"))
-    return df
+    raise NotImplementedError(
+        f"PLRG {year} datasets on data.economie.gouv.fr now contain only a PDF "
+        "notice; the tabular export was discontinued. Re-enable when a CSV/Excel "
+        "resource reappears."
+    )
 
 
 if __name__ == "__main__":
