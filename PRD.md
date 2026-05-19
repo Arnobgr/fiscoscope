@@ -83,7 +83,7 @@ fisc-o-scope/
 │   │   ├── budget_execution.py       # data.economie.gouv.fr monthly execution
 │   │   ├── oecd.py                   # OECD Data Explorer SDMX API
 │   │   ├── urssaf.py                 # open.urssaf.fr OpenDataSoft API
-│   │   └── unedic.py                 # Unédic unemployment data
+│   │   └── france_travail.py        # France Travail unemployment data
 │   ├── processors/
 │   │   ├── __init__.py
 │   │   ├── cofog.py             # COFOG classification and spend bucketing
@@ -120,7 +120,7 @@ fisc-o-scope/
 ### 2.4 Scheduling
 
 The pipeline runs via a `systemd` timer on the VPS. Two schedules:
-- **Monthly** (1st of each month, 06:00): fetches budget execution, Urssaf, Unédic, CPI
+- **Monthly** (1st of each month, 06:00): fetches budget execution, Urssaf, France Travail, CPI
 - **Annual** (February 1st): fetches INSEE COFOG national accounts, OECD data, PLF annexes (published ~May, so a second annual run in June)
 
 ```ini
@@ -649,50 +649,49 @@ def fetch_urssaf_wage_bill() -> pd.DataFrame:
 
 ---
 
-### 3.5 data.gouv.fr — Unédic Unemployment Insurance
+### 3.5 data.gouv.fr — France Travail Unemployment Insurance
 
-**What it provides:** Monthly count of unemployment insurance recipients (allocataires), total indemnification cost, entries and exits. Useful as a social protection efficiency signal.
+**What it provides:** Monthly count of unemployment-insurance allocataires (indemnisés) broken down by allocation type. Useful as a social protection efficiency signal.
 
-**API:** CKAN REST API (data.gouv.fr catalog), then direct CSV download.
+**API:** data.gouv.fr REST API (resource resolution), then direct XLSX download from France Travail's statistics portal.
 
-**Dataset slug:** Search for "unedic allocataires" on data.gouv.fr to get the current dataset ID and resource URL. The resource URL changes occasionally — always resolve it programmatically.
+**Dataset:** `561fa8bbc751df54a1cdbb48` ("Allocataires de l'assurance chômage"). The resource is XLSX-only; the national sheet is `"Brut France"` with the header on row 5 and monthly data from 2006-01 onward.
 
 **How to fetch:**
 
 ```python
-DATAGOUV_API = "https://www.data.gouv.fr/api/1"
+import io
+import requests
+import pandas as pd
 
-def fetch_unedic_allocataires() -> pd.DataFrame:
+DATAGOUV_API = "https://www.data.gouv.fr/api/1"
+DATASET_ID = "561fa8bbc751df54a1cdbb48"
+NATIONAL_SHEET = "Brut France"
+HEADER_ROW = 5
+
+def fetch_france_travail_allocataires() -> pd.DataFrame:
     """
-    Fetch monthly Unédic unemployment insurance data from data.gouv.fr.
-    Resolves the current CSV resource URL dynamically via the catalog API.
+    Fetch the monthly France Travail national allocataires series.
+    Resolves the current XLSX resource URL via data.gouv.fr, then reads
+    the 'Brut France' sheet.
     """
-    # Search for the dataset
-    search_url = f"{DATAGOUV_API}/datasets/"
-    params = {"q": "unedic allocataires assurance chomage mensuel", "page_size": 5}
-    response = requests.get(search_url, params=params, timeout=30)
-    response.raise_for_status()
-    
-    datasets = response.json().get("data", [])
-    if not datasets:
-        raise ValueError("Unédic dataset not found on data.gouv.fr")
-    
-    # Get resources from the first matching dataset
-    dataset_id = datasets[0]["id"]
-    dataset_url = f"{DATAGOUV_API}/datasets/{dataset_id}/"
-    resources = requests.get(dataset_url, timeout=30).json().get("resources", [])
-    
-    # Find the CSV resource
-    csv_resource = next((r for r in resources if r["format"].lower() == "csv"), None)
-    if not csv_resource:
-        raise ValueError("No CSV resource found for Unédic dataset")
-    
-    csv_url = csv_resource["url"]
-    response = requests.get(csv_url, timeout=60)
-    response.raise_for_status()
-    
-    from io import StringIO
-    return pd.read_csv(StringIO(response.text), sep=";", encoding="utf-8")
+    meta = requests.get(f"{DATAGOUV_API}/datasets/{DATASET_ID}/", timeout=30).json()
+    xlsx = next(
+        (r for r in meta.get("resources", [])
+         if (r.get("format") or "").lower() in ("xlsx", "excel")
+         and "indem" in (r.get("url") or "").lower()
+         and "region" not in (r.get("title") or "").lower()),
+        None,
+    )
+    if not xlsx:
+        raise ValueError("No national XLSX resource found for France Travail dataset")
+
+    resp = requests.get(xlsx["url"], timeout=180, allow_redirects=True)
+    resp.raise_for_status()
+    df = pd.read_excel(io.BytesIO(resp.content), engine="openpyxl",
+                       sheet_name=NATIONAL_SHEET, header=HEADER_ROW)
+    df = df.rename(columns={df.columns[0]: "date"}).dropna(subset=["date"])
+    return df
 ```
 
 **Update frequency:** Monthly.
@@ -959,7 +958,7 @@ from fetchers.insee_bdm import fetch_all_insee_series
 from fetchers.budget_execution import fetch_monthly_execution, fetch_plrg_execution
 from fetchers.oecd import fetch_oecd_cofog, fetch_oecd_fiscal
 from fetchers.urssaf import fetch_urssaf_wage_bill
-from fetchers.unedic import fetch_unedic_allocataires
+from fetchers.france_travail import fetch_france_travail_allocataires
 from processors.kpi_overhead import compute_overhead_rate
 from processors.kpi_friction import compute_friction_ratio
 from processors.kpi_allocation import compute_productive_spend, compute_pension_investment
@@ -972,11 +971,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger(__name__)
 
 def run_monthly():
-    """Run monthly pipeline: budget execution, CPI, Urssaf, Unédic."""
+    """Run monthly pipeline: budget execution, CPI, Urssaf, France Travail."""
     log.info("Starting monthly pipeline run")
     fetch_monthly_execution()
     fetch_urssaf_wage_bill()
-    fetch_unedic_allocataires()
+    fetch_france_travail_allocataires()
     compute_monthly_execution()
     upload_all_outputs(prefix="monthly")
 
@@ -1155,7 +1154,7 @@ Written at the end of every pipeline run. The frontend uses this to display data
       "latest_quarter": "2025-Q4",
       "status": "ok"
     },
-    "unedic": {
+    "france_travail": {
       "last_fetched": "2026-05-01T06:06:44Z",
       "latest_month": "2026-02",
       "status": "ok"
