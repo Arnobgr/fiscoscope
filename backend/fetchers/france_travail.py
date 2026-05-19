@@ -9,8 +9,7 @@ from fetchers import DEFAULT_HEADERS, save_raw
 log = logging.getLogger(__name__)
 
 DATAGOUV_API = "https://www.data.gouv.fr/api/1"
-# "Allocataires de l'assurance chômage" — re-published by France Travail
-# (ex-Pôle Emploi / ex-Unédic) as XLSX-only.
+# "Allocataires de l'assurance chômage" — published by France Travail as XLSX-only.
 DATASET_ID = "561fa8bbc751df54a1cdbb48"
 # "Brut France" sheet = France métropolitaine et Dom, données brutes, total
 # indemnisés ventilés par allocation. Header is in row index 5 (0-indexed):
@@ -42,9 +41,9 @@ def _resolve_xlsx_url() -> str:
     return xlsx["url"]
 
 
-def fetch_unedic_allocataires() -> pd.DataFrame:
+def fetch_france_travail_allocataires() -> pd.DataFrame:
     """
-    Fetch the monthly France Travail (ex-Unédic) national allocataires series.
+    Fetch the monthly France Travail national allocataires series.
     Returns the wide 'Brut France' sheet: one row per month, one column per
     allocation type (~48 columns) with the first column 'date'.
     """
@@ -67,6 +66,6 @@ def fetch_unedic_allocataires() -> pd.DataFrame:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    df = fetch_unedic_allocataires()
+    df = fetch_france_travail_allocataires()
     print(f"\nFrance Travail allocataires: {len(df)} rows, {df.shape[1]} columns")
     print(df.head())

@@ -1,7 +1,7 @@
 """fisc-o-scope pipeline entry point — see PRD §6.
 
 Modes:
-  monthly  — budget execution + Urssaf + Unédic, then the monthly KPI.
+  monthly  — budget execution + Urssaf + France Travail, then the monthly KPI.
   annual   — INSEE idBank resolver, all INSEE/OECD/PLRG fetches, then every
              annual KPI processor.
   full     — annual then monthly. Used for initial setup.
@@ -30,7 +30,7 @@ from fetchers.budget_execution import fetch_monthly_execution, fetch_plrg_execut
 from fetchers.insee_bdm import fetch_all_insee_series
 from fetchers.insee_idbank_resolver import run_idbank_resolver
 from fetchers.oecd import fetch_oecd_cofog, fetch_oecd_fiscal
-from fetchers.unedic import fetch_unedic_allocataires
+from fetchers.france_travail import fetch_france_travail_allocataires
 from fetchers.urssaf import fetch_urssaf_wage_bill
 from processors.kpi_allocation import compute_pension_investment, compute_productive_spend
 from processors.kpi_friction import compute_friction_ratio
@@ -110,7 +110,7 @@ def run_monthly(sources: dict) -> None:
     log.info("=== monthly pipeline ===")
     _run_step("budget_execution", fetch_monthly_execution, sources)
     _run_step("urssaf", fetch_urssaf_wage_bill, sources)
-    _run_step("unedic", fetch_unedic_allocataires, sources)
+    _run_step("france_travail", fetch_france_travail_allocataires, sources)
     _run_step("kpi_monthly_execution", compute_monthly_execution, sources)
 
 

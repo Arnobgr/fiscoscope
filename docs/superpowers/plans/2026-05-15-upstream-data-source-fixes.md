@@ -455,14 +455,13 @@ observed.
 
 ---
 
-## Session 7c — France Travail (formerly Unédic): switch to Excel reader
+## Session 7c — France Travail: switch to Excel reader
 
 ### Background
 
-The `unedic` fetcher fails because:
-1. The dataset has been re-published by **France Travail** (rebranded Pôle
-   Emploi); its title no longer contains the word "unédic", so the
-   keyword search returns 0 results.
+The assurance-chômage fetcher fails because:
+1. The dataset is published by **France Travail**; its title no longer
+   matches the previous keyword search, so the search returns 0 results.
 2. The dataset (`561fa8bbc751df54a1cdbb48`) now publishes **Excel only**
    (`format = excel`), no CSV resource. The download URL itself is a
    redirect to a France Travail statistics portal.
@@ -476,9 +475,7 @@ We still need: monthly count of unemployment-insurance allocataires (or
 indemnisés), national, time series.
 
 ### Files
-- Modify: `backend/fetchers/unedic.py` (rename module to `france_travail.py`
-  is tempting but defer — keep filename for surgical scope; rename the
-  public function instead.)
+- Modify: `backend/fetchers/france_travail.py`
 - Modify: `backend/requirements.txt` — add `openpyxl`.
 
 ### Step 1: Pin and install openpyxl
@@ -543,7 +540,7 @@ total of allocataires** (likely a sheet named like "Allocataires" or
 "France entière"). Note the header row offset (sometimes data starts at
 row 5+).
 
-### Step 3: Rewrite `fetch_unedic_allocataires`
+### Step 3: Rewrite `fetch_france_travail_allocataires`
 
 Replace the function with one that:
 1. Resolves the dataset's Excel resource via the data.gouv.fr API (still
@@ -554,7 +551,7 @@ Replace the function with one that:
    sheet_name=<NAME>, header=<ROW>)` using the offsets found in Step 2.
 4. Returns a flat DataFrame with columns `date`, `value` (or whatever the
    downstream processor expects — check `processors/kpi_*.py` if any uses
-   `unedic` data; if none, this is unblocked detail).
+   this data; if none, this is unblocked detail).
 
 ```python
 import io
@@ -566,9 +563,9 @@ from fetchers import DEFAULT_HEADERS, save_raw
 DATAGOUV_API = "https://www.data.gouv.fr/api/1"
 DATASET_ID = "561fa8bbc751df54a1cdbb48"  # Allocataires de l'assurance chômage
 
-def fetch_unedic_allocataires() -> pd.DataFrame:
+def fetch_france_travail_allocataires() -> pd.DataFrame:
     """
-    Fetch the monthly France Travail (ex-Unédic) allocataires series.
+    Fetch the monthly France Travail allocataires series.
     The published resource is an XLSX hosted on statistiques.francetravail.org.
     """
     meta = requests.get(
@@ -604,7 +601,7 @@ def fetch_unedic_allocataires() -> pd.DataFrame:
 ```bash
 cd backend
 source .venv/bin/activate
-python -m fetchers.unedic
+python -m fetchers.france_travail
 ```
 
 Expected: non-empty DataFrame, raw file written.
@@ -612,15 +609,15 @@ Expected: non-empty DataFrame, raw file written.
 ### Step 5: Commit
 
 ```bash
-git add backend/fetchers/unedic.py backend/requirements.txt
+git add backend/fetchers/france_travail.py backend/requirements.txt
 git commit -m "$(cat <<'EOF'
-Session 7c — Unédic: switch to France Travail XLSX
+Session 7c — France Travail: switch to XLSX
 
 Dataset 561fa8bbc751df54a1cdbb48 ('Allocataires de l'assurance chômage')
-is now published by France Travail in XLSX form only — the keyword
-'unedic' no longer appears in the title. Replace the search-based
-resource resolution with a direct dataset-ID lookup, add openpyxl
-dependency, and parse the national XLSX sheet.
+is now published by France Travail in XLSX form only and no longer
+matches the previous keyword search. Replace the search-based resource
+resolution with a direct dataset-ID lookup, add openpyxl dependency,
+and parse the national XLSX sheet.
 EOF
 )"
 ```

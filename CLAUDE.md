@@ -58,7 +58,7 @@ french-efficiency-dashboard/
 │   │   ├── budget_execution.py        # data.economie.gouv.fr monthly execution
 │   │   ├── oecd.py                    # OECD Data Explorer SDMX API
 │   │   ├── urssaf.py                  # open.urssaf.fr private wage bill
-│   │   └── unedic.py                  # data.gouv.fr Unédic unemployment
+│   │   └── france_travail.py          # data.gouv.fr France Travail unemployment
 │   ├── processors/
 │   │   ├── cofog.py                   # COFOG bucketing (productive/redis./admin.)
 │   │   ├── kpi_overhead.py            # Administrative Overhead Rate
@@ -92,7 +92,7 @@ section below, then commit.
 |---|-------|-----------|--------|
 | 1 | Scaffolding — structure, config, stubs, CLAUDE.md | `config.py`, `requirements.txt`, `.gitignore`, all stubs | ✅ done |
 | 2 | INSEE idBank resolver | `fetchers/insee_idbank_resolver.py` | ✅ done |
-| 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `unedic.py` | ✅ done |
+| 3 | All fetchers | `insee_bdm.py`, `budget_execution.py`, `oecd.py`, `urssaf.py`, `france_travail.py` | ✅ done |
 | 4 | Allocation & overhead KPIs | `processors/cofog.py`, `kpi_overhead.py`, `kpi_allocation.py` | ✅ done |
 | 5 | Remaining KPIs | `kpi_friction.py`, `kpi_monthly.py`, `kpi_sustainability.py`, `kpi_outcomes.py` | ✅ done |
 | 6 | Orchestration + publisher | `run_pipeline.py`, `publishers/r2_upload.py` | ✅ done |
@@ -221,7 +221,7 @@ Runtime discoveries below.
   with `peers: {}` and omits debt; `kpi_outcomes` emits a well-formed placeholder
   (`france: []`, `peers: {}`) since its outcome side (life expectancy, PISA) is entirely
   OECD-sourced — both to be wired up in Session 7. (3) *Tax Expenditure* (§5.8) has no
-  fetcher module (the five fetchers are INSEE/budget/OECD/urssaf/unedic); per the user,
+  fetcher module (the five fetchers are INSEE/budget/OECD/urssaf/france_travail); per the user,
   `compute_tax_expenditure()` raises `NotImplementedError` until a PLF "dépenses fiscales"
   fetcher (PRD §3.6) is built — `run_pipeline.py` must account for this gap in Session 6.
   **kpi_monthly** reshapes the cached `budget_execution` ODS dataset; its OpenDataSoft
@@ -262,9 +262,9 @@ Runtime discoveries below.
   (`FREQ`→`PERIODICITE`, `SECT_INST`→`SECT-INST`, `COFOG`→`FONCTION`). (2) **OECD**
   `DSD_GOV_COFOG@DF_GOV_COFOG_2025` and `DSD_GOV_TRANSACTION@DF_GOV_TRANSACTION_2025`
   now require 8 key dimensions instead of 5 (`422 Not enough key values in query`);
-  the endpoint is reachable, only the filter string needs rebuilding. (3) **Unédic**
-  data is now hosted by **France Travail** (id `561fa8bbc751df54a1cdbb48`); the search
-  query "unedic" no longer matches and resources are **XLSX only**, no CSV. (4) `urssaf`
+  the endpoint is reachable, only the filter string needs rebuilding. (3) **France Travail**
+  assurance-chômage dataset (id `561fa8bbc751df54a1cdbb48`) no longer matches the
+  old keyword query and resources are **XLSX only**, no CSV. (4) `urssaf`
   and `budget_execution` work as-is (verified: 116 Urssaf rows; budget data through
   03/2026). **This session's prep work**: centralized a generic Firefox UA in
   `fetchers/__init__.py` (`DEFAULT_HEADERS`) and threaded it through every `requests.get`
@@ -331,10 +331,10 @@ Runtime discoveries below.
 
 ---
 
-- **Session 7c — Unédic fetcher repointed at France Travail XLSX.** Dataset
+- **Session 7c — France Travail fetcher: switched to XLSX reader.** Dataset
   `561fa8bbc751df54a1cdbb48` ("Allocataires de l'assurance chômage") is now
-  XLSX-only and its title no longer contains "unedic", so the old keyword
-  search returns nothing. Resolver now hits the data.gouv.fr dataset endpoint
+  XLSX-only and its title no longer contains the old keyword, so the
+  prior search-based resolver returns nothing. Resolver now hits the data.gouv.fr dataset endpoint
   directly and picks the national XLSX resource (`format=excel`, URL
   contains `indem`, title without `region`). The published URL
   (`https://statistiques.francetravail.org/indem/teleindemalloc`) redirects
@@ -350,7 +350,7 @@ Runtime discoveries below.
   48 individual allocation columns** (header offset = 5, 0-indexed). Data
   starts row 6 and runs monthly from 2006-01 through the most recent month
   (verified: 240 rows × 49 cols). The sheet exposes **`indemnisés` per
-  allocation**, not `allocataires` in the strict Unédic sense; it includes
+  allocation**, not `allocataires` in the strict sense; it includes
   a final **`Total (1+2+3)`** column that aggregates all allocations and
   is the right column to read for the headline national indemnisés count.
   The fetcher returns the full wide DataFrame (no aggregation) so future
