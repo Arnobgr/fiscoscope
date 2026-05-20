@@ -100,216 +100,67 @@ section below, then commit.
 
 ---
 
-## Session 2 brief — INSEE idBank resolver
-
-**Goal:** `fetchers/insee_idbank_resolver.py` downloads
-`correspondance_idbank_dimension.csv` from INSEE, filters it using
-`SERIES_SEARCH_RULES`, writes `data/raw/insee_idbanks.json`, and raises a
-detailed error for any unresolved or ambiguous series.
-
-**Verification:** Run `python -m fetchers.insee_idbank_resolver` from `backend/`
-and confirm all ~27 logical series names resolve to 9-digit idBanks with no
-errors.
-
-**Watch out for:**
-- Column names in the CSV are only confirmed at runtime (log them on first run).
-  Common names: `IDBANK`, `OPERATION`, `SECT_INST`, `COFOG`, `FREQ`, `UNITE`.
-- The file uses `;` or `,` as separator — the loader tries both.
-- OECD dataset IDs reference the 2025 edition; update when a new edition ships.
-
----
-
-## Session 3 brief — Fetchers
-
-**Goal:** Implement all five fetcher modules. Each must:
-1. Call its API with appropriate pagination/batching.
-2. Save the raw response to `data/raw/{source}_{YYYY-MM-DD}.json` before returning.
-3. Return a clean `pd.DataFrame`.
-4. Handle rate limits (OECD: 20 req/min — add `time.sleep(3)` between calls).
-
-**Verification:** Run each fetcher's `if __name__ == "__main__"` block standalone
-and confirm a non-empty DataFrame is returned and the raw file is written.
-
----
-
-## Session 4 brief — Allocation & overhead KPIs
-
-**Goal:** Implement `cofog.py` (bucket helper), `kpi_overhead.py`, and
-`kpi_allocation.py`. Each processor must:
-1. Read from `data/raw/` (never re-fetch).
-2. Write a JSON file to `data/output/` matching the schema in PRD §5.1.
-3. Be deterministic (same raw data → same output, always).
-
-**Verification:** Run each processor standalone, open its output JSON, and
-confirm structure matches PRD §5.1 schema.
-
----
-
-## Session 5 brief — Remaining KPIs
-
-Same contract as Session 4 for `kpi_friction.py`, `kpi_monthly.py`,
-`kpi_sustainability.py`, `kpi_outcomes.py`.
-
-Note: PISA data is triennial — interpolate linearly between survey years and
-mark interpolated values with `"interpolated": true` in the data points.
-
----
-
-## Session 6 brief — Orchestration + publisher
-
-**Goal:** Implement `run_pipeline.py` (modes: monthly, annual, full) and
-`publishers/r2_upload.py`. After all outputs are written, also write
-`data/output/meta.json` (see PRD §9 for schema).
-
-**Verification:** Run `python run_pipeline.py --mode full` with real R2
-credentials and confirm all JSON files appear in the bucket and are valid JSON.
-
----
-
-## Session 7 brief — Integration test
-
-Run the full pipeline against live APIs. Fix any API surprises (changed column
-names, SDMX structure changes, pagination edge cases). Document all findings in
-Runtime discoveries below.
-
----
-
 ## Runtime discoveries
 
 > Fill this in as sessions progress. These notes persist across sessions.
+> Per-session task briefs for the completed Sessions 1–7 were removed once
+> their work shipped; the durable outcomes are recorded below. Original briefs
+> remain in git history if ever needed.
 
-- **Session 2 — INSEE CDN blocks datacenter IPs.** Both `www.insee.fr` and `api.insee.fr`
-  return `403 x-deny-reason: host_not_allowed` from cloud/VPS environments.
-  The resolver code is correct; live verification of idBank resolution must be run from a
-  residential IP or a French/EU VPS. The `download_mapping()` function already includes a
-  `User-Agent` header; if the block persists on the target VPS, try adding a `Referer:
-  https://www.insee.fr` header or downloading the mapping CSV manually once and placing it
-  at `data/raw/insee_idbank_mapping.csv` (the resolver will use the cache and skip the
-  download for up to 30 days).
+- **Sessions 2–3 — datacenter IP block (OBSOLETE).** INSEE/OECD/data.gouv.fr/
+  data.economie.gouv.fr/open.urssaf.fr originally `403`'d from this VPS. The block
+  was lifted before Session 7 (see Session 7 prep); ignore unless 403s return.
 
-- **Session 3 — all five data sources block datacenter IPs.** Standalone runs of every
-  fetcher returned `403 Forbidden` from this environment: OECD (`sdmx.oecd.org`),
-  `data.economie.gouv.fr`, `open.urssaf.fr`, and `data.gouv.fr` — same pattern as INSEE.
-  The fetcher code is implemented and its offline paths (`_parse_sdmx_json`, `save_raw`,
-  `fetch_ods_records` pagination) are verified, but live verification of all fetchers must
-  run from a residential or French/EU IP. Shared helpers `save_raw` and `fetch_ods_records`
-  live in `fetchers/__init__.py`. `fetch_all_insee_series` fetches all ~27 idBanks in one
-  BDM call (well under the 400-idBank API limit).
+- **Session 4 — processor helpers (still current).** `processors/__init__.py` holds the
+  shared helpers: `load_insee_series()` (rebuilds logical_name → DataFrame from the latest
+  `data/raw/insee_bdm_*.json` + `insee_idbanks.json`), plus `annual_values`, `build_latest`,
+  `write_output`, `now_iso`, `to_year`, `latest_raw`. `cofog.py` holds the COFOG bucketing
+  (its API changed in Session 8 — see there). Processors read the raw cache only, never
+  re-fetch, and are deterministic. `requirements.txt` lists `pandas` (runtime dep).
 
-- **Session 4 — processors read raw cache, never re-fetch.** Shared helpers live in
-  `processors/__init__.py`: `load_insee_series()` rebuilds the logical_name → DataFrame
-  mapping from the latest `data/raw/insee_bdm_*.json` plus `insee_idbanks.json` (reuses
-  `_parse_sdmx_json` from the fetcher); `annual_values`, `build_latest`, `write_output`,
-  `now_iso`, `to_year`, `latest_raw` round it out. `cofog.py` exposes `bucket_cofog()`
-  (sums GF01–GF10 into the three buckets per year) and `base_break_note()` (flags the
-  2020 base change when the year range spans it). All three KPI processors verified
-  deterministic against a synthetic SDMX fixture. **Peer comparison deferred:** per the
-  user's call, the Administrative Overhead Rate emits `peers: {}` for now — OECD peer
-  series will be wired up in Session 7 when live OECD column layouts are inspectable.
-  The Productive Spend and Pension/Investment KPIs are France-only by design (PRD names
-  no peer source). `requirements.txt` lists `pandas` — processors need it at runtime.
+- **Session 5 — Friction Ratio denominator decision (still the live methodology).** PRD §5.3
+  names "total taxes collected" but no tax-revenue series is resolved, so total revenue is
+  derived as `total_apu_expenditure + fiscal_balance (B9)`; friction spend is the
+  administrative COFOG bucket (GF01+GF02+GF03), debt interest left inside GF01 (not added
+  again). France-only. (Other Session 5 notes — tax-expenditure, kpi_monthly, outcomes,
+  sustainability — are superseded by Sessions 7d/8/9/10.)
+
+- **Session 6 — orchestrator is fail-soft (still current).** Every fetcher/processor runs
+  inside `_run_step`, which records `status: ok | skipped | error` (with the exception
+  message) into `meta.json.sources` and never re-raises — one outage can't abort the run,
+  and `NotImplementedError` lands as `skipped`. `run_pipeline.py` has a `--no-upload` flag
+  and calls `load_dotenv()` from the repo-root `.env` *before* importing `config`.
+  `publishers/r2_upload.py` validates all four R2 env vars upfront and raises one
+  `RuntimeError` listing any missing names.
 
 ---
 
-- **Session 5 — three PRD/data mismatches resolved with the user.** (1) *Friction Ratio*:
-  PRD §5.3 names "total taxes collected" as the denominator, but no tax-revenue series is
-  resolved in the INSEE idBanks. Per the user's call, total revenue is derived as
-  `total_apu_expenditure + fiscal_balance (B9)`; friction spend is the administrative COFOG
-  bucket (GF01+GF02+GF03), with debt interest left inside GF01 rather than added again.
-  France-only. (2) *kpi_sustainability* and *kpi_outcomes* are OECD-heavy — same deferral as
-  Session 4's overhead peers. `kpi_sustainability` emits the France deficit series (B9/GDP)
-  with `peers: {}` and omits debt; `kpi_outcomes` emits a well-formed placeholder
-  (`france: []`, `peers: {}`) since its outcome side (life expectancy, PISA) is entirely
-  OECD-sourced — both to be wired up in Session 7. (3) *Tax Expenditure* (§5.8) has no
-  fetcher module (the five fetchers are INSEE/budget/OECD/urssaf/france_travail); per the user,
-  `compute_tax_expenditure()` raises `NotImplementedError` until a PLF "dépenses fiscales"
-  fetcher (PRD §3.6) is built — `run_pipeline.py` must account for this gap in Session 6.
-  **kpi_monthly** reshapes the cached `budget_execution` ODS dataset; its OpenDataSoft
-  field names are only confirmed at runtime, so `_resolve_column` raises a detailed,
-  resolver-style error listing the actual columns if the candidate `*_FIELDS` lists don't
-  match — adjust them on the first live run. All four processors verified deterministic
-  against synthetic SDMX + budget-execution fixtures.
-
----
-
-- **Session 6 — orchestrator is fail-soft; one outage doesn't abort the run.** Each
-  fetcher and processor runs inside `_run_step`, which records `status: ok | skipped |
-  error` (with the exception message) into the `meta.json` `sources` block but never
-  re-raises. `kpi_tax_expenditure` therefore lands as `skipped` rather than crashing the
-  pipeline (Session 5 gap). `run_pipeline.py` adds a `--no-upload` flag for local dry runs
-  and calls `load_dotenv()` from the repo-root `.env` *before* importing `config`, so R2
-  credentials are picked up at config-load time. `publishers/r2_upload.py` validates all
-  four R2 env vars upfront and raises a single `RuntimeError` listing the missing names —
-  no boto3 stack trace if `.env` is empty. Verified end-to-end with `python run_pipeline.py
-  --mode full --no-upload`: from this datacenter IP every live source 403s (expected per
-  Sessions 2/3), `compute_outcomes` writes its placeholder, and `meta.json` is well-formed
-  with all 16 steps recorded. **`meta.json` schema deviates slightly from PRD §9**: it
-  reports `status` per step (one entry per fetcher *and* per processor) rather than per
-  data source only, and omits `latest_year`/`latest_month` extraction. The richer
-  per-step status was more useful while every source is still 403'ing; revisit in
-  Session 7 once live runs make `latest_year` cheap to compute.
-
----
-
-- **Session 7 prep (2026-05-15) — IP block lifted on this VPS; four upstream breakages
-  found, split into follow-up sessions.** Datacenter `403`s are gone from every host
-  (INSEE, OECD, data.gouv.fr, data.economie.gouv.fr, open.urssaf.fr), so the original
-  Session 2/3 blockers no longer apply. Standalone re-runs surfaced four real upstream
-  changes between the prior sessions and today: (1) **INSEE** migrated the idBank
-  mapping from a flat CSV to a monthly ZIP (`YYYYMM_correspondance_idbank_dimension.zip`)
-  whose CSV has 4 columns (`famille,idbank,list_mod,list_var`) with dimensions packed
-  positionally into `list_mod` and names in `list_var`; dimension names also changed
-  (`FREQ`→`PERIODICITE`, `SECT_INST`→`SECT-INST`, `COFOG`→`FONCTION`). (2) **OECD**
-  `DSD_GOV_COFOG@DF_GOV_COFOG_2025` and `DSD_GOV_TRANSACTION@DF_GOV_TRANSACTION_2025`
-  now require 8 key dimensions instead of 5 (`422 Not enough key values in query`);
-  the endpoint is reachable, only the filter string needs rebuilding. (3) **France Travail**
-  assurance-chômage dataset (id `561fa8bbc751df54a1cdbb48`) no longer matches the
-  old keyword query and resources are **XLSX only**, no CSV. (4) `urssaf`
-  and `budget_execution` work as-is (verified: 116 Urssaf rows; budget data through
-  03/2026). **This session's prep work**: centralized a generic Firefox UA in
-  `fetchers/__init__.py` (`DEFAULT_HEADERS`) and threaded it through every `requests.get`
-  call (replacing the custom `fisc-o-scope/1.0` UA, which is more fingerprintable);
-  pinned `requirements.txt` to exact versions ≥ 1 week old
-  (`requests==2.33.1`, `pandas==2.3.3`, `boto3==1.43.6`, `python-dotenv==1.2.2`);
-  cached the INSEE ZIP + extracted CSV at `data/raw/insee_idbank_mapping.{zip,csv}`
-  so Session 7a can develop offline. **Plan for sessions 7a–7d** lives in
+- **Session 7 prep (2026-05-15) — IP block lifted; durable prep work.** The datacenter
+  `403`s are gone from every host. Four upstream breakages found here were all fixed in
+  Sessions 7a–7d (INSEE ZIP/positional schema → 7a; OECD 8-dim DSDs → 7b; France Travail
+  XLSX → 7c; INSEE BDM XML + budget/monthly → 7d). Still-live prep: a generic Firefox UA
+  in `fetchers/__init__.py` (`DEFAULT_HEADERS`) threaded through every `requests.get`;
+  `requirements.txt` pinned to exact versions (`requests==2.33.1`, `pandas==2.3.3`,
+  `boto3==1.43.6`, `python-dotenv==1.2.2`). Plan for 7a–7d:
   `docs/superpowers/plans/2026-05-15-upstream-data-source-fixes.md`.
 
 ---
 
-- **Session 7a — INSEE resolver ported to the new ZIP / positional schema.** The new
-  mapping CSV has only 4 columns (`famille`, `idbank`, `list_mod`, `list_var`); every
-  dimension is decoded by zipping `list_var.split('.')` with `list_mod.split('.')` per
-  row. `download_mapping()` now scrapes
-  `https://www.insee.fr/fr/information/2862759` for the latest
-  `*_correspondance_idbank_dimension.zip` link and extracts the CSV from the ZIP.
-  **Final SERIES_SEARCH_RULES surprises** (worth flagging because they're not derivable
-  from the dimension-rename table alone):
-    1. The `DEP-APU` family has **no `B9` or `D41` OPERATION** — only aggregate codes
-       (`D1, D3, D4, D6M, D7, D9, OTE, P2, P5K2, D2951, SO`). `fiscal_balance` and
-       `debt_interest` are resolved against `famille = "CNA-2014-CSI"` (sector accounts
-       satellite) using `OPERATION=B9NF` / `D41` with `COMPTE=EA` (employments) — not
-       `DEP-APU`.
-    2. `FONCTION` accepts a synthetic value **`FONTOTAL`** that aggregates over all
-       COFOG functions; APU-wide totals (D1, P5K2, D6M, OTE, …) need `FONCTION=FONTOTAL`
-       to match a single row, not an empty/`SO` value.
-    3. PRD's `OPERATION=P51` (gross fixed capital formation) appears in `DEP-APU` as
-       **`P5K2`** (P5 + K2 aggregate); `OPERATION=P51` only exists in CNT-quarterly
-       families. We map `public_investment → P5K2` from `CNA-2014-DEP-APU`.
-    4. PRD's `social_benefits ≡ D62` is mapped to **`D6M`** in `CNA-2014-DEP-APU`
-       (D6M = social benefits in cash + in-kind via market producers, the DEP-APU
-       aggregate). A pure-D62 alternative is available from `CNA-2014-CSI` if a future
-       processor needs the strict ESA D.62 series.
-    5. `gdp_nominal` uses `famille = "CNA-2020-PIB"` (newest active base; CNA-2014-PIB
-       has `SERIE_ARRETEE=TRUE`) with `PRIX_REF=VAL`, `NATURE=VALEUR_ABSOLUE`,
-       `UNITE=EUROS_COURANTS`.
-    6. `cpi` lives in `famille = "IPC-2025"`. It has no `OPERATION` dimension — match
-       on `INDICATEUR=IPC`, `COICOP2018=00`, `PRIX_CONSO=00`, `NATURE=INDICE`,
-       `MENAGES_IPC=ENSEMBLE`, `ZONE_GEO=FE`, `CORRECTION=BRUT`, `PERIODICITE=M`.
-  All 19 logical series resolve to a single 9-digit idBank; `insee_idbanks.json` written
-  successfully from the cached ZIP. Live-fetch path (metadata scrape + ZIP download)
-  unverified in this session because the cache was warm — first scheduled refresh in
-  ≤30 days will exercise it.
+- **Session 7a — INSEE resolver ported to the new ZIP / positional schema (still current).**
+  The mapping CSV has only 4 columns (`famille`, `idbank`, `list_mod`, `list_var`); every
+  dimension is decoded by zipping `list_var.split('.')` with `list_mod.split('.')` per row.
+  `download_mapping()` scrapes `https://www.insee.fr/fr/information/2862759` for the latest
+  `*_correspondance_idbank_dimension.zip` link and extracts the CSV. Dimension names
+  changed from the old flat CSV (`FREQ`→`PERIODICITE`, `SECT_INST`→`SECT-INST`,
+  `COFOG`→`FONCTION`). Two resolver rules set here are **still live** (the rest — the APU
+  aggregates D1/OTE/P5K2/D62/B9NF/D41 — were re-pointed to CNT-2020-CSI in Session 8):
+    - `gdp_nominal`: `famille=CNA-2020-PIB`, `PRIX_REF=VAL`, `NATURE=VALEUR_ABSOLUE`,
+      `UNITE=EUROS_COURANTS` (CNA-2014-PIB is `SERIE_ARRETEE=TRUE`).
+    - `cpi`: `famille=IPC-2025`, no `OPERATION` dim — match `INDICATEUR=IPC`,
+      `COICOP2018=00`, `PRIX_CONSO=00`, `NATURE=INDICE`, `MENAGES_IPC=ENSEMBLE`,
+      `ZONE_GEO=FE`, `CORRECTION=BRUT`, `PERIODICITE=M`.
+  COFOG `cofog_gf01..gf10` stay on `CNA-2014-DEP-APU` (`FONCTION=FON01..FON10`,
+  `OPERATION=OTE`, `SECT-INST=S13`) — frozen at 2020, stitched with OECD in Session 8.
 
 ---
 
@@ -413,14 +264,7 @@ Runtime discoveries below.
        inside `_run_step`. Wrapped in `try/except Exception: return {}` so
        fetcher steps (no output JSON) and any malformed file leave the
        existing `status` untouched — fail-soft contract preserved.
-  **Known data gap (out of 7d scope):** The base-2014 APU series in
-  `CNA-2014-DEP-APU` (used for `wage_bill_apu`, `social_benefits`,
-  `total_apu_expenditure`, `public_investment`, and all `cofog_gf*`) end at
-  **2020**, so `kpi_overhead_rate` / `kpi_friction_ratio` /
-  `kpi_productive_spend` / `kpi_pension_investment` stop at 2020 (visible in
-  `meta.json.sources.*.latest_year`). `gdp_nominal` is already on
-  `CNA-2020-PIB` per the Session 7a fix; the matching `CNA-2020-DEP-APU`
-  rebase for the COFOG / aggregate series is a separate follow-up.
+  (The 7d "base-2014 stops at 2020" data gap was resolved in Session 8.)
 
 ---
 
