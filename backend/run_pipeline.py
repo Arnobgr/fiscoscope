@@ -29,7 +29,11 @@ from config import OUTPUT_DATA_DIR
 from fetchers.budget_execution import fetch_monthly_execution, fetch_plrg_execution
 from fetchers.insee_bdm import fetch_all_insee_series
 from fetchers.insee_idbank_resolver import run_idbank_resolver
-from fetchers.oecd import fetch_oecd_cofog, fetch_oecd_fiscal
+from fetchers.oecd import (
+    fetch_oecd_cofog,
+    fetch_oecd_fiscal,
+    fetch_oecd_life_expectancy,
+)
 from fetchers.france_travail import fetch_france_travail_allocataires
 from fetchers.urssaf import fetch_urssaf_wage_bill
 from processors.kpi_allocation import compute_pension_investment, compute_productive_spend
@@ -121,6 +125,7 @@ def run_annual(sources: dict) -> None:
     _run_step("insee_bdm", fetch_all_insee_series, sources)
     _run_step("oecd_cofog", fetch_oecd_cofog, sources)
     _run_step("oecd_fiscal", fetch_oecd_fiscal, sources)
+    _run_step("oecd_life_expectancy", fetch_oecd_life_expectancy, sources)
     _run_step(
         "budget_plrg", fetch_plrg_execution, sources, datetime.now().year - 1
     )
