@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -55,13 +56,37 @@ def load_insee_series() -> dict[str, pd.DataFrame]:
     }
 
 
+_ANNUAL_DATE_RE = re.compile(r"^\d{4}$")
+_QUARTERLY_DATE_RE = re.compile(r"^\d{4}-Q[1-4]$")
+
+
 def annual_values(df: pd.DataFrame) -> dict[int, float]:
-    """Collapse a (date, value) DataFrame to a {year: value} dict, dropping nulls."""
-    return {
-        to_year(row.date): float(row.value)
-        for row in df.itertuples()
-        if pd.notna(row.value)
-    }
+    """
+    Collapse a (date, value) DataFrame to a {year: value} dict, dropping nulls.
+
+    Accepts two BDM period formats:
+      - Annual ('YYYY'): one observation per year, passed through.
+      - Quarterly ('YYYY-QN'): 4 observations per year summed into the annual
+        total; years with fewer than 4 quarters are dropped.
+
+    Raises ValueError for unrecognized period formats (e.g. monthly 'YYYY-MM').
+    """
+    tmp = df.dropna(subset=["value"])
+    if tmp.empty:
+        return {}
+    dates = tmp["date"].astype(str)
+    if dates.str.match(_ANNUAL_DATE_RE).all():
+        return {to_year(d): float(v) for d, v in zip(tmp["date"], tmp["value"])}
+    if dates.str.match(_QUARTERLY_DATE_RE).all():
+        tmp = tmp.assign(year=dates.map(to_year))
+        counts = tmp.groupby("year").size()
+        complete = counts[counts == 4].index
+        agg = tmp[tmp["year"].isin(complete)].groupby("year")["value"].sum()
+        return {int(y): float(v) for y, v in agg.items()}
+    raise ValueError(
+        f"annual_values: unrecognized date format. Sample dates: "
+        f"{sorted(set(dates))[:3]}. Expected 'YYYY' or 'YYYY-QN'."
+    )
 
 
 def build_latest(france: list[dict]) -> dict | None:

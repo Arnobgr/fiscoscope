@@ -424,6 +424,57 @@ Runtime discoveries below.
 
 ---
 
+- **Session 8 — killed the 2020 ceiling. `CNA-2020-DEP-APU` does not exist;
+  used CNT-2020-CSI + OECD stitch instead.** Per-user goal: no KPI may stop at
+  2020. The Session 7d follow-up assumed a `CNA-2020-DEP-APU` family — **it is
+  not in the INSEE mapping.** The only base-2020 APU families are
+  `CNA-2020-PIB` (GDP, already used) and `CNA-2020-CSI` (5 rows of *ratios*,
+  useless). Two-part fix:
+    1. **APU aggregates → `CNT-2020-CSI` (quarterly, base 2020).** This family
+       carries D1, OTE, B9NF, D41, D62, P5K2 for `SECT-INST=S13` with
+       `NATURE=VALEUR_ABSOLUE`, `UNITE=EUROS`, and — critically — data from
+       **1949-Q1 (OTE: 1980) through 2025-Q4**, so it fully *replaces* the
+       frozen `CNA-2014-DEP-APU`/`CNA-2014-CSI` aggregates with no stitch
+       needed. Repointed `wage_bill_apu`, `total_apu_expenditure`,
+       `public_investment`, `social_benefits`, `fiscal_balance`,
+       `debt_interest` in `SERIES_SEARCH_RULES`. Disambiguators:
+       `COMPTE=E` (emplois/uses) for the flows, `COMPTE=SO` for the B9NF
+       balance line. No `FONCTION` dimension here (it's sector accounts, not
+       DEP-APU). **`wage_bill_central` (S13111) deleted** — CNT-2020-CSI has
+       no central-state breakdown and no KPI consumed it.
+    2. **Quarterly→annual in `annual_values()`.** It now detects period format:
+       `YYYY` passes through; `YYYY-QN` is summed across the 4 quarters with
+       **incomplete years dropped** (so a partial 2026 won't appear until
+       Q4 lands); monthly `YYYY-MM` raises (CPI is loaded but no processor
+       aggregates it, so this never fires in practice).
+    3. **COFOG has no base-2020 home → stitch INSEE+OECD in `cofog.py`.** No
+       INSEE family carries the FON01..FON10 functional breakdown past 2020
+       (CNT-2020 families have no FONCTION dim). So `cofog_gf01..gf10` stay on
+       `CNA-2014-DEP-APU` (frozen at 2020) and `processors/cofog.py` now
+       *stitches* OECD GIP 2025 COFOG for France (already cached, 2007–2023,
+       `MEASURE=GE`, `UNIT_MEASURE=PT_B1GQ` = % of GDP) for years after the
+       last INSEE year. OECD %-of-GDP is converted to EUR via `gdp_nominal`
+       so every downstream ratio stays in EUR/EUR and methodology-consistent.
+       New API: `bucket_cofog(series, gdp_by_year)` (was `bucket_cofog(series)`)
+       returns a DataFrame with a `total` column and a per-row `source`
+       tag (`"INSEE"|"OECD"`); `function_eur_stitched(gf, series, gdp)` returns
+       a single function's stitched EUR series (used by pension/investment for
+       GF10). `base_break_note()` was **removed** — the per-datapoint `source`
+       tag in each KPI JSON now self-documents the seam. **Seam quality:** at
+       the 2020 overlap INSEE vs OECD agree within ±0.44pp of GDP per bucket
+       (productive bucket: INSEE 14.28% vs OECD 14.72%). The visible jump at
+       2020→2021 in productive_spend (14.28→15.49) is mostly the real
+       post-COVID GF04 (economic-affairs) surge, ~0.44pp of it is the seam.
+  **Result (verified via `--mode annual --no-upload`):** every KPI advances —
+  `kpi_overhead_rate` → 2025, `kpi_sustainability` → 2024 (GDP-limited),
+  `kpi_friction_ratio` / `kpi_productive_spend` / `kpi_pension_investment` →
+  2023 (OECD COFOG limit). The new upstream ceiling is OECD's 2023, not 2020.
+  **Each KPI now carries a `"source"` field per France datapoint.** Peer
+  benchmarking remains deferred per the user (Phase 1.5); OECD COFOG is used
+  here only as France's own post-2020 COFOG source, not for peer overlays.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load

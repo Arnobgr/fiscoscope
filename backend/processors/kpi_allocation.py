@@ -1,8 +1,9 @@
 """
 KPI: Productive Spend Ratio (PRD §5.4) and Pension/Investment Ratio (PRD §5.5).
 
-Both are France-only series from INSEE BDM; the PRD names no peer source, so
-the `peers` block is empty.
+Both are France-only series; the PRD names no peer source, so the `peers`
+block is empty. COFOG inputs are stitched INSEE 1995–2020 + OECD 2021+
+(see processors/cofog.py).
 """
 
 import logging
@@ -14,7 +15,12 @@ from processors import (
     now_iso,
     write_output,
 )
-from processors.cofog import CLASSIFICATION_CAVEAT, base_break_note, bucket_cofog
+from processors.cofog import (
+    CLASSIFICATION_CAVEAT,
+    STITCH_NOTE,
+    bucket_cofog,
+    function_eur_stitched,
+)
 
 log = logging.getLogger(__name__)
 
@@ -22,23 +28,18 @@ log = logging.getLogger(__name__)
 def compute_productive_spend() -> dict:
     """Compute the Productive Spend Ratio and write kpi_productive_spend.json."""
     series = load_insee_series()
-    buckets = bucket_cofog(series)
-    total = annual_values(series["total_apu_expenditure"])
+    gdp = annual_values(series["gdp_nominal"])
+    buckets = bucket_cofog(series, gdp)
 
     france = [
-        {"year": int(row.year), "value": round(row.productive / total[int(row.year)] * 100, 2)}
+        {
+            "year": int(row.year),
+            "value": round(row.productive / row.total * 100, 2),
+            "source": row.source,
+        }
         for row in buckets.itertuples()
-        if int(row.year) in total and total[int(row.year)]
+        if row.total
     ]
-
-    methodology = (
-        "COFOG productive bucket (GF04 economic affairs + GF05 environmental "
-        "protection + GF06 housing) / total APU expenditure × 100. "
-        + CLASSIFICATION_CAVEAT
-    )
-    note = base_break_note(p["year"] for p in france)
-    if note:
-        methodology += " " + note
 
     payload = {
         "kpi_id": "productive_spend",
@@ -49,8 +50,11 @@ def compute_productive_spend() -> dict:
             "than transfers or administration."
         ),
         "unit": "percent",
-        "source": "INSEE BDM — Comptes des APU par fonction (COFOG)",
-        "methodology": methodology,
+        "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
+        "methodology": (
+            "COFOG productive bucket (GF04 + GF05 + GF06) / total COFOG "
+            "expenditure × 100. " + CLASSIFICATION_CAVEAT + " " + STITCH_NOTE
+        ),
         "last_updated": now_iso(),
         "france": france,
         "peers": {},
@@ -63,14 +67,19 @@ def compute_productive_spend() -> dict:
 def compute_pension_investment() -> dict:
     """Compute the Pension/Investment Ratio and write kpi_pension_investment.json."""
     series = load_insee_series()
-    pension = annual_values(series["cofog_gf10"])
+    gdp = annual_values(series["gdp_nominal"])
     investment = annual_values(series["public_investment"])
+    pension_series = function_eur_stitched("GF10", series, gdp)
 
-    france = [
-        {"year": year, "value": round(pension[year] / investment[year], 2)}
-        for year in sorted(set(pension) & set(investment))
-        if investment[year]
-    ]
+    france = []
+    for pt in pension_series:
+        year = pt["year"]
+        inv = investment.get(year)
+        if not inv:
+            continue
+        france.append(
+            {"year": year, "value": round(pt["value"] / inv, 2), "source": pt["source"]}
+        )
 
     payload = {
         "kpi_id": "pension_investment",
@@ -81,10 +90,10 @@ def compute_pension_investment() -> dict:
             "productive capacity rather than building it."
         ),
         "unit": "ratio",
-        "source": "INSEE BDM — Comptes des APU",
+        "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
         "methodology": (
-            "COFOG GF10 (social protection expenditure, all APU) / P51_S13 "
-            "(gross fixed capital formation, all APU)."
+            "COFOG GF10 (social protection expenditure, all APU) / P5K2 "
+            "(gross fixed capital formation, all APU). " + STITCH_NOTE
         ),
         "last_updated": now_iso(),
         "france": france,

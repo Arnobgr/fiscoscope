@@ -22,68 +22,64 @@ ZIP_FILENAME_RE = re.compile(
 # Dimension `famille` is a top-level CSV column; every other dimension is decoded
 # positionally from the row's `list_var` / `list_mod` pair.
 #
-# Key dimensions (CNA-2014 base):
+# Key dimensions:
 #   PERIODICITE: A=annual, M=monthly, T=quarterly
-#   SECT-INST: S13=all APU, S13111=central state, S13112=ODACs, S1313=local, S1314=social-security
-#   OPERATION (DEP-APU): D1=compensation of employees, P5K2=gross capital formation,
-#                        D6M=social benefits (cash+kind via market), D3=subsidies,
-#                        D7=other current transfers, D9=capital transfers,
-#                        D4=property income paid, P2=intermediate consumption,
-#                        OTE=total expenditure
-#   OPERATION (CSI):     B9NF=net lending/borrowing, D41=interest paid, D62=cash social benefits
-#   FONCTION: FON01..FON10=COFOG functions (1-digit aggregates), FONTOTAL=all functions
-#   COMPTE (CSI): EA=emplois (uses), RP=ressources (resources)
+#   SECT-INST: S13=all APU, S0=economy-wide, etc.
+#   OPERATION (CNT-2020-CSI): D1=compensation of employees, OTE=total expenditure,
+#                             P5K2=gross capital formation, D62=cash social benefits,
+#                             B9NF=net lending/borrowing, D41=interest paid
+#   FONCTION (CNA-2014-DEP-APU only): FON01..FON10=COFOG functions
+#   COMPTE (CNT-2020-CSI): E=emplois (uses), R=ressources, SO=neither (balance lines)
+#
+# APU aggregates use CNT-2020-CSI (quarterly, base 2020, freshness through current
+# quarter); annual_values() aggregates 4 quarters and drops incomplete years.
+# CNA-2020-DEP-APU does not exist in the INSEE mapping (only CNA-2020-PIB and
+# CNA-2020-CSI as ratios), so the COFOG functional breakdown (FON01..FON10)
+# stays on CNA-2014-DEP-APU (frozen at 2020). Post-2020 COFOG is stitched in
+# from OECD GIP 2025 at the processor layer — see processors/cofog.py.
 SERIES_SEARCH_RULES = {
-    # --- APU aggregate accounts (CNA-2014-DEP-APU base) ---
+    # --- APU aggregate accounts (CNT-2020-CSI, quarterly, base 2020) ---
     "wage_bill_apu": [
-        ("famille", "CNA-2014-DEP-APU"),
-        ("PERIODICITE", "A"),
+        ("famille", "CNT-2020-CSI"),
+        ("PERIODICITE", "T"),
         ("SECT-INST", "S13"),
         ("OPERATION", "D1"),
-        ("FONCTION", "FONTOTAL"),
-    ],
-    "wage_bill_central": [
-        ("famille", "CNA-2014-DEP-APU"),
-        ("PERIODICITE", "A"),
-        ("SECT-INST", "S13111"),
-        ("OPERATION", "D1"),
-        ("FONCTION", "FONTOTAL"),
+        ("COMPTE", "E"),
     ],
     "public_investment": [
-        ("famille", "CNA-2014-DEP-APU"),
-        ("PERIODICITE", "A"),
+        ("famille", "CNT-2020-CSI"),
+        ("PERIODICITE", "T"),
         ("SECT-INST", "S13"),
         ("OPERATION", "P5K2"),
-        ("FONCTION", "FONTOTAL"),
+        ("COMPTE", "E"),
     ],
     "social_benefits": [
-        ("famille", "CNA-2014-DEP-APU"),
-        ("PERIODICITE", "A"),
+        ("famille", "CNT-2020-CSI"),
+        ("PERIODICITE", "T"),
         ("SECT-INST", "S13"),
-        ("OPERATION", "D6M"),
-        ("FONCTION", "FONTOTAL"),
+        ("OPERATION", "D62"),
+        ("COMPTE", "E"),
     ],
     "total_apu_expenditure": [
-        ("famille", "CNA-2014-DEP-APU"),
-        ("PERIODICITE", "A"),
+        ("famille", "CNT-2020-CSI"),
+        ("PERIODICITE", "T"),
         ("SECT-INST", "S13"),
         ("OPERATION", "OTE"),
-        ("FONCTION", "FONTOTAL"),
+        ("COMPTE", "E"),
     ],
-    # --- Sector-account balances and interest (CNA-2014-CSI) ---
     "fiscal_balance": [
-        ("famille", "CNA-2014-CSI"),
-        ("PERIODICITE", "A"),
+        ("famille", "CNT-2020-CSI"),
+        ("PERIODICITE", "T"),
         ("SECT-INST", "S13"),
         ("OPERATION", "B9NF"),
-        ("COMPTE", "EA"),
+        ("COMPTE", "SO"),
     ],
     "debt_interest": [
-        ("famille", "CNA-2014-CSI"),
-        ("PERIODICITE", "A"),
+        ("famille", "CNT-2020-CSI"),
+        ("PERIODICITE", "T"),
         ("SECT-INST", "S13"),
         ("OPERATION", "D41"),
-        ("COMPTE", "EA"),
+        ("COMPTE", "E"),
     ],
     # --- GDP and prices ---
     "gdp_nominal": [
