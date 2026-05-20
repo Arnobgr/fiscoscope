@@ -102,6 +102,20 @@ SERIES_SEARCH_RULES = {
         ("ZONE_GEO", "FE"),
         ("CORRECTION", "BRUT"),
     ],
+    # --- Maastricht public debt as % of GDP (DETTE-TRIM-APU-2020, quarterly) ---
+    # NATURE=PROPORTION + UNITE=POURCENT gives the debt ratio directly (no division).
+    # Debt is a STOCK: the annual figure is the year-end (Q4) quarter, not a sum.
+    # Instrument is F (total financial liabilities) — the plan's `TOT` does not
+    # co-occur with PROPORTION/POURCENT; only F carries the %-of-GDP ratio.
+    "public_debt_ratio": [
+        ("famille", "DETTE-TRIM-APU-2020"),
+        ("PERIODICITE", "T"),
+        ("INDICATEUR", "DETTE_MAASTRICHT"),
+        ("SECT-INST", "S13"),
+        ("DETTE_MAASTRICHT_INTRUMENTS", "F"),
+        ("NATURE", "PROPORTION"),
+        ("UNITE", "POURCENT"),
+    ],
     # --- COFOG functions: OTE (total expenditure) per FON01..FON10, S13, CNA-2014 ---
     "cofog_gf01": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON01")],
     "cofog_gf02": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON02")],
