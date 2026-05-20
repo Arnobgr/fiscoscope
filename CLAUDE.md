@@ -397,6 +397,43 @@ section below, then commit.
 
 ---
 
+- **Session A (2026-05-20) — peer benchmarking wired for overhead, friction,
+  productive spend (plan `docs/superpowers/plans/2026-05-20-backend-kpi-expansion.md`).**
+  Three KPIs now carry a populated `peers` block; no new fetches (OECD COFOG +
+  fiscal raw already cached). Shared helpers added to `processors/__init__.py`:
+  `OECD_PEERS = [DEU,GBR,ITA,ESP,NLD,SWE]` (FRA excluded), `OECD_AVG_KEY`,
+  `load_oecd_long(source)` (latest `data/raw/{source}_*.json` → long DF with
+  `country/year/value` + lower-cased `transaction/expenditure/measure/unit_measure`),
+  and `peer_series(df)` → `{country: [{year,value}], OECD_AVG: [...]}` where
+  **OECD_AVG is the unweighted per-year mean across the 6 peers present**.
+    - `kpi_overhead`: peers = D1 / total-expenditure (both % of GDP), level-comparable
+      to France's D1/OTE.
+    - `kpi_productive_spend`: peers = productive bucket (GF04+GF05+GF06) / total COFOG.
+    - `kpi_friction_ratio`: peers = admin bucket (GF01+GF02+GF03) / total COFOG.
+      **Trend-comparable only, not level-comparable** — France's denominator is
+      revenue (expenditure+balance) but the peer denominator is total expenditure.
+    The COFOG-bucket construction is a single helper `_cofog_bucket_peers(codes)`
+    in `kpi_allocation.py`, imported by `kpi_friction.py`.
+  - **Peer floor is 2007** (OECD GIP limit) vs. France's 1995/1998 — upstream, not a bug.
+  - **Pension/investment peers stay deferred** — OECD fiscal raw has no P51
+    (gross fixed capital formation) and PRD §5.5 names no peer source.
+  - **PLAN DEVIATION (user-approved) — the A2 `_T` total-expenditure code does not
+    exist under `MEASURE=GE` in the cached `oecd_fiscal`.** The plan assumed
+    `tot = ge[ge['transaction']=='_T']`; in the cache, `MEASURE=GE` carries only
+    component transactions (`D1,D3,D4,D6M,KE,P2,_O_CE`) and `_T` appears only under
+    `MEASURE=OUT`/`PRCO` (neither is total expenditure — they give nonsensical
+    ratios of 109%/44%). Total general-government expenditure is the **sum of the
+    GE component transactions** (all % of GDP): ΣGE = 55.35% for FRA 2019, matching
+    the real ~55%-of-GDP figure, and D1/ΣGE = 22.33% matches France's own KPI
+    value 22.32%. So `kpi_overhead` uses
+    `ge.groupby(["country","year"])["value"].sum()` as the denominator, not `_T`.
+    The COFOG-bucket peers (A3) were unaffected — they already sum GF01..GF10.
+  - **Verified** via each module's `__main__` + `--mode annual --no-upload`: all
+    three KPIs `status: ok`, each `peers` has the 6 codes + `OECD_AVG` (FRA absent),
+    France series unchanged (overhead 1995–2025, friction/productive 1995–2023).
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
