@@ -657,6 +657,33 @@ git commit -m "Session C — tax-expenditure data-source spike: findings + decis
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
 
+### Spike outcome (2026-05-20): **BUILD** — GTED via Zenodo
+
+Spike completed. A clean, costed, multi-year, redistribution-OK tabular source **was found**: the Global Tax Expenditures Database (GTED), mirrored on Zenodo as an annual XLSX, CC-BY-4.0, with France revenue-forgone (cost) per provision for 1999–2025. Full findings + every source checked are in `CLAUDE.md` Runtime discoveries (Session C entry). Per the spike contract, the build is **scheduled below as Task C2, gated on user go-ahead** — not built inline.
+
+### Task C2: Build the Tax Expenditure KPI from GTED *(scheduled — awaiting user go-ahead)*
+
+**Source (verified in the C1 spike):** GTED v1.3.2, Zenodo record `17312217` (concept `12585656`), `GTED_FullDatabase_20251010.xlsx`, sheet `RevenueForgone`, `Country=="FRA"`. CC-BY-4.0 → attribution required.
+
+**Files:**
+- Create: `backend/fetchers/tax_expenditure.py`
+- Modify: `backend/processors/kpi_outcomes.py` (`compute_tax_expenditure`) — or wherever the existing `compute_tax_expenditure` stub lives.
+- Modify: `backend/run_pipeline.py` (register the fetcher + flip the KPI from `skipped` to live).
+
+- [ ] **Step 1: Write `fetchers/tax_expenditure.py`**
+  - Resolve the **latest** GTED version from the Zenodo **concept** record, don't hardcode the version id: `GET https://zenodo.org/api/records/12585656` then follow `links.latest`/`relations.version` to the newest record, pick its `.xlsx` file's `links.self` (+ `/content`). Use `_fetch` / `DEFAULT_HEADERS`; Zenodo is not behind Cloudflare (gted.net is — do **not** fetch from gted.net).
+  - Save the raw XLSX to `data/raw/` (cache-before-parse), then read sheet `RevenueForgone` with the pinned `openpyxl==3.1.5`, filter `Country=="FRA"`, and cache the parsed France records (`ProvisionID, Year, RF (LCU), Projection/Estimate, RF % of GDP, RF % of Tax`) to `data/raw/tax_expenditure_*.json` (mirror the France-Travail XLSX fetcher pattern from Session 7c).
+
+- [ ] **Step 2: Implement `compute_tax_expenditure()`** (France-only — PRD names no peer source)
+  - Per year: `count` = number of France provisions with a non-null `RF (LCU)`; `total_cost_eur_bn` = ΣRF (LCU) / 1e9; `ratio_to_revenue_pct` = total cost / total government revenue × 100, where revenue = `annual_values(total_apu_expenditure) + annual_values(fiscal_balance)` (the existing friction/debt-service revenue definition); add YoY % on total cost.
+  - Emit `france: [{year, total_cost_eur_bn, count, ratio_to_revenue_pct, ...}]`, `peers: {}`, `latest: build_latest(...)`.
+  - **Attribution (CC-BY-4.0):** set `source` to the GTED citation + DOI (`https://doi.org/10.5281/zenodo.17312217`, concept `10.5281/zenodo.12585656`) and note in `methodology` that GTED is a third-party compilation of France's PLF whose provision count/Revenue-Forgone definition differs slightly from the official Tome II.
+  - Sanity-check against the spike: 2024 total ≈ €79.8 Bn, 2018 ≈ €96.5 Bn, ~400 provisions/yr.
+
+- [ ] **Step 3: Register in the pipeline** — add the fetcher to `run_annual()` and flip `kpi_tax_expenditure` from the `NotImplementedError`/`skipped` branch to a live `_run_step`.
+
+- [ ] **Step 4: Verify + commit** — module `__main__` + `python run_pipeline.py --mode annual --no-upload`; confirm `kpi_tax_expenditure` is now `ok`. Update the CLAUDE.md Session C entry's decision line (BUILD → done) and commit.
+
 ---
 
 ## Session D — KPIs from Urssaf, France Travail, and on-hand data
