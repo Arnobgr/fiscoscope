@@ -531,6 +531,36 @@ section below, then commit.
   the methodology/source clearly; (4) data is an **annual XLSX snapshot** (one big file),
   read it with the pinned `openpyxl==3.1.5`. **Session 9's option-2 (PDF parse of Tome II)
   and option-3 (headline aggregate) are now FALLBACKS ONLY** — preferred path is GTED.
+  - **BUILT (Task C2, same day, user-approved) — `kpi_tax_expenditure` is now `ok`, no
+    longer `skipped`.** New `fetchers/tax_expenditure.py`: resolves the newest GTED release
+    via the Zenodo **concept** record (conceptrecid **`5940165`**, concept DOI
+    `10.5281/zenodo.5940165`) at `…/records/5940165/versions/latest` — **no version id
+    hardcoded** (the earlier `12585656` is the v1.3.0 version record, *not* the concept).
+    Downloads the XLSX from Zenodo (gted.net is Cloudflare-blocked; Zenodo is not), reads
+    sheet `RevenueForgone`, filters `Country=="FRA"`, caches the 6 KPI columns
+    (`ProvisionID, Year, RF (LCU), Projection/Estimate, RF % of GDP, RF % of Tax`) to
+    `data/raw/tax_expenditure_*.json`. `compute_tax_expenditure()` (in `kpi_outcomes.py`,
+    rewritten from the `NotImplementedError` stub) emits France `[{year,
+    total_cost_eur_bn, count, projection, ratio_to_revenue_pct, yoy_change_pct}]`,
+    `peers: {}`, 1999–2025 (27 pts). Decisions/gotchas:
+      - **UNIT MISMATCH (the one real trap):** GTED `RF (LCU)` is in **absolute EUR**
+        (e.g. 5.295e10), but INSEE CNT-2020-CSI revenue is in **millions of EUR**
+        (2023 revenue = 1,456,129 = €1,456 Bn). The ratio scales revenue ×1e6:
+        `total_eur / (revenue × 1e6) × 100`. Forgetting this gives ~7,000,000%.
+      - `count` = provisions **reported** that year (~405–409; **includes ~300/yr costed
+        at zero** — a zero-cost niche still exists). `FRA0000` is a real €1 Bn provision,
+        not an aggregate/total row — nothing to exclude. No duplicate provision-year rows.
+      - The **two most recent years (2024, 2025) are GTED `Projection`** (forecasts) →
+        `"projection": true`; all earlier years are `Estimate` → `false`. The frontend
+        must not present projected years as actuals.
+      - Revenue denominator = `total_apu_expenditure (OTE) + fiscal_balance (B9NF)` (same
+        as friction/debt-service), emitted only for years with INSEE revenue.
+      - **No new dependency** (openpyxl/pandas/requests already pinned). Registered as the
+        `tax_expenditure` fetch step in `run_annual()` (before the KPI block).
+    **Verified** via `--mode annual --no-upload`: `tax_expenditure` + `kpi_tax_expenditure`
+    both `ok`; series 1999→2025; 2018 peak €96.5 Bn / 7.58% of revenue, 2023 €81.7 Bn /
+    5.61%, 2025 (projection) €75.6 Bn / 4.84%. All other KPIs unchanged; `budget_plrg`
+    remains the only by-design `skipped` step.
 
 ---
 
