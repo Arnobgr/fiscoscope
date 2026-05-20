@@ -434,6 +434,41 @@ section below, then commit.
 
 ---
 
+- **Session B (2026-05-20) — sustainability gains France Maastricht debt + OECD
+  deficit/debt peers** (same plan as Session A).
+  - **France debt series — `DETTE-TRIM-APU-2020` (quarterly, base 2020).** New
+    `public_debt_ratio` resolver rule. **PLAN DEVIATION (data-verified):** the
+    plan's `DETTE_MAASTRICHT_INTRUMENTS=TOT` finds nothing — for the S13 Maastricht
+    debt %-of-GDP series the instrument code is **`F`** (total financial
+    liabilities); `TOT` never co-occurs with `NATURE=PROPORTION`/`UNITE=POURCENT`.
+    Resolves uniquely to idbank `010777608`. Debt is a **STOCK** → annual figure is
+    the year-end Q4 quarter (2024-Q4 = 112.6%), via new `year_end_value()` in
+    `processors/__init__.py` (mirrors `annual_values` but takes Q4, not the sum;
+    annual 'YYYY' input passes through).
+  - **Peer deficit + debt — one GIP dataflow, NOT the plan's two.** **PLAN
+    DEVIATION (data-verified):** the plan's `DSD_GOV_FIN_INSTR` debt dataflow has
+    **no % of GDP** unit (only `PT_FD4_S13` = % of total debt, and `USD_PPP`), and
+    the `SDD.NAD,DSD_NASEC10_IDC@DF_TABLE12_IDC` deficit set is a 135 MB unfiltered
+    pull. Both peer series come instead from **`OECD.GOV.GIP,DSD_GOV@DF_GOV_PF_2025`**
+    ("Public finance main indicators"), dims
+    `FREQ.REF_AREA.MEASURE.UNIT_MEASURE.SECTOR.EDITION.CATEGORY` (7 → 6 dots).
+    Keys: deficit `A.{countries}.GNLB.PT_B1GQ.S13..` (GNLB = net lending/borrowing),
+    debt `A.{countries}.GGDM.PT_B1GQ.S13..` (**GGDM = Maastricht** gross debt —
+    matches France's INSEE Maastricht line, e.g. FRA 2023 GGDM 109.9% vs INSEE
+    109.5%; the alternative `GGD` SNA gross debt runs ~12pp higher and is NOT
+    level-comparable). Both verified live: 7 countries, 2007–2024, 126 rows.
+    `fetch_oecd_deficit()` / `fetch_oecd_debt()` cache `oecd_deficit_*` /
+    `oecd_debt_*`; each key pins a single MEASURE+UNIT so `load_oecd_long` +
+    `peer_series` need no extra filtering. Registered both in `run_annual()`.
+  - **Payload shape grew:** `kpi_sustainability.json` now carries
+    `"debt": {"france": [...]}` and a two-part `"peers": {"deficit": {...},
+    "debt": {...}}` (each = 6 peers + `OECD_AVG`). France deficit series unchanged.
+  - **Verified** via `--mode annual --no-upload`: no errors; `oecd_deficit`/
+    `oecd_debt` `ok`, `kpi_sustainability` `ok` → 2024; France debt 31 pts
+    (1995–2025), 2024 = 112.6%; peer blocks FRA-absent; DEU 2023 deficit −2.48%.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
