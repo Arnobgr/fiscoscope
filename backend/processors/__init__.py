@@ -108,3 +108,46 @@ def write_output(filename: str, payload: dict) -> Path:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
     log.info(f"Wrote {filename} ({len(payload.get('france', []))} France data points)")
     return path
+
+
+OECD_PEERS = ["DEU", "GBR", "ITA", "ESP", "NLD", "SWE"]
+OECD_AVG_KEY = "OECD_AVG"
+
+
+def load_oecd_long(source: str) -> pd.DataFrame:
+    """
+    Load the most recent data/raw/{source}_*.json into a long DataFrame with
+    columns: country, year, value, plus any of transaction/expenditure/measure/
+    unit_measure that are present (lower-cased). value is numeric; nulls dropped.
+    """
+    path = latest_raw(source)
+    if path is None:
+        raise FileNotFoundError(f"No data/raw/{source}_*.json found — run its fetcher first.")
+    df = pd.DataFrame(json.loads(path.read_text()))
+    rename = {"REF_AREA": "country", "TIME_PERIOD": "year", "OBS_VALUE": "value"}
+    for opt in ("TRANSACTION", "EXPENDITURE", "MEASURE", "UNIT_MEASURE"):
+        if opt in df.columns:
+            rename[opt] = opt.lower()
+    out = df[list(rename)].rename(columns=rename)
+    out["year"] = out["year"].astype(int)
+    out["value"] = pd.to_numeric(out["value"], errors="coerce")
+    return out.dropna(subset=["value"])
+
+
+def peer_series(df: pd.DataFrame) -> dict:
+    """
+    Turn a long DataFrame (columns: country, year, value) into the §5.1 `peers`
+    block: {country_code: [{year, value}, ...], "OECD_AVG": [...]}. France is
+    excluded from both the per-country output and the average. OECD_AVG is the
+    unweighted per-year mean across whatever peer countries are present.
+    """
+    sub = df[df["country"].isin(OECD_PEERS)]
+    out = {}
+    for country, g in sub.groupby("country"):
+        rows = g.sort_values("year")
+        out[country] = [
+            {"year": int(r.year), "value": round(float(r.value), 2)} for r in rows.itertuples()
+        ]
+    avg = sub.groupby("year")["value"].mean().sort_index()
+    out[OECD_AVG_KEY] = [{"year": int(y), "value": round(float(v), 2)} for y, v in avg.items()]
+    return out
