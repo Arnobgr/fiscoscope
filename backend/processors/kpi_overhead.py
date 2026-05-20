@@ -13,7 +13,9 @@ from processors import (
     annual_values,
     build_latest,
     load_insee_series,
+    load_oecd_long,
     now_iso,
+    peer_series,
     write_output,
 )
 
@@ -32,6 +34,17 @@ def compute_overhead_rate() -> dict:
         if total[year]
     ]
 
+    fiscal = load_oecd_long("oecd_fiscal")
+    ge = fiscal[fiscal["measure"] == "GE"]
+    d1 = ge[ge["transaction"] == "D1"][["country", "year", "value"]].rename(columns={"value": "d1"})
+    # No `_T` total under MEASURE=GE in the cache; total expenditure is the sum
+    # of the GE component transactions (all % of GDP) — matches France's own
+    # D1/OTE level (verified Session A).
+    tot = ge.groupby(["country", "year"])["value"].sum().rename("tot").reset_index()
+    merged = d1.merge(tot, on=["country", "year"])
+    merged["value"] = merged["d1"] / merged["tot"] * 100
+    peers = peer_series(merged[["country", "year", "value"]])
+
     payload = {
         "kpi_id": "overhead_rate",
         "kpi_name": "Administrative Overhead Rate",
@@ -45,11 +58,14 @@ def compute_overhead_rate() -> dict:
         "methodology": (
             "D1_S13 (compensation of employees, all APU) / OTE_S13 (total APU "
             "expenditure) × 100. Quarterly series summed to annual; incomplete "
-            "years dropped. Peer comparison deferred."
+            "years dropped."
+            " Peers: OECD GIP 2025, D1/total-expenditure (both % of GDP) — "
+            "comparable to the France ratio; OECD_AVG is the unweighted mean of "
+            "DEU/GBR/ITA/ESP/NLD/SWE; peer series start 2007."
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": {},
+        "peers": peers,
         "latest": build_latest(france),
     }
     write_output("kpi_overhead_rate.json", payload)
