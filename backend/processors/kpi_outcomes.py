@@ -11,13 +11,12 @@ KPI: Spend vs. Outcome Ratios (PRD §5.9) and Tax Expenditure Cost (PRD §5.8).
     instruction-time are), so they cannot be fetched programmatically yet.
     See the Session 9 note in CLAUDE.md.
 
-  - Tax Expenditure needs the PLF "dépenses fiscales" annex (PRD §3.6). The
-    Session 8-era catalog probe confirmed the costed tabular data is NOT
-    published: only an uncosted 468-row descriptive list and an 8-row top-IR
-    snapshot exist. The full chiffrage lives in the Tome II PDF.
-    compute_tax_expenditure() therefore stays NotImplementedError. See the
-    Session 9 note in CLAUDE.md for the two fallback paths (PDF parse;
-    headline aggregate).
+  - Tax Expenditure Cost (PRD §5.8) is built from GTED (Global Tax Expenditures
+    Database, CC-BY-4.0). France's official full costed list is PDF-only (PLF
+    Voies-et-Moyens Tome II), but GTED republishes the same per-provision
+    revenue-forgone series in tabular form (Session C). compute_tax_expenditure()
+    reads the cached GTED France rows and emits annual total cost, provision
+    count and cost-to-revenue ratio. See the Session C note in CLAUDE.md.
 """
 
 import json
@@ -121,21 +120,88 @@ def compute_outcomes() -> dict:
 
 def compute_tax_expenditure() -> dict:
     """
-    Compute the Tax Expenditure Cost KPI and write kpi_tax_expenditure.json.
+    Compute the Tax Expenditure Cost KPI (PRD §5.8) and write
+    kpi_tax_expenditure.json, from the cached GTED France revenue-forgone series.
 
-    Blocked: KPI 5.8 needs a costed, multi-year dépenses-fiscales table, but
-    no such tabular dataset is published (verified Session 9). data.gouv.fr /
-    data.economie.gouv.fr expose only an uncosted 468-row list and an 8-row
-    top-IR snapshot; the full chiffrage is PDF-only (PLF Voies et Moyens
-    Tome II). Two fallback paths are documented in CLAUDE.md Session 9:
-    (2) parse the Tome II PDF; (3) track the headline aggregate total only.
+    Per year: total cost (Σ revenue forgone, EUR bn), the number of provisions
+    reported, the cost as a share of total government revenue, and YoY % change.
+    France-only — the PRD names no peer source. GTED flags the two most recent
+    years as projections (forecasts), marked with "projection": true.
     """
-    raise NotImplementedError(
-        "compute_tax_expenditure is blocked: no costed tabular dépenses-fiscales "
-        "dataset is published (only an uncosted 468-row list + an 8-row top-IR "
-        "snapshot). Full chiffrage is PDF-only. See CLAUDE.md Session 9 for the "
-        "PDF-parse and headline-aggregate fallback options."
-    )
+    raw_path = latest_raw("tax_expenditure")
+    if raw_path is None:
+        raise FileNotFoundError(
+            "No data/raw/tax_expenditure_*.json — run the GTED fetcher "
+            "(fetchers.tax_expenditure) first."
+        )
+    df = pd.DataFrame(json.loads(raw_path.read_text()))
+    df["Year"] = df["Year"].astype(int)
+    df["RF (LCU)"] = pd.to_numeric(df["RF (LCU)"], errors="coerce")
+
+    series = load_insee_series()
+    expenditure = annual_values(series["total_apu_expenditure"])
+    balance = annual_values(series["fiscal_balance"])
+    revenue = {y: expenditure[y] + balance[y] for y in set(expenditure) & set(balance)}
+
+    france = []
+    for year in sorted(df["Year"].unique()):
+        grp = df[df["Year"] == year]
+        total_eur = float(grp["RF (LCU)"].sum())
+        total_bn = round(total_eur / 1e9, 2)
+        entry = {
+            "year": int(year),
+            "total_cost_eur_bn": total_bn,
+            "count": int(grp["ProvisionID"].nunique()),
+            "projection": bool((grp["Projection/Estimate"] == "Projection").all()),
+        }
+        if revenue.get(year):
+            # INSEE revenue is in millions of EUR; GTED RF (LCU) is in absolute
+            # EUR — scale revenue to euros before taking the ratio.
+            entry["ratio_to_revenue_pct"] = round(
+                total_eur / (revenue[year] * 1e6) * 100, 2
+            )
+        if france:
+            prev = france[-1]["total_cost_eur_bn"]
+            if prev:
+                entry["yoy_change_pct"] = round((total_bn - prev) / prev * 100, 2)
+        france.append(entry)
+
+    payload = {
+        "kpi_id": "tax_expenditure",
+        "kpi_name": "Tax Expenditure Cost",
+        "description": (
+            "Total cost of France's tax expenditures (dépenses fiscales / niches "
+            "fiscales) — revenue the state forgoes through exemptions, reduced "
+            "rates, credits and deferrals — in euros, as a count of provisions, "
+            "and as a share of total government revenue. A rising ratio means a "
+            "growing slice of potential revenue is given up before any spending."
+        ),
+        "unit": "mixed",
+        "source": (
+            "Global Tax Expenditures Database (GTED), Tax Expenditures Lab — "
+            "Redonda, von Haldenwang & Aliu, CC-BY-4.0, concept DOI "
+            "10.5281/zenodo.5940165; revenue denominator from INSEE BDM "
+            "CNT-2020-CSI (OTE_S13 + B9NF_S13)."
+        ),
+        "methodology": (
+            "Per year: total_cost_eur_bn = Σ revenue forgone across all France "
+            "provisions (GTED 'RF (LCU)', EUR); count = number of provisions "
+            "reported that year (includes provisions costed at zero); "
+            "ratio_to_revenue_pct = total cost / total government revenue × 100, "
+            "where revenue = total APU expenditure (OTE) + fiscal balance (B9NF) "
+            "from CNT-2020-CSI — emitted only for years with INSEE revenue. The "
+            "two most recent years are GTED projections (projection: true); "
+            "earlier years are estimates. GTED is a third-party compilation of "
+            "France's PLF Voies-et-Moyens Tome II; its provision count and "
+            "revenue-forgone definition differ slightly from the official annex."
+        ),
+        "last_updated": now_iso(),
+        "france": france,
+        "peers": {},
+        "latest": dict(france[-1]) if france else None,
+    }
+    write_output("kpi_tax_expenditure.json", payload)
+    return payload
 
 
 if __name__ == "__main__":

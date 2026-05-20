@@ -37,6 +37,7 @@ from fetchers.oecd import (
     fetch_oecd_life_expectancy,
 )
 from fetchers.france_travail import fetch_france_travail_allocataires
+from fetchers.tax_expenditure import fetch_tax_expenditure
 from fetchers.urssaf import fetch_urssaf_wage_bill
 from processors.kpi_allocation import compute_pension_investment, compute_productive_spend
 from processors.kpi_friction import compute_friction_ratio
@@ -133,6 +134,7 @@ def run_annual(sources: dict) -> None:
     _run_step(
         "budget_plrg", fetch_plrg_execution, sources, datetime.now().year - 1
     )
+    _run_step("tax_expenditure", fetch_tax_expenditure, sources)
     _run_step("kpi_overhead_rate", compute_overhead_rate, sources)
     _run_step("kpi_friction_ratio", compute_friction_ratio, sources)
     _run_step("kpi_productive_spend", compute_productive_spend, sources)
