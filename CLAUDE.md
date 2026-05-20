@@ -475,6 +475,47 @@ Runtime discoveries below.
 
 ---
 
+- **Session 9 — PLF "dépenses fiscales" fetcher abandoned (no costed tabular
+  data). `kpi_tax_expenditure` stays `skipped`.** Per-user decision after a
+  full catalog probe: option 1 (skip cleanly), with options 2 & 3 documented
+  below as future paths. **What exists** on data.gouv.fr / data.economie.gouv.fr:
+    - `plf-2024-vm-tome-2_depenses-fiscales` — 468 rows, the most recent full
+      list, but **uncosted**: only `(impôt, sous-catégorie, type, code numérique,
+      description, finalité)`. No montant, no year columns. (data.gouv.fr id
+      `655d451f3950fa796da6435b`; mirror ODS dataset same name.)
+    - `top-8-depenses-fiscales-ir2021dlf-bces` — **8 rows only**, but costed:
+      `cout_2021/2022/2023_en_millions_d_euros`, `nombre_beneficiaires_2021`.
+      A one-off top-IR snapshot, not the full list.
+    - `plf2023_voies_et_moyens_t2_liste_des_depenses_fiscales` and the
+      `plf-201x-recettes-fiscales-nettes` sets — **0 records** (deprecated).
+  KPI 5.8 needs count + total cost + ratio-to-revenue + YoY; 3 of 4 need cost,
+  which is **PDF-only** (PLF *Voies et Moyens, Tome II*). So no usable fetcher.
+  `compute_tax_expenditure()` keeps raising `NotImplementedError` (message
+  updated to state the real reason), surfaced by the orchestrator as `skipped`
+  — same pattern as `budget_plrg`. No fetcher file was created (a stub that
+  only raises would be dead code; the existing processor skip is enough).
+  **Fallback option 2 — parse the Tome II PDF (if this KPI becomes a priority):**
+  The full costed table (one row per dépense fiscale, with chiffrage for years
+  N-2 executed / N-1 estimated / N forecast) is published annually as a PDF
+  on the Bercy/budget site (~September–October, alongside the PLF). Process:
+  (a) resolve the latest "Voies et Moyens Tome II" PDF URL — slug varies
+  year-to-year, search the data.gouv.fr/budget catalog; (b) extract tables
+  with `pdfplumber` or `camelot` (pin a version per the ≥1-week rule); (c) the
+  layout shifts between editions, so detect the chiffrage columns by header
+  text ("Chiffrage pour 20NN") rather than position; (d) cache raw extracted
+  rows to `data/raw/plf_depenses_fiscales_*.json`. This is a brittle, sizeable
+  fetcher — give it its own session and budget for yearly maintenance.
+  **Fallback option 3 — headline aggregate only (cheaper, lower fidelity):**
+  France publishes a single national total dépenses-fiscales figure (~€80–90Bn/yr)
+  in the budget documents. Track just `total_cost_eur_bn` and
+  `ratio_to_revenue_pct` (revenue denominator already available from
+  CNT-2020-CSI). Drop the per-expenditure breakdown and count. Caveat: the
+  total is still PDF/text-sourced, so this needs either a small PDF scrape of
+  the summary line or a documented manual-update step — which bumps against the
+  project's "no hardcoded data" constraint, so treat it as a stopgap only.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load

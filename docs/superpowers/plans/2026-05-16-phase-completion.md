@@ -678,6 +678,14 @@ CLAUDE.md entry should list:
 
 ## Session 11 — PLF "dépenses fiscales" fetcher (unblock `kpi_tax_expenditure`)
 
+> **RESOLVED (Session 9, 2026-05-20): NOT BUILT — no costed tabular data exists.**
+> Step 1's catalog probe was executed and hit the "skip" branch: only an
+> uncosted 468-row list and an 8-row top-IR snapshot are published; the full
+> chiffrage is PDF-only. `kpi_tax_expenditure` stays `skipped`. The two
+> fallback paths (option 2: parse the Tome II PDF; option 3: headline aggregate
+> only) are documented in detail in CLAUDE.md's Session 9 Runtime-discoveries
+> entry. Do not re-attempt a tabular fetcher — it does not exist upstream.
+
 ### Background
 
 PRD §3.6 and §5.8 spec the Tax Expenditure Cost KPI: total cost of niches fiscales / total tax revenues × 100. Currently `compute_tax_expenditure()` in `kpi_outcomes.py` raises `NotImplementedError` (Session 5 deferral). The data is published annually by Bercy in the PLF's **"Voies et moyens — Tome II"** annex (released ~September–October each year), available via data.gouv.fr or data.economie.gouv.fr.
