@@ -31,6 +31,20 @@ LIFE_EXPECTANCY_KEY = "FRA.A.LFEXP.Y.Y0._T......."
 # (B1GQ is the SDMX code for GDP at market prices); the legacy PT_GDP code is gone.
 UNIT_PCT_GDP = "PT_B1GQ"
 
+# Public finance main indicators (Government at a Glance 2025), DSD_GOV — 7 dims:
+#   FREQ . REF_AREA . MEASURE . UNIT_MEASURE . SECTOR . EDITION . CATEGORY  (→ 6 dots)
+# MEASURE carries the indicator: GNLB = general-government net lending/borrowing
+# (the deficit), GGDM = Maastricht gross debt. Both at PT_B1GQ (% of GDP), S13.
+# Session B note: the plan's assumed dataflows were wrong for % of GDP —
+# DSD_GOV_FIN_INSTR exposes only "% of total debt"/USD-PPP, and SDD.NAD TABLE12
+# is a 135 MB unfiltered pull. DSD_GOV yields both peer series cleanly from one
+# GIP dataflow, consistent with the existing COFOG/transaction fetchers. GGDM
+# (Maastricht) matches France's own INSEE Maastricht-debt series; GGD (SNA gross
+# debt) runs ~12pp higher and would not be level-comparable.
+PUBLIC_FINANCE_DATASET = "OECD.GOV.GIP,DSD_GOV@DF_GOV_PF_2025"
+DEFICIT_KEY = f"A.{'+'.join(OECD_COUNTRIES)}.GNLB.{UNIT_PCT_GDP}.S13.."
+DEBT_KEY = f"A.{'+'.join(OECD_COUNTRIES)}.GGDM.{UNIT_PCT_GDP}.S13.."
+
 # OECD rate limit is 20 requests/minute — pause between calls.
 RATE_LIMIT_SLEEP = 3
 
@@ -64,6 +78,20 @@ def fetch_oecd_fiscal(countries: list[str] = None, start_year: int = OECD_START_
     return df
 
 
+def fetch_oecd_deficit(start_year: int = OECD_START_YEAR) -> pd.DataFrame:
+    """Fetch general-government net lending/borrowing (% of GDP) for the peer set."""
+    df = _fetch_oecd_csv(PUBLIC_FINANCE_DATASET, DEFICIT_KEY, start_year)
+    save_raw("oecd_deficit", df.to_dict(orient="records"))
+    return df
+
+
+def fetch_oecd_debt(start_year: int = OECD_START_YEAR) -> pd.DataFrame:
+    """Fetch general-government Maastricht gross debt (% of GDP) for the peer set."""
+    df = _fetch_oecd_csv(PUBLIC_FINANCE_DATASET, DEBT_KEY, start_year)
+    save_raw("oecd_debt", df.to_dict(orient="records"))
+    return df
+
+
 def fetch_oecd_life_expectancy(start_year: int = INSEE_START_YEAR) -> pd.DataFrame:
     """
     Fetch France life expectancy at birth (total population), annual, in years.
@@ -81,5 +109,9 @@ if __name__ == "__main__":
     print(f"\nOECD COFOG: {len(cofog)} rows, {cofog.shape[1]} columns")
     fiscal = fetch_oecd_fiscal()
     print(f"OECD fiscal: {len(fiscal)} rows, {fiscal.shape[1]} columns")
+    deficit = fetch_oecd_deficit()
+    print(f"OECD deficit: {len(deficit)} rows, {deficit.shape[1]} columns")
+    debt = fetch_oecd_debt()
+    print(f"OECD debt: {len(debt)} rows, {debt.shape[1]} columns")
     le = fetch_oecd_life_expectancy()
     print(f"OECD life expectancy: {len(le)} rows, {le.shape[1]} columns")
