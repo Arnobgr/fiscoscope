@@ -9,9 +9,13 @@ Both KPIs depend on data sources not yet wired up:
     wiring is deferred to Session 7. compute_outcomes() emits a well-formed
     placeholder so the pipeline stays runnable until then.
 
-  - Tax Expenditure needs the PLF "dépenses fiscales" annex (PRD §3.6), for
-    which no fetcher module exists yet. compute_tax_expenditure() raises
-    NotImplementedError until that fetcher is built.
+  - Tax Expenditure needs the PLF "dépenses fiscales" annex (PRD §3.6). The
+    Session 8-era catalog probe confirmed the costed tabular data is NOT
+    published: only an uncosted 468-row descriptive list and an 8-row top-IR
+    snapshot exist. The full chiffrage lives in the Tome II PDF.
+    compute_tax_expenditure() therefore stays NotImplementedError. See the
+    Session 9 note in CLAUDE.md for the two fallback paths (PDF parse;
+    headline aggregate).
 """
 
 import logging
@@ -58,13 +62,18 @@ def compute_tax_expenditure() -> dict:
     """
     Compute the Tax Expenditure Cost KPI and write kpi_tax_expenditure.json.
 
-    Blocked: this KPI needs the PLF "dépenses fiscales" annex, for which no
-    fetcher module exists yet. Build a PLF fetcher (PRD §3.6) before
-    implementing this processor.
+    Blocked: KPI 5.8 needs a costed, multi-year dépenses-fiscales table, but
+    no such tabular dataset is published (verified Session 9). data.gouv.fr /
+    data.economie.gouv.fr expose only an uncosted 468-row list and an 8-row
+    top-IR snapshot; the full chiffrage is PDF-only (PLF Voies et Moyens
+    Tome II). Two fallback paths are documented in CLAUDE.md Session 9:
+    (2) parse the Tome II PDF; (3) track the headline aggregate total only.
     """
     raise NotImplementedError(
-        "compute_tax_expenditure requires a PLF 'dépenses fiscales' fetcher "
-        "(PRD §3.6), which does not exist yet — see Session 5 notes in CLAUDE.md."
+        "compute_tax_expenditure is blocked: no costed tabular dépenses-fiscales "
+        "dataset is published (only an uncosted 468-row list + an 8-row top-IR "
+        "snapshot). Full chiffrage is PDF-only. See CLAUDE.md Session 9 for the "
+        "PDF-parse and headline-aggregate fallback options."
     )
 
 
