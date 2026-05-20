@@ -2,12 +2,10 @@
 KPI: Fiscal Deficit Trend — see PRD §5.7.
 
 France general government fiscal balance as % of GDP, from INSEE BDM
-(B9_S13 / nominal GDP × 100).
+(B9_S13 quarterly summed to annual / nominal GDP × 100).
 
-Peer countries and public-debt-to-GDP are OECD-sourced. Per the Session 4
-decision (see Runtime discoveries in CLAUDE.md), OECD wiring is deferred to
-Session 7 — live column layouts are not inspectable offline — so the `peers`
-block is emitted empty and debt is omitted for now.
+Peer countries and public-debt-to-GDP are OECD-sourced and deferred to a
+later session — `peers` block emitted empty, debt omitted.
 """
 
 import logging
@@ -43,12 +41,11 @@ def compute_fiscal_sustainability() -> dict:
             "deficits. Tracks whether public finances are sustainable over time."
         ),
         "unit": "percent",
-        "source": "INSEE BDM — Comptes des APU",
+        "source": "INSEE BDM — CNT-2020-CSI (quarterly, base 2020) + CNA-2020-PIB",
         "methodology": (
-            "B9_S13 (net lending/borrowing, all APU) / nominal GDP × 100. Peer "
-            "countries and public-debt-to-GDP are OECD-sourced and deferred — "
-            "emitted empty until live OECD column layouts are confirmed "
-            "(Session 7)."
+            "B9NF_S13 (net lending/borrowing, all APU) summed to annual / "
+            "nominal GDP × 100. Peer countries and public-debt-to-GDP are "
+            "OECD-sourced and deferred — emitted empty."
         ),
         "last_updated": now_iso(),
         "france": france,

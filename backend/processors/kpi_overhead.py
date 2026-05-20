@@ -2,9 +2,9 @@
 KPI: Administrative Overhead Rate — see PRD §5.2.
 
 Formula: public sector wage bill (D1_S13) / total APU expenditure × 100.
-France series from INSEE BDM. Peer comparison is deferred (see Runtime
-discoveries in CLAUDE.md): emitted as an empty `peers` block until OECD
-column layouts can be confirmed against a live fetch.
+France series from INSEE BDM's CNT-2020-CSI quarterly accounts, summed to
+annual values. Peer comparison is deferred to a later session and emitted
+as an empty `peers` block.
 """
 
 import logging
@@ -41,11 +41,11 @@ def compute_overhead_rate() -> dict:
             "apparatus rather than delivering services or transfers."
         ),
         "unit": "percent",
-        "source": "INSEE BDM — Comptes des APU",
+        "source": "INSEE BDM — CNT-2020-CSI (quarterly, base 2020)",
         "methodology": (
-            "D1_S13 (compensation of employees, all APU) / total APU expenditure "
-            "× 100. Based on INSEE national accounts. Peer comparison deferred — "
-            "no OECD peer series wired up yet."
+            "D1_S13 (compensation of employees, all APU) / OTE_S13 (total APU "
+            "expenditure) × 100. Quarterly series summed to annual; incomplete "
+            "years dropped. Peer comparison deferred."
         ),
         "last_updated": now_iso(),
         "france": france,

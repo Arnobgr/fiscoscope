@@ -6,8 +6,8 @@ import os
 # data/raw/insee_idbanks.json. All INSEE fetchers load from that file.
 #
 # Logical series names used throughout the pipeline:
-#   wage_bill_apu, wage_bill_central, public_investment, social_benefits,
-#   fiscal_balance, debt_interest, total_apu_expenditure, gdp_nominal, cpi,
+#   wage_bill_apu, public_investment, social_benefits, fiscal_balance,
+#   debt_interest, total_apu_expenditure, gdp_nominal, cpi,
 #   cofog_gf01 through cofog_gf10
 
 # OECD
