@@ -1,13 +1,15 @@
 """
 KPI: Spend vs. Outcome Ratios (PRD §5.9) and Tax Expenditure Cost (PRD §5.8).
 
-Both KPIs depend on data sources not yet wired up:
-
-  - Spend vs. Outcome needs OECD health/education spend, life expectancy and
-    PISA series. The outcome side and all peer benchmarking are OECD-sourced;
-    per the Session 4 decision (see Runtime discoveries in CLAUDE.md), OECD
-    wiring is deferred to Session 7. compute_outcomes() emits a well-formed
-    placeholder so the pipeline stays runnable until then.
+  - Spend vs. Outcome — HEALTH ONLY for now. France health spend (COFOG GF07,
+    % of GDP, stitched INSEE+OECD) is emitted alongside life expectancy at
+    birth (OECD Health Statistics) as two parallel time series — the reader
+    judges whether outcomes track spending. Peer benchmarking is deferred
+    (Phase 1.5), so there is no "indexed to OECD average" transform.
+    The EDUCATION side (spend vs. PISA) is a documented gap: PISA scores are
+    not available via OECD's SDMX API (only enrolment / per-student spend /
+    instruction-time are), so they cannot be fetched programmatically yet.
+    See the Session 9 note in CLAUDE.md.
 
   - Tax Expenditure needs the PLF "dépenses fiscales" annex (PRD §3.6). The
     Session 8-era catalog probe confirmed the costed tabular data is NOT
@@ -18,41 +20,100 @@ Both KPIs depend on data sources not yet wired up:
     headline aggregate).
 """
 
+import json
 import logging
 
-from processors import now_iso, write_output
+import pandas as pd
+
+from processors import (
+    annual_values,
+    latest_raw,
+    load_insee_series,
+    now_iso,
+    write_output,
+)
+from processors.cofog import STITCH_NOTE, function_eur_stitched
 
 log = logging.getLogger(__name__)
 
 
-def compute_outcomes() -> dict:
-    """
-    Write a placeholder kpi_outcomes.json.
+def _life_expectancy_france() -> list[dict]:
+    """France life expectancy at birth (years) per year, from cached OECD raw."""
+    raw_path = latest_raw("oecd_life_expectancy")
+    if raw_path is None:
+        log.warning("No cached oecd_life_expectancy raw — life-expectancy series empty")
+        return []
+    df = pd.DataFrame(json.loads(raw_path.read_text()))
+    df = df[
+        (df["REF_AREA"] == "FRA")
+        & (df["MEASURE"] == "LFEXP")
+        & (df["AGE"] == "Y0")
+        & (df["SEX"] == "_T")
+    ]
+    rows = (
+        df[["TIME_PERIOD", "OBS_VALUE"]]
+        .dropna()
+        .astype({"TIME_PERIOD": int, "OBS_VALUE": float})
+        .sort_values("TIME_PERIOD")
+    )
+    return [{"year": int(r.TIME_PERIOD), "value": round(float(r.OBS_VALUE), 1)} for r in rows.itertuples()]
 
-    The outcome series (life expectancy, PISA) and peer benchmarking are
-    OECD-sourced and deferred to Session 7; france and peers are populated once
-    the OECD fetcher's live column layout is confirmed.
-    """
+
+def compute_outcomes() -> dict:
+    """Compute the health Spend-vs-Outcome KPI and write kpi_outcomes.json."""
+    series = load_insee_series()
+    gdp = annual_values(series["gdp_nominal"])
+
+    health_spend = [
+        {
+            "year": pt["year"],
+            "value": round(pt["value"] / gdp[pt["year"]] * 100, 2),
+            "source": pt["source"],
+        }
+        for pt in function_eur_stitched("GF07", series, gdp)
+        if pt["year"] in gdp and gdp[pt["year"]]
+    ]
+    life_expectancy = _life_expectancy_france()
+
+    latest = None
+    if health_spend and life_expectancy:
+        latest = {
+            "spend_year": health_spend[-1]["year"],
+            "spend_pct_gdp": health_spend[-1]["value"],
+            "life_expectancy_year": life_expectancy[-1]["year"],
+            "life_expectancy_years": life_expectancy[-1]["value"],
+        }
+
     payload = {
         "kpi_id": "outcomes",
-        "kpi_name": "Spend vs. Outcome Ratios",
+        "kpi_name": "Spend vs. Outcome — Health",
         "description": (
-            "Health spend per capita vs. life expectancy and education spend "
-            "per pupil vs. PISA scores, indexed to the OECD average."
+            "France public health spend (COFOG GF07) as % of GDP set against "
+            "life expectancy at birth, as two parallel time series. A widening "
+            "gap between rising spend and flat outcomes signals declining "
+            "efficiency."
         ),
-        "unit": "index",
-        "source": "OECD Data Explorer — health expenditure, life expectancy, PISA",
+        "unit": "mixed",
+        "source": (
+            "INSEE BDM + OECD GIP 2025 (health spend, % of GDP); "
+            "OECD Health Statistics (life expectancy at birth)"
+        ),
         "methodology": (
-            "Deferred to Session 7: the outcome series (life expectancy, PISA) "
-            "and peer benchmarking are OECD-sourced and require live column "
-            "layouts to be confirmed before wiring up. PISA is triennial and "
-            'will be linearly interpolated between survey years, with '
-            'interpolated points marked "interpolated": true.'
+            "Health block: GF07 (health) COFOG spend / nominal GDP × 100, "
+            "stitched INSEE 1995–2020 + OECD 2021+ (each point source-tagged). "
+            "Life expectancy at birth, total population, from OECD Health "
+            "Statistics (DF_LE). Education (spend vs. PISA) is omitted — PISA "
+            "is not available via OECD's SDMX API. Peer benchmarking deferred. "
+            + STITCH_NOTE
         ),
         "last_updated": now_iso(),
-        "france": [],
+        "health": {
+            "spend_pct_gdp": health_spend,
+            "life_expectancy_years": life_expectancy,
+        },
+        "education": None,
         "peers": {},
-        "latest": None,
+        "latest": latest,
     }
     write_output("kpi_outcomes.json", payload)
     return payload
@@ -80,4 +141,10 @@ def compute_tax_expenditure() -> dict:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     result = compute_outcomes()
-    print(f"\nOutcomes: {len(result['france'])} France data points (placeholder)")
+    h = result["health"]
+    print(
+        f"\nOutcomes (health): {len(h['spend_pct_gdp'])} spend points, "
+        f"{len(h['life_expectancy_years'])} life-expectancy points"
+    )
+    if result["latest"]:
+        print(f"Latest: {result['latest']}")

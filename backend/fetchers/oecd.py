@@ -5,7 +5,7 @@ from io import StringIO
 import pandas as pd
 import requests
 
-from config import OECD_COUNTRIES, OECD_START_YEAR
+from config import INSEE_START_YEAR, OECD_COUNTRIES, OECD_START_YEAR
 from fetchers import DEFAULT_HEADERS, save_raw
 
 log = logging.getLogger(__name__)
@@ -14,6 +14,16 @@ OECD_BASE = "https://sdmx.oecd.org/public/rest/data"
 # Dataset IDs reference the 2025 Government at a Glance edition — update when 2027 ships.
 COFOG_DATASET = "OECD.GOV.GIP,DSD_GOV_COFOG@DF_GOV_COFOG_2025"
 FISCAL_DATASET = "OECD.GOV.GIP,DSD_GOV_TRANSACTION@DF_GOV_TRANSACTION_2025"
+
+# Life expectancy (OECD Health Statistics). The DSD_HEALTH_STAT structure has 13
+# dimensions in this order:
+#   REF_AREA . FREQ . MEASURE . UNIT_MEASURE . AGE . SEX . SOCIO_ECON_STATUS .
+#   DEATH_CAUSE . CALC_METHODOLOGY . GESTATION_THRESHOLD . HEALTH_STATUS .
+#   DISEASE . CANCER_SITE
+# Key below pins France / annual / life-expectancy / years / at-birth / total
+# and wildcards the 7 trailing dimensions (→ 12 dots total).
+LIFE_EXPECTANCY_DATASET = "OECD.ELS.HD,DSD_HEALTH_STAT@DF_LE"
+LIFE_EXPECTANCY_KEY = "FRA.A.LFEXP.Y.Y0._T......."
 
 # Both 2025-edition DSDs expose 8 key dimensions in this order:
 #   FREQ . REF_AREA . MEASURE . UNIT_MEASURE . SECTOR . (EXPENDITURE|TRANSACTION) . EDITION . CATEGORY
@@ -54,9 +64,22 @@ def fetch_oecd_fiscal(countries: list[str] = None, start_year: int = OECD_START_
     return df
 
 
+def fetch_oecd_life_expectancy(start_year: int = INSEE_START_YEAR) -> pd.DataFrame:
+    """
+    Fetch France life expectancy at birth (total population), annual, in years.
+    Defaults to INSEE_START_YEAR (1995) to span the same range as the
+    INSEE-sourced health-spend series it is compared against.
+    """
+    df = _fetch_oecd_csv(LIFE_EXPECTANCY_DATASET, LIFE_EXPECTANCY_KEY, start_year)
+    save_raw("oecd_life_expectancy", df.to_dict(orient="records"))
+    return df
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     cofog = fetch_oecd_cofog()
     print(f"\nOECD COFOG: {len(cofog)} rows, {cofog.shape[1]} columns")
     fiscal = fetch_oecd_fiscal()
     print(f"OECD fiscal: {len(fiscal)} rows, {fiscal.shape[1]} columns")
+    le = fetch_oecd_life_expectancy()
+    print(f"OECD life expectancy: {len(le)} rows, {le.shape[1]} columns")

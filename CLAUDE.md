@@ -516,6 +516,43 @@ Runtime discoveries below.
 
 ---
 
+- **Session 10 — Outcomes KPI shipped HEALTH-ONLY as dual time series.**
+  Per-user decisions: (a) ship health only — **PISA is not in OECD's SDMX API**
+  (the dataflow catalog has enrolment, per-student expenditure `DSD_EAG_UOE_FIN`,
+  instruction time, and TALIS, but no student-performance scores; PISA ships via
+  separate downloads/the PISA explorer), so the education side is a documented
+  gap; (b) **dual time series**, not "indexed to OECD average" — peer
+  benchmarking is deferred, so the KPI emits France health spend and life
+  expectancy as two parallel series and lets the reader judge whether outcomes
+  track spend. Implementation:
+    - **New fetcher `fetch_oecd_life_expectancy()`** in `fetchers/oecd.py`.
+      Dataset `OECD.ELS.HD,DSD_HEALTH_STAT@DF_LE`. The DSD has **13 dimensions**
+      in order `REF_AREA.FREQ.MEASURE.UNIT_MEASURE.AGE.SEX.SOCIO_ECON_STATUS.
+      DEATH_CAUSE.CALC_METHODOLOGY.GESTATION_THRESHOLD.HEALTH_STATUS.DISEASE.
+      CANCER_SITE`, so the France key is `FRA.A.LFEXP.Y.Y0._T.......` (12 dots,
+      7 trailing wildcards). `MEASURE=LFEXP`, `AGE=Y0` (at birth), `SEX=_T`
+      (total), `UNIT_MEASURE=Y` (years). Defaulted `start_year=INSEE_START_YEAR`
+      (1995, not OECD's 2000) so it spans the same range as the health-spend
+      series. Verified live: France 1995→2023, 29 annual points (78.1y→83.0y).
+    - **`compute_outcomes()` rewritten** (`processors/kpi_outcomes.py`): health
+      spend = GF07 COFOG `function_eur_stitched("GF07", …)` / nominal GDP × 100
+      (so it reuses the Session 8 INSEE+OECD stitch and inherits `source` tags);
+      life expectancy read from the cached `oecd_life_expectancy` raw filtered to
+      `LFEXP/Y0/_T`. Output schema changed from the old `france/peers/latest`
+      placeholder to `{health: {spend_pct_gdp[], life_expectancy_years[]},
+      education: null, peers: {}, latest: {...}}`. Registered
+      `oecd_life_expectancy` in `run_pipeline.run_annual()`.
+  Verified end to end: both series 1995–2023 (29 pts). Note the intended signal
+  is already visible — 2015→2020 spend +0.86pp of GDP while life expectancy was
+  flat (82.4→82.3y). **Education gap reopen path:** if PISA becomes a priority,
+  source it from the OECD PISA explorer bulk download or a data.gouv.fr mirror
+  (not SDMX), interpolate the triennial surveys linearly per PRD §5.9, and add
+  an `education` block mirroring `health`. `write_output` still logs "0 France
+  data points" for this KPI because the payload has no `france` key — cosmetic,
+  left as-is.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
