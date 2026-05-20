@@ -7,12 +7,15 @@ block is empty. COFOG inputs are stitched INSEE 1995–2020 + OECD 2021+
 """
 
 import logging
+import re
 
 from processors import (
     annual_values,
     build_latest,
     load_insee_series,
+    load_oecd_long,
     now_iso,
+    peer_series,
     write_output,
 )
 from processors.cofog import (
@@ -23,6 +26,29 @@ from processors.cofog import (
 )
 
 log = logging.getLogger(__name__)
+
+_TOP_GF = re.compile(r"^GF(0[1-9]|10)$")
+
+
+def _cofog_bucket_peers(bucket_codes: list[str]) -> dict:
+    """
+    Peer block for a COFOG bucket: sum(bucket_codes) / sum(GF01..GF10) × 100,
+    per peer country, from cached oecd_cofog (% of GDP cancels in the ratio).
+    bucket_codes are OECD GF codes, e.g. ["GF04","GF05","GF06"].
+    """
+    cofog = load_oecd_long("oecd_cofog")
+    top = cofog[(cofog["measure"] == "GE") & cofog["expenditure"].str.match(_TOP_GF)]
+    total = top.groupby(["country", "year"])["value"].sum().rename("tot").reset_index()
+    num = (
+        top[top["expenditure"].isin(bucket_codes)]
+        .groupby(["country", "year"])["value"]
+        .sum()
+        .rename("num")
+        .reset_index()
+    )
+    merged = total.merge(num, on=["country", "year"])
+    merged["value"] = merged["num"] / merged["tot"] * 100
+    return peer_series(merged[["country", "year", "value"]])
 
 
 def compute_productive_spend() -> dict:
@@ -54,10 +80,12 @@ def compute_productive_spend() -> dict:
         "methodology": (
             "COFOG productive bucket (GF04 + GF05 + GF06) / total COFOG "
             "expenditure × 100. " + CLASSIFICATION_CAVEAT + " " + STITCH_NOTE
+            + " Peers: OECD GIP 2025, productive bucket / total COFOG (both % of "
+            "GDP); OECD_AVG = unweighted mean of the 6 peers; peer series start 2007."
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": {},
+        "peers": _cofog_bucket_peers(["GF04", "GF05", "GF06"]),
         "latest": build_latest(france),
     }
     write_output("kpi_productive_spend.json", payload)
