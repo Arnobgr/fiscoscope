@@ -26,6 +26,7 @@ from processors import (
     write_output,
 )
 from processors.cofog import STITCH_NOTE, bucket_cofog
+from processors.kpi_allocation import _cofog_bucket_peers
 
 log = logging.getLogger(__name__)
 
@@ -72,10 +73,15 @@ def compute_friction_ratio() -> dict:
             "derived as total COFOG expenditure + fiscal balance "
             "(B9_S13, INSEE) since no direct tax-revenue series is resolved. "
             "This is an approximation — see PRD §5.3. " + STITCH_NOTE
+            + " Peers: OECD GIP 2025, administrative bucket (GF01+GF02+GF03) / "
+            "total COFOG. NOTE: the France-side denominator is revenue "
+            "(expenditure + balance) while the peer denominator is total "
+            "expenditure, so peers are TREND-comparable, not level-comparable. "
+            "OECD_AVG = unweighted mean of the 6 peers; peer series start 2007."
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": {},
+        "peers": _cofog_bucket_peers(["GF01", "GF02", "GF03"]),
         "latest": build_latest(france),
     }
     write_output("kpi_friction_ratio.json", payload)
