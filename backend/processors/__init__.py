@@ -110,6 +110,22 @@ def write_output(filename: str, payload: dict) -> Path:
     return path
 
 
+def year_end_value(df: pd.DataFrame) -> dict[int, float]:
+    """
+    Collapse a quarterly (date, value) DataFrame to {year: Q4_value} — the
+    correct annual figure for a STOCK (e.g. outstanding debt). Years without a
+    Q4 observation are dropped. Annual ('YYYY') input passes through unchanged.
+    """
+    tmp = df.dropna(subset=["value"])
+    if tmp.empty:
+        return {}
+    dates = tmp["date"].astype(str)
+    if dates.str.match(_ANNUAL_DATE_RE).all():
+        return {to_year(d): float(v) for d, v in zip(tmp["date"], tmp["value"])}
+    q4 = tmp[dates.str.endswith("-Q4")]
+    return {to_year(d): float(v) for d, v in zip(q4["date"], q4["value"])}
+
+
 OECD_PEERS = ["DEU", "GBR", "ITA", "ESP", "NLD", "SWE"]
 OECD_AVG_KEY = "OECD_AVG"
 
