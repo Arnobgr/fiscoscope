@@ -31,6 +31,8 @@ from fetchers.insee_bdm import fetch_all_insee_series
 from fetchers.insee_idbank_resolver import run_idbank_resolver
 from fetchers.oecd import (
     fetch_oecd_cofog,
+    fetch_oecd_debt,
+    fetch_oecd_deficit,
     fetch_oecd_fiscal,
     fetch_oecd_life_expectancy,
 )
@@ -126,6 +128,8 @@ def run_annual(sources: dict) -> None:
     _run_step("oecd_cofog", fetch_oecd_cofog, sources)
     _run_step("oecd_fiscal", fetch_oecd_fiscal, sources)
     _run_step("oecd_life_expectancy", fetch_oecd_life_expectancy, sources)
+    _run_step("oecd_deficit", fetch_oecd_deficit, sources)
+    _run_step("oecd_debt", fetch_oecd_debt, sources)
     _run_step(
         "budget_plrg", fetch_plrg_execution, sources, datetime.now().year - 1
     )

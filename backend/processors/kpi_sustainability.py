@@ -2,10 +2,13 @@
 KPI: Fiscal Deficit Trend — see PRD §5.7.
 
 France general government fiscal balance as % of GDP, from INSEE BDM
-(B9_S13 quarterly summed to annual / nominal GDP × 100).
+(B9_S13 quarterly summed to annual / nominal GDP × 100), plus the Maastricht
+public-debt-to-GDP ratio (DETTE-TRIM-APU-2020, year-end stock).
 
-Peer countries and public-debt-to-GDP are OECD-sourced and deferred to a
-later session — `peers` block emitted empty, debt omitted.
+Peers are OECD-sourced (GIP 2025, % of GDP): net lending/borrowing for the
+deficit and Maastricht gross debt for the debt, each as a `deficit`/`debt`
+sub-block under `peers`, with an unweighted 6-peer OECD_AVG. Peer data starts
+2007 (OECD GIP coverage limit).
 """
 
 import logging
@@ -14,8 +17,11 @@ from processors import (
     annual_values,
     build_latest,
     load_insee_series,
+    load_oecd_long,
     now_iso,
+    peer_series,
     write_output,
+    year_end_value,
 )
 
 log = logging.getLogger(__name__)
@@ -33,23 +39,47 @@ def compute_fiscal_sustainability() -> dict:
         if gdp[year]
     ]
 
+    # Maastricht public-debt-to-GDP (year-end stock, base 2020), already a ratio.
+    debt_ratio = year_end_value(series["public_debt_ratio"])
+    debt_france = [
+        {"year": y, "value": round(debt_ratio[y], 2)} for y in sorted(debt_ratio)
+    ]
+
+    # Peer raw is pre-filtered to net-lending-%GDP / Maastricht-debt-%GDP by the
+    # fetcher key, so country/year/value is all that's needed.
+    deficit_peers = load_oecd_long("oecd_deficit")
+    debt_peers = load_oecd_long("oecd_debt")
+    peers = {
+        "deficit": peer_series(deficit_peers[["country", "year", "value"]]),
+        "debt": peer_series(debt_peers[["country", "year", "value"]]),
+    }
+
     payload = {
         "kpi_id": "sustainability",
         "kpi_name": "Fiscal Deficit Trend",
         "description": (
-            "General government fiscal balance as % of GDP. Negative values are "
-            "deficits. Tracks whether public finances are sustainable over time."
+            "General government fiscal balance as % of GDP (negative values are "
+            "deficits) plus the Maastricht public-debt-to-GDP ratio. Tracks "
+            "whether public finances are sustainable over time, benchmarked "
+            "against OECD peers."
         ),
         "unit": "percent",
-        "source": "INSEE BDM — CNT-2020-CSI (quarterly, base 2020) + CNA-2020-PIB",
+        "source": (
+            "INSEE BDM — CNT-2020-CSI + CNA-2020-PIB + DETTE-TRIM-APU-2020 "
+            "(Maastricht debt); peers OECD GIP 2025 (DSD_GOV, % of GDP)"
+        ),
         "methodology": (
-            "B9NF_S13 (net lending/borrowing, all APU) summed to annual / "
-            "nominal GDP × 100. Peer countries and public-debt-to-GDP are "
-            "OECD-sourced and deferred — emitted empty."
+            "Deficit: B9NF_S13 (net lending/borrowing, all APU) summed to annual "
+            "/ nominal GDP × 100. Debt: Maastricht public-debt-to-GDP "
+            "(DETTE-TRIM-APU-2020, base 2020), taken at the year-end (Q4) quarter "
+            "since debt is a stock. Peers: OECD GIP 2025 net lending/borrowing "
+            "(GNLB) and Maastricht gross debt (GGDM), both % of GDP — OECD_AVG is "
+            "the unweighted mean of DEU/GBR/ITA/ESP/NLD/SWE; peer series start 2007."
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": {},
+        "debt": {"france": debt_france},
+        "peers": peers,
         "latest": build_latest(france),
     }
     write_output("kpi_sustainability.json", payload)
