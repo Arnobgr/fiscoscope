@@ -469,6 +469,71 @@ section below, then commit.
 
 ---
 
+- **Session C (2026-05-20) — tax-expenditure source spike: DECISION = BUILD (GTED
+  via Zenodo).** A spike, not a build — no fetcher/KPI written this session. Session 9
+  deferred `kpi_tax_expenditure` because no costed, multi-year, full-list tabular source
+  was known; this session re-checked every candidate and **found one**, so the decision
+  flips to *build* (scheduled as Task C2 in the plan, gated on user go-ahead). Every
+  source checked, with format / multi-year-costed availability / licence:
+  - **data.gouv.fr catalog sweep** (the plan's hyper-specific multi-term queries all
+    returned **0 results** — data.gouv's search needs broad terms; `q="depenses fiscales"`
+    returns the real 6-dataset catalog). Confirms Session 9 at field level:
+    - `plf-2024-vm-tome-2-depenses-fiscales` — CSV/JSON, licence **notspecified**, 468
+      rows, columns = impôt / catégorie / type / **code numérique** / description /
+      finalité. **UNCOSTED** (no montant, no year cols). Full list, no cost.
+    - `plf2023-voies-et-moyens-t2-liste-des-depenses-fiscales` — CSV/XLSX/JSON, lov2;
+      the ODS export now returns only record-metadata columns → **0 real records**
+      (deprecated/empty).
+    - `top-8-depenses-fiscales-ir2021dlf-bces` — CSV/JSON, licence **lov2** (Licence
+      Ouverte 2.0, redistribution OK). **COSTED** (`Coût 2021/2022/2023 en M€`, nombre
+      bénéficiaires 2021) but only **8 rows, impôt-sur-le-revenu subset**, a one-off
+      (last modified 2023-03-10). Partial, not the full list.
+    - `liste-des-8-depenses-fiscales-les-plus-couteuses-...-ir` — same shape, 8-row IR
+      snapshot (2018), lov2.
+    - Two Cour-des-comptes-style "efficience / gestion des dépenses fiscales" reports
+      (2017/2019, odc-odbl) — thematic/narrative, not a full costed table.
+    - `plf-201x-recettes-fiscales-nettes` sets — tax **revenue**, not tax expenditures.
+    → data.gouv.fr verdict unchanged from Session 9: no full-list, costed, multi-year
+    tabular source. Best costed = the 8-row IR snapshot.
+  - **GTED — Global Tax Expenditures Database (the lead, CC-BY).** The website
+    (`gted.net` → `gted.taxexpenditures.org`) sits behind a **Cloudflare JS challenge**
+    ("Just a moment…", `server: cloudflare`) — `requests` + `DEFAULT_HEADERS` get `403`
+    on every path, so the site itself is NOT scrapable without a headless browser. **But
+    the full database is mirrored on Zenodo**, reachable via the Zenodo REST API with
+    `DEFAULT_HEADERS` (no Cloudflare): concept record `12585656`; latest **v1.3.2 =
+    record `17312217`** (published 2025-10-10), a single **18.57 MB XLSX**
+    (`GTED_FullDatabase_20251010.xlsx`), download verified HTTP 200. Licence
+    **CC-BY-4.0** (Zenodo metadata + GTED site agree) → redistribution permitted with
+    attribution (cite Redonda, von Haldenwang & Aliu; DIE/CEP). Sheets: `Information,
+    TEProvisions, RevenueForgone, NumberofBeneficiaries, Background_data, Source Tables`.
+    The **`RevenueForgone`** sheet is the costed long table (150,705 rows total): columns
+    `Country, ProvisionID, Year, RF (LCU), Projection/Estimate, Note, RF (USD),
+    RF % of GDP, RF % of Tax`. **France (`Country=="FRA"`): 10,896 rows, 869 distinct
+    provisions, years 1999–2025, every row costed** (`RF (LCU)` = EUR; ~400 provisions
+    reported per year). Annual ΣRF (LCU) matches France's published dépenses-fiscales
+    headline (2024 ≈ €79.8 Bn, 2018 ≈ €96.5 Bn — the real ~€80–90 Bn/yr). This is a
+    **clean, costed, multi-year, redistribution-OK tabular source** → satisfies KPI 5.8's
+    needs (count + total cost + ratio + YoY).
+  - **Eurostat** `gov_10a_taxag` — tax **revenue** aggregates (ESA 2010 detailed
+    receipts), **no** France tax-expenditure / niches-fiscales dataset. Not applicable.
+  - **performance.gouv.fr / forge.dgfip, Cour des comptes / Assemblée nationale** — the
+    official full costed list (Voies et Moyens *Tome II*) remains **PDF-only** in these
+    channels; no tabular open-data mirror beyond what data.gouv.fr already carries. GTED
+    supersedes the need to parse these.
+  **Build caveats to honour in Task C2 (do not lose these):** (1) fetch from **Zenodo,
+  not gted.net** — resolve the latest version from the concept record `12585656`
+  (`/api/records/12585656` → follow to the newest version) so the fetcher tracks new
+  releases without a hardcoded record id; (2) **CC-BY-4.0 requires attribution** — emit
+  the GTED citation/DOI in the KPI JSON `source` and surface it in the frontend; (3) GTED
+  is a **third-party academic compilation** of France's own PLF data, not a primary
+  statistical-agency feed like the rest of the pipeline — its provision count (~400/yr)
+  and Revenue-Forgone definition differ slightly from France's PLF (~468 lines), so state
+  the methodology/source clearly; (4) data is an **annual XLSX snapshot** (one big file),
+  read it with the pinned `openpyxl==3.1.5`. **Session 9's option-2 (PDF parse of Tome II)
+  and option-3 (headline aggregate) are now FALLBACKS ONLY** — preferred path is GTED.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
