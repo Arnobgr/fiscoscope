@@ -598,6 +598,38 @@ section below, then commit.
       transformation (constant-euro reframing), not a standalone metric. Build it
       only when a KPI wants constant-euro framing; `cpi` remains loaded but
       unconsumed.
+  - **D2 BUILT — `kpi_wage_ratio` (`processors/kpi_wage_ratio.py`, new).** Formula:
+    `wage_bill_apu (D1_S13, millions) × 1e6 / private wage bill (Σ4 Urssaf
+    ms_t_60j_cvs quarters, absolute EUR) × 100`. The `× 1e6` is the unit
+    correction above — **a deliberate deviation from the plan's literal
+    `public / private × 100`**, which was off by 1e6. Private side hand-rolls the
+    4-quarter sum (Urssaf isn't an INSEE BDM series, so `annual_values` can't read
+    it; the standard helpers — `annual_values`, `build_latest`, `latest_raw`,
+    `load_insee_series`, `now_iso`, `write_output` — are reused everywhere else).
+    France-only (no peer source). Registered in **`run_monthly()`** after the
+    `urssaf` fetch. Verified: 29 pts 1997–2025, 2025 = 49.77%.
+  - **D3 BUILT — `kpi_debt_service` (`processors/kpi_debt_service.py`, new).**
+    Formula: `debt_interest (D41_S13) / [total_apu_expenditure (OTE) +
+    fiscal_balance (B9NF)] × 100` — the same revenue denominator as
+    friction/tax-expenditure. All three legs are CNT-2020-CSI (millions), so units
+    cancel — **no scaling needed** (unlike D2). France-only. Registered in
+    **`run_annual()`** after `kpi_sustainability`. Verified: 31 pts 1995–2025,
+    range 2.43–6.94% (1995 = 6.79% → 2020-era ZIRP trough → 2025 = 4.15%).
+  - **Orphan status now:** `debt_interest` (D41) and **Urssaf are no longer
+    orphaned** (consumed by D3 and D2 respectively). **`cpi` and France Travail
+    remain unused.** France Travail would become a KPI only with a benefit-**spend**
+    series (COFOG GF10.5 unemployment sub-function in EUR, or a France-Travail
+    expenditure/montant file) to pair with its indemnisés count as € per recipient.
+  - **Verified** via `python run_pipeline.py --mode full --no-upload`:
+    `kpi_wage_ratio` and `kpi_debt_service` both `status: ok` in `meta.json`
+    (latest_year 2025). `budget_plrg` remains the only by-design `skipped`.
+  - **WATCH ITEM TRIGGERED — `open.urssaf.fr` TLS still expired (2026-05-21).** The
+    `urssaf` fetch step reported `status: error`
+    (`CERTIFICATE_VERIFY_FAILED ... certificate has expired`), failing soft as
+    designed — **`verify=False` was NOT added** (per the plan's standing
+    instruction). `kpi_wage_ratio` still computed `ok` from the cached
+    `data/raw/urssaf_2026-05-16.json`, so the wage-ratio output is **current as of
+    that cache, not a fresh fetch** — it will go stale until the cert is renewed.
 
 ---
 
