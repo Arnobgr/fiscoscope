@@ -17,7 +17,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Load .env before importing config so R2 credentials are picked up.
+# Load .env (if present) before importing config, so any env-driven settings
+# (e.g. API ALLOWED_ORIGINS / RATE_LIMIT) are available during local runs.
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 import argparse
@@ -47,7 +48,6 @@ from processors.kpi_overhead import compute_overhead_rate
 from processors.kpi_debt_service import compute_debt_service
 from processors.kpi_sustainability import compute_fiscal_sustainability
 from processors.kpi_wage_ratio import compute_wage_ratio
-from publishers.r2_upload import upload_all_outputs
 
 PIPELINE_VERSION = "1.0.0"
 
@@ -153,11 +153,6 @@ def main() -> None:
     parser.add_argument(
         "--mode", choices=["monthly", "annual", "full"], default="full"
     )
-    parser.add_argument(
-        "--no-upload",
-        action="store_true",
-        help="Skip the R2 upload step (for local dry runs).",
-    )
     args = parser.parse_args()
 
     sources: dict = {}
@@ -167,14 +162,6 @@ def main() -> None:
         run_monthly(sources)
 
     write_meta(args.mode, sources)
-
-    if args.no_upload:
-        log.info("Skipping R2 upload (--no-upload)")
-    else:
-        try:
-            upload_all_outputs()
-        except Exception:
-            log.exception("R2 upload failed")
 
     log.info("Pipeline complete")
 
