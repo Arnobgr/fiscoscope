@@ -45,6 +45,7 @@ from processors.kpi_monthly import compute_monthly_execution
 from processors.kpi_outcomes import compute_outcomes, compute_tax_expenditure
 from processors.kpi_overhead import compute_overhead_rate
 from processors.kpi_sustainability import compute_fiscal_sustainability
+from processors.kpi_wage_ratio import compute_wage_ratio
 from publishers.r2_upload import upload_all_outputs
 
 PIPELINE_VERSION = "1.0.0"
@@ -117,6 +118,7 @@ def run_monthly(sources: dict) -> None:
     log.info("=== monthly pipeline ===")
     _run_step("budget_execution", fetch_monthly_execution, sources)
     _run_step("urssaf", fetch_urssaf_wage_bill, sources)
+    _run_step("kpi_wage_ratio", compute_wage_ratio, sources)
     _run_step("france_travail", fetch_france_travail_allocataires, sources)
     _run_step("kpi_monthly_execution", compute_monthly_execution, sources)
 
