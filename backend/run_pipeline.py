@@ -44,6 +44,7 @@ from processors.kpi_friction import compute_friction_ratio
 from processors.kpi_monthly import compute_monthly_execution
 from processors.kpi_outcomes import compute_outcomes, compute_tax_expenditure
 from processors.kpi_overhead import compute_overhead_rate
+from processors.kpi_debt_service import compute_debt_service
 from processors.kpi_sustainability import compute_fiscal_sustainability
 from processors.kpi_wage_ratio import compute_wage_ratio
 from publishers.r2_upload import upload_all_outputs
@@ -142,6 +143,7 @@ def run_annual(sources: dict) -> None:
     _run_step("kpi_productive_spend", compute_productive_spend, sources)
     _run_step("kpi_pension_investment", compute_pension_investment, sources)
     _run_step("kpi_sustainability", compute_fiscal_sustainability, sources)
+    _run_step("kpi_debt_service", compute_debt_service, sources)
     _run_step("kpi_outcomes", compute_outcomes, sources)
     _run_step("kpi_tax_expenditure", compute_tax_expenditure, sources)
 
