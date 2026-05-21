@@ -21,12 +21,15 @@ INSEE_START_YEAR = 1995
 RAW_DATA_DIR = "data/raw"
 OUTPUT_DATA_DIR = "data/output"
 
-# Cloudflare R2 (loaded from environment via .env)
-R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "")
-R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
-R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
-R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
-R2_PUBLIC_URL = os.environ.get("R2_PUBLIC_URL", "")  # e.g. https://pub-xxx.r2.dev
+# API server (FastAPI — see PRD §8). Read from the environment; in production
+# the systemd unit / `uvicorn --env-file` supplies these.
+# ALLOWED_ORIGINS: comma-separated list of browser origins allowed by CORS
+#   (e.g. "https://fisc-o-scope.pages.dev"). Empty = no cross-origin reads.
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()
+]
+# RATE_LIMIT: slowapi limit string applied globally to every endpoint.
+RATE_LIMIT = os.environ.get("RATE_LIMIT", "60/minute")
 
 # COFOG bucket classification (logical names matching keys in insee_idbanks.json)
 COFOG_PRODUCTIVE = ["cofog_gf04", "cofog_gf05", "cofog_gf06"]
