@@ -564,6 +564,43 @@ section below, then commit.
 
 ---
 
+- **Session D (2026-05-21) — orphaned-source KPI evaluation (plan
+  `docs/superpowers/plans/2026-05-20-backend-kpi-expansion.md`).** Four orphaned
+  inputs evaluated; two built (#1, #2), two deferred (#3, #4).
+  - **D1 decision = BUILD #1 + #2, DEFER #3 + #4.** Sanity-checked the Urssaf
+    annualization and ratio scale against the cached raw before building.
+    - **Urssaf raw** (`data/raw/urssaf_2026-05-16.json`, 116 rows): every year
+      **1997–2025 has all 4 quarters** (none dropped by the "complete-year"
+      filter — the unsorted file made early rows *look* sparse, but `groupby`
+      confirms 29 complete years). `ms_t_60j_cvs` is the seasonally-adjusted
+      quarterly private wage bill in **absolute EUR** (1998 ≈ €78.5 Bn/quarter).
+    - **UNIT MISMATCH (the trap the plan's D1 step exists to catch).** INSEE
+      `wage_bill_apu` (D1_S13, CNT-2020-CSI) is in **millions of EUR**
+      (2023 = 346,293 = €346.3 Bn), but Urssaf `ms_t_60j_cvs` is **absolute EUR**
+      (2023 ΣQ = 703,264,232,755 = €703.3 Bn). The plan's literal D2 ratio
+      `public / private × 100` is therefore **off by exactly 1e6** (yields
+      ~5e-5%). **Fix (data-verified, documented CNT-2020-CSI convention from
+      Session C): scale public ×1e6** → `public × 1e6 / private × 100`. Corrected
+      ratio is **49–57%, trending down** (1997 ≈ 57% → 2023–25 ≈ 49–50%; public
+      payroll grows slower than the private wage bill, with a real 2020 COVID blip
+      to 54.8% as the private bill dipped) — squarely in the plan's expected
+      40–55% band, so the build proceeds.
+    - **#3 France Travail — DEFERRED (no efficiency ratio possible yet).** The
+      cached `france_travail_*` table gives an indemnisés *count* (`Total (1+2+3)`),
+      a level not a ratio. The natural efficiency metric — **benefit € per
+      recipient** — needs a benefit-**spend** series the France-Travail file does
+      not carry. To build it later, add one of: the COFOG **GF10.5 unemployment
+      sub-function** (EUR spend, sliceable from the OECD GIP COFOG raw or an INSEE
+      functional series) as numerator over the count, or a France-Travail
+      *expenditure* (allocations versées, € montant) file. Until then it stays
+      orphaned.
+    - **#4 CPI deflation — DEFERRED (utility, not a KPI).** `cpi` is a
+      transformation (constant-euro reframing), not a standalone metric. Build it
+      only when a KPI wants constant-euro framing; `cpi` remains loaded but
+      unconsumed.
+
+---
+
 ## Key constraints (from PRD §12)
 
 1. **idBank resolution is runtime-only** — never hardcode idBanks; always load
