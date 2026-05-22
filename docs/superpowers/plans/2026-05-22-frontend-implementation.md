@@ -30,15 +30,15 @@ Use `--save-exact` for any package added later, or rely on `.npmrc` (`save-exact
 | vite | 8.0.10 | 2026-04-23 |
 | react | 19.2.5 | 2026-04-08 |
 | react-dom | 19.2.5 | 2026-04-08 |
-| typescript | 6.0.3 | 2026-04-16 |
+| typescript | 6.0.2 | 2026-03-23 |
 | @vitejs/plugin-react | 6.0.1 | 2026-03-13 |
 | react-router-dom | 7.14.2 | 2026-04-21 |
-| recharts | 3.8.1 | 2026-03-25 |
+| recharts | 3.8.0 | 2026-03-06 |
 | vitest | 4.1.5 | 2026-04-21 |
 | @testing-library/react | 16.3.2 | 2026-01-19 |
 | @testing-library/jest-dom | 6.9.1 | 2025-10-01 |
 | @testing-library/user-event | 14.6.1 | 2025-01-21 |
-| jsdom | 29.1.1 | 2026-04-30 |
+| jsdom | 29.1.0 | 2026-04-27 |
 | @playwright/test | 1.59.1 | 2026-04-01 |
 
 ---
@@ -76,8 +76,8 @@ cd frontend
 # Enforce exact pins for all future installs in this project:
 printf "save-exact=true\n" > .npmrc
 # Install all packages at hard-pinned, supply-chain-safe versions (see "Pinned package versions" table above):
-npm install --save-exact react@19.2.5 react-dom@19.2.5 react-router-dom@7.14.2 recharts@3.8.1
-npm install -D --save-exact vite@8.0.10 @vitejs/plugin-react@6.0.1 typescript@6.0.3 vitest@4.1.5 @testing-library/react@16.3.2 @testing-library/jest-dom@6.9.1 @testing-library/user-event@14.6.1 jsdom@29.1.1 @playwright/test@1.59.1
+npm install --save-exact react@19.2.5 react-dom@19.2.5 react-router-dom@7.14.2 recharts@3.8.0
+npm install -D --save-exact vite@8.0.10 @vitejs/plugin-react@6.0.1 typescript@6.0.2 vitest@4.1.5 @testing-library/react@16.3.2 @testing-library/jest-dom@6.9.1 @testing-library/user-event@14.6.1 jsdom@29.1.0 @playwright/test@1.59.1
 ```
 
 - [ ] **Step 2: Copy the backend output as fixtures**
