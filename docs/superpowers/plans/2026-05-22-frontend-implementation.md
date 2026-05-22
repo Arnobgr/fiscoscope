@@ -6,7 +6,7 @@
 
 **Architecture:** A routed SPA. A pure **data core** (types → French formatters → per-KPI **adapters** that normalize each JSON variant into one common `KpiView` model → a **registry** of French presentation metadata → a fetch/cache layer) is fully TDD'd. UI components consume only `KpiView`, so they're agnostic to per-KPI JSON quirks. Visual styling is applied last via the `frontend-design` skill against stable DOM/behaviour contracts. Dev + tests run on **bundled fixtures** (copies of `backend/data/output/*.json`) so the whole build proceeds in parallel with VPS deployment; production fetches the live API.
 
-**Tech stack:** Vite, React 18, TypeScript, React Router, Recharts, Vitest + React Testing Library, Playwright (1 smoke), self-hosted Fraunces + Inter. No dashboard component kit.
+**Tech stack:** Vite, React 19, TypeScript, React Router, Recharts, Vitest + React Testing Library, Playwright (1 smoke), self-hosted Fraunces + Inter. No dashboard component kit.
 
 **Spec:** `docs/superpowers/specs/2026-05-22-frontend-design.md` (read it; this plan implements it).
 
@@ -15,6 +15,31 @@
 - Branch: `dev` (current). Commit after each task. End commit bodies with:
   `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>`
 - **KPI identity:** the API/file id keeps the `kpi_` prefix (e.g. `kpi_overhead_rate`); the route **slug** drops it (e.g. `overhead_rate`). The registry holds both.
+
+---
+
+## Pinned package versions
+
+All npm packages are **hard-pinned to exact versions** — no `^` or `~` ranges anywhere.
+Every version below was published at least 3 weeks before 2026-05-22 to guard against supply-chain attacks.
+Use `--save-exact` for any package added later, or rely on `.npmrc` (`save-exact=true`) created in Task 1.
+
+| Package | Pinned version | Published |
+|---------|---------------|-----------|
+| create-vite (scaffold only) | 9.0.6 | 2026-04-23 |
+| vite | 8.0.10 | 2026-04-23 |
+| react | 19.2.5 | 2026-04-08 |
+| react-dom | 19.2.5 | 2026-04-08 |
+| typescript | 6.0.3 | 2026-04-16 |
+| @vitejs/plugin-react | 6.0.1 | 2026-03-13 |
+| react-router-dom | 7.14.2 | 2026-04-21 |
+| recharts | 3.8.1 | 2026-03-25 |
+| vitest | 4.1.5 | 2026-04-21 |
+| @testing-library/react | 16.3.2 | 2026-01-19 |
+| @testing-library/jest-dom | 6.9.1 | 2025-10-01 |
+| @testing-library/user-event | 14.6.1 | 2025-01-21 |
+| jsdom | 29.1.1 | 2026-04-30 |
+| @playwright/test | 1.59.1 | 2026-04-01 |
 
 ---
 
@@ -46,11 +71,13 @@
 
 ```bash
 cd /home/arnobgr/french-efficiency-dashboard
-npm create vite@latest frontend -- --template react-ts
+npm create vite@9.0.6 frontend -- --template react-ts
 cd frontend
-npm install
-npm install react-router-dom recharts
-npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom @playwright/test
+# Enforce exact pins for all future installs in this project:
+printf "save-exact=true\n" > .npmrc
+# Install all packages at hard-pinned, supply-chain-safe versions (see "Pinned package versions" table above):
+npm install --save-exact react@19.2.5 react-dom@19.2.5 react-router-dom@7.14.2 recharts@3.8.1
+npm install -D --save-exact vite@8.0.10 @vitejs/plugin-react@6.0.1 typescript@6.0.3 vitest@4.1.5 @testing-library/react@16.3.2 @testing-library/jest-dom@6.9.1 @testing-library/user-event@14.6.1 jsdom@29.1.1 @playwright/test@1.59.1
 ```
 
 - [ ] **Step 2: Copy the backend output as fixtures**
