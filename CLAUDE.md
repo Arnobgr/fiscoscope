@@ -40,8 +40,10 @@ efficiency of the French public administration using publicly available fiscal d
 - Ratio-focused (efficiency per euro, not raw accounting figures)
 - Longitudinal (1995–present time series)
 - Peer-benchmarked (France vs. DE, GB, IT, ES, NL, SE, OECD average)
-- Fully automated (cron pipeline → static JSON → Cloudflare R2 → frontend)
-- No backend API — frontend fetches pre-computed static JSON from R2
+- Fully automated (cron pipeline → static JSON → FastAPI → frontend)
+- Backend API: a small FastAPI app on the VPS serves pre-computed static JSON
+  over read-only HTTP; the frontend (Cloudflare Pages) fetches it. HTTPS via an
+  `<ip>.sslip.io` Let's Encrypt cert (no custom domain).
 
 Full specification: `PRD.md`
 
@@ -67,15 +69,14 @@ french-efficiency-dashboard/
 │   │   ├── kpi_outcomes.py            # Spend vs. Outcome + Tax Expenditure
 │   │   ├── kpi_sustainability.py      # Fiscal Deficit Trend
 │   │   └── kpi_monthly.py             # Monthly Budget Execution
-│   ├── publishers/
-│   │   └── r2_upload.py               # Upload output JSON to Cloudflare R2
+│   ├── api.py                         # FastAPI read-only server for data/output/*.json
 │   ├── data/
 │   │   ├── raw/                       # Cached API responses (not committed)
-│   │   └── output/                    # Final JSON files before upload (not committed)
+│   │   └── output/                    # Final JSON files served by api.py (not committed)
 │   ├── config.py                      # All constants and environment variables
 │   └── run_pipeline.py                # Main entry point (--mode monthly|annual|full)
 ├── frontend/                          # Phase 2 — Vite + React + Recharts (not started)
-├── .env                               # Secrets — never commit (in .gitignore)
+├── .env                               # Environment settings (ALLOWED_ORIGINS, RATE_LIMIT) — never commit
 ├── PRD.md
 └── CLAUDE.md                          # ← this file
 ```
@@ -128,10 +129,7 @@ section below, then commit.
 - **Session 6 — orchestrator is fail-soft (still current).** Every fetcher/processor runs
   inside `_run_step`, which records `status: ok | skipped | error` (with the exception
   message) into `meta.json.sources` and never re-raises — one outage can't abort the run,
-  and `NotImplementedError` lands as `skipped`. `run_pipeline.py` has a `--no-upload` flag
-  and calls `load_dotenv()` from the repo-root `.env` *before* importing `config`.
-  `publishers/r2_upload.py` validates all four R2 env vars upfront and raises one
-  `RuntimeError` listing any missing names.
+  and `NotImplementedError` lands as `skipped`. `run_pipeline.py` calls `load_dotenv()` from the repo-root `.env` *before* importing `config`. (The `--no-upload` flag and the R2 publisher were removed in Session E — output is now served by `api.py`, not uploaded.)
 
 ---
 
@@ -636,6 +634,31 @@ section below, then commit.
 
 ---
 
+- **Session E (2026-05-21) — R2 retired; output now served by a FastAPI app.**
+  Decision (user): drop the Cloudflare R2 upload entirely and serve the ~80 KB
+  `data/output/*.json` directly from a small always-on FastAPI app on the VPS.
+  This reverses the PRD's original "no backend API / static JSON from R2" design.
+    - **New `backend/api.py`** (FastAPI + uvicorn): read-only endpoints
+      `/healthz`, `/api/meta`, `/api/kpis`, `/api/kpi/{name}`, reading
+      `OUTPUT_DATA_DIR`. CORS allowlist (`config.ALLOWED_ORIGINS`) + global
+      `slowapi` rate limit (`config.RATE_LIMIT`, default `60/minute`). KPI names
+      are regex-guarded (`^[a-z0-9_]+$`) against path traversal. `OUTPUT_DIR` is
+      module-level so tests monkeypatch it. Tests in `backend/tests/test_api.py`
+      (pytest + FastAPI TestClient).
+    - **Removed:** `publishers/r2_upload.py` (+ the now-empty `publishers/`),
+      its `run_pipeline.py` import / `--no-upload` flag / upload block, the
+      `R2_*` vars in `config.py`, and `boto3` from `requirements.txt`. Added
+      `fastapi`, `uvicorn[standard]`, `slowapi` (runtime) and a
+      `requirements-dev.txt` with `pytest`, `httpx`.
+    - **Deploy model (not in this repo):** Cloudflare Pages frontend →
+      `<ip>.sslip.io` (Let's Encrypt) → uvicorn, with `ufw` (only 80/443+SSH)
+      and rate limiting. "Only the frontend can call the API" is *not* a goal —
+      impossible for a public SPA + public API, and unneeded for public data;
+      CORS only enables the frontend, rate-limit + firewall bound abuse.
+    - The first live deployment + the frontend (Phase 2) remain to be built.
+
+---
+
 ## Known gaps & blocked attempts (don't re-attempt without new upstream data)
 
 > Consolidated 2026-05-21 from the scattered session notes above. This is the
@@ -643,7 +666,7 @@ section below, then commit.
 > re-attempting any item here, confirm its blocker has changed** — otherwise it
 > will fail the same way. All 8 PRD KPIs (§5.2–5.9) plus 2 extra (wage ratio,
 > debt service) are built and `ok`; the items below are the asterisks on
-> "complete". Backend code is feature-complete; deployment, a live R2 upload run,
+> "complete". Backend code is feature-complete; deployment (first live run of the FastAPI app)
 > and the frontend (Phase 2) are the remaining *build* work (not "blocked" — just
 > not started; see "Open follow-ups" in the expansion plan).
 
@@ -704,11 +727,16 @@ needed series for several, and three KPIs are France-only by construction.
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp ../.env.example .env   # fill in R2 credentials
+# No secrets needed — all data sources are public. The API reads optional
+# ALLOWED_ORIGINS / RATE_LIMIT from the environment.
 
 # Validate idBank resolution first (Session 2+):
 python -m fetchers.insee_idbank_resolver
 
 # Full pipeline run (Session 6+):
 python run_pipeline.py --mode full
+
+# Serve the output over HTTP (separate always-on process):
+ALLOWED_ORIGINS="https://your-frontend.pages.dev" \
+    uvicorn api:app --host 127.0.0.1 --port 8000 --proxy-headers
 ```
