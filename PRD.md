@@ -40,19 +40,17 @@ The target audience is citizens, journalists, and researchers who want a clear, 
 │  │  - Fetches raw data from public APIs                 │  │
 │  │  - Normalizes and stores raw data locally            │  │
 │  │  - Computes KPIs                                     │  │
-│  │  - Writes output JSON files                          │  │
-│  │  - Uploads JSON to Cloudflare R2                     │  │
+│  │  - Writes output JSON files to data/output/          │  │
+│  └──────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  FastAPI app (uvicorn, always-on)                    │  │
+│  │  - Serves data/output/*.json read-only over HTTP     │  │
+│  │  - CORS-restricted to the frontend origin            │  │
+│  │  - Rate-limited (slowapi)                            │  │
 │  └──────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
                           │
-                          │ rclone / boto3 upload
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Cloudflare R2 (object storage)                 │
-│  Public bucket — free tier                                  │
-│  URL pattern: https://pub-{hash}.r2.dev/{filename}.json     │
-└─────────────────────────────────────────────────────────────┘
-                          │
+                          │ HTTPS via <ip>.sslip.io (Let's Encrypt)
                           │ fetch() at page load
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
@@ -62,14 +60,24 @@ The target audience is citizens, journalists, and researchers who want a clear, 
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 No Backend API Required
+### 2.2 Backend API (FastAPI)
 
-There is **no FastAPI or HTTP server** in v1. The VPS runs only a Python cron job. The frontend fetches pre-computed static JSON files directly from R2. This makes the system:
-- Cheaper (no always-on process beyond the cron job)
-- More resilient (no server to go down)
-- Faster for users (static files served from Cloudflare edge)
+The VPS runs a small always-on FastAPI app (served by uvicorn) that exposes the
+pipeline's pre-computed `data/output/*.json` over read-only HTTP. The frontend
+(Cloudflare Pages) fetches these endpoints. The data is public, so the API needs
+no authentication; abuse is bounded by `slowapi` rate limiting and an OS
+firewall, and a CORS allowlist restricts browser cross-origin reads to the
+frontend origin. HTTPS is provided by a Let's Encrypt certificate on an
+`<ip>.sslip.io` hostname — no custom domain required.
 
-A FastAPI layer can be added in a future version if interactive server-side queries are needed.
+Endpoints:
+- `GET /healthz` — liveness check
+- `GET /api/meta` — pipeline run metadata (`meta.json`)
+- `GET /api/kpis` — list of available KPI names
+- `GET /api/kpi/{name}` — one KPI's JSON
+
+This replaces the original R2-upload design; the pipeline no longer pushes to
+object storage.
 
 ### 2.3 Backend Directory Structure
 
@@ -93,12 +101,10 @@ fisc-o-scope/
 │   │   ├── kpi_outcomes.py      # Spend vs. outcome KPIs
 │   │   ├── kpi_sustainability.py # Deficit trend, Debt-Adjusted Return
 │   │   └── kpi_monthly.py       # Monthly execution KPIs
-│   ├── publishers/
-│   │   ├── __init__.py
-│   │   └── r2_upload.py         # Upload JSON output files to Cloudflare R2
+│   ├── api.py                   # FastAPI read-only server for data/output/*.json
 │   ├── data/
 │   │   ├── raw/                 # Raw API responses, cached locally
-│   │   └── output/              # Final JSON files before upload
+│   │   └── output/              # Final JSON files served by api.py
 │   │       ├── meta.json
 │   │       ├── kpi_overhead_rate.json
 │   │       ├── kpi_friction_ratio.json
@@ -112,7 +118,7 @@ fisc-o-scope/
 │   ├── run_pipeline.py          # Main entry point: orchestrates all steps
 │   └── requirements.txt
 ├── frontend/                    # Phase 2 — Vite + React app (not in scope now)
-├── .env                         # Secrets: R2 credentials
+├── .env                         # Environment settings (ALLOWED_ORIGINS, RATE_LIMIT)
 ├── README.md
 └── PRD.md
 ```
@@ -945,7 +951,7 @@ This is the entry point called by the systemd timer. It:
 2. Calls each fetcher and caches raw data to `data/raw/`
 3. Calls each processor which reads from `data/raw/` and writes to `data/output/`
 4. Writes `data/output/meta.json` with pipeline run metadata
-5. Calls the R2 uploader to sync all files in `data/output/` to the R2 bucket
+5. Writes all output to `data/output/`, which the always-on FastAPI app (`api.py`) serves over HTTP — there is no upload step
 
 ```python
 # run_pipeline.py
@@ -965,8 +971,6 @@ from processors.kpi_allocation import compute_productive_spend, compute_pension_
 from processors.kpi_monthly import compute_monthly_execution
 from processors.kpi_sustainability import compute_fiscal_sustainability
 from processors.kpi_outcomes import compute_outcomes, compute_tax_expenditure
-from publishers.r2_upload import upload_all_outputs
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
@@ -977,7 +981,6 @@ def run_monthly():
     fetch_urssaf_wage_bill()
     fetch_france_travail_allocataires()
     compute_monthly_execution()
-    upload_all_outputs(prefix="monthly")
 
 def run_annual():
     """Run annual pipeline: INSEE COFOG, OECD, PLRG, all structural KPIs."""
@@ -996,7 +999,6 @@ def run_annual():
     compute_fiscal_sustainability()
     compute_outcomes()
     compute_tax_expenditure()
-    upload_all_outputs(prefix="annual")
 
 def run_full():
     """Run both monthly and annual pipelines. Used for initial setup."""
@@ -1051,13 +1053,12 @@ INSEE_START_YEAR = 1995
 RAW_DATA_DIR = "data/raw"
 OUTPUT_DATA_DIR = "data/output"
 
-# Cloudflare R2 (loaded from environment)
+# API server (FastAPI), loaded from environment
 import os
-R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "")
-R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
-R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
-R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
-R2_PUBLIC_URL = os.environ.get("R2_PUBLIC_URL", "")  # e.g. https://pub-xxx.r2.dev
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()
+]
+RATE_LIMIT = os.environ.get("RATE_LIMIT", "60/minute")
 
 # COFOG bucket classification
 COFOG_PRODUCTIVE = ["cofog_gf04", "cofog_gf05", "cofog_gf06"]
@@ -1068,60 +1069,55 @@ COFOG_ADMINISTRATIVE = ["cofog_gf01", "cofog_gf02", "cofog_gf03"]
 ### 7.2 `.env` (never commit to git)
 
 ```
-R2_BUCKET_NAME=fisoscope-data
-R2_ACCOUNT_ID=your_cloudflare_account_id
-R2_ACCESS_KEY_ID=your_r2_access_key
-R2_SECRET_ACCESS_KEY=your_r2_secret_key
-R2_PUBLIC_URL=https://pub-yourhash.r2.dev
+ALLOWED_ORIGINS=https://your-frontend.pages.dev
+RATE_LIMIT=60/minute
 ```
 
 ---
 
-## 8. R2 Upload
+## 8. Serving the Output (FastAPI)
 
-### 8.1 `publishers/r2_upload.py`
+### 8.1 `api.py`
+
+A small always-on FastAPI app serves the pipeline's `data/output/*.json` over
+read-only HTTP. It is launched separately from the cron pipeline (e.g. a systemd
+unit running uvicorn). The data is public; there is no authentication.
 
 ```python
-import boto3
-import json
-import os
-import logging
-from pathlib import Path
-from config import (
-    OUTPUT_DATA_DIR, R2_BUCKET_NAME, R2_ACCOUNT_ID,
-    R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
-)
+# api.py (abridged — see the file for the full source)
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 
-log = logging.getLogger(__name__)
+from config import ALLOWED_ORIGINS, OUTPUT_DATA_DIR, RATE_LIMIT
 
-def get_r2_client():
-    return boto3.client(
-        "s3",
-        endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
-        aws_access_key_id=R2_ACCESS_KEY_ID,
-        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
-        region_name="auto"
-    )
-
-def upload_all_outputs(prefix: str = ""):
-    """Upload all JSON files from the output directory to R2."""
-    client = get_r2_client()
-    output_dir = Path(OUTPUT_DATA_DIR)
-    
-    for json_file in output_dir.glob("*.json"):
-        key = json_file.name
-        log.info(f"Uploading {key} to R2")
-        client.upload_file(
-            str(json_file),
-            R2_BUCKET_NAME,
-            key,
-            ExtraArgs={
-                "ContentType": "application/json",
-                "CacheControl": "public, max-age=3600"
-            }
-        )
-        log.info(f"Uploaded {key}")
+limiter = Limiter(key_func=get_remote_address, default_limits=[RATE_LIMIT])
+app = FastAPI(title="fisc-o-scope API", docs_url=None, redoc_url=None)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS,
+                   allow_methods=["GET"], allow_headers=["*"])
 ```
+
+Endpoints: `GET /healthz`, `GET /api/meta`, `GET /api/kpis`,
+`GET /api/kpi/{name}`.
+
+### 8.2 Running it
+
+```bash
+cd backend
+ALLOWED_ORIGINS="https://your-frontend.pages.dev" \
+    uvicorn api:app --host 127.0.0.1 --port 8000 --proxy-headers
+```
+
+`--proxy-headers` lets uvicorn read `X-Forwarded-For` from the reverse proxy so
+slowapi rate-limits on the real client IP. TLS, the reverse proxy, the
+`<ip>.sslip.io` hostname, and the firewall are deployment concerns handled on
+the VPS (not in this repo).
 
 ---
 
@@ -1183,8 +1179,11 @@ Written at the end of every pipeline run. The frontend uses this to display data
 ```
 requests>=2.31.0
 pandas>=2.0.0
-boto3>=1.34.0
+openpyxl>=3.1.0
 python-dotenv>=1.0.0
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+slowapi>=0.1.9
 ```
 
 Note: `pandasdmx` is not required. The INSEE SDMX-JSON responses are parsed directly with the `_parse_sdmx_json` function in `fetchers/insee_bdm.py`. The OECD fetcher requests CSV format directly (`format=csvfilewithlabels`), parsed with `pandas.read_csv`.
@@ -1202,7 +1201,7 @@ Python 3.11+
 - [ ] Implement `fetchers/insee_idbank_resolver.py` and verify it resolves all series correctly against the live mapping file
 - [ ] Implement all remaining fetchers with error handling and local caching
 - [ ] Implement all KPI processors
-- [ ] Implement R2 uploader
+- [ ] Implement FastAPI serving app (`api.py`)
 - [ ] Implement `run_pipeline.py` orchestrator
 - [ ] Run `python -m fetchers.insee_idbank_resolver` standalone to validate idBank resolution before running the full pipeline
 - [ ] Test full pipeline run locally with `python run_pipeline.py --mode full`
@@ -1211,7 +1210,7 @@ Python 3.11+
 
 ### Phase 2 — Frontend (out of scope for this document)
 - Vite + React + Recharts
-- Fetches JSON from R2 `pub-xxx.r2.dev` URLs
+- Fetches JSON from the VPS FastAPI app (e.g. `https://<ip>.sslip.io/api/...`)
 - KPI cards with sparklines (latest value, YoY change, vs. OECD average)
 - Time series charts per KPI with peer country overlays
 - "Last updated" badge from `meta.json`
@@ -1231,4 +1230,4 @@ Python 3.11+
 
 5. **COFOG base changes.** INSEE revised its national accounts base in 2020 (previously base 2014). The COFOG series may have a structural break around 2020. The processor should detect and flag this in the output metadata if the series has inconsistent methodology across years.
 
-6. **No secrets in code or git.** All R2 credentials are loaded from environment variables via `.env`. The `.env` file must be in `.gitignore`.
+6. **No secrets in code or git.** The pipeline needs no secrets (all data sources are public). The API reads only non-secret settings (`ALLOWED_ORIGINS`, `RATE_LIMIT`) from the environment. `.env` remains in `.gitignore`.
