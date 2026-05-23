@@ -1,0 +1,133 @@
+{
+  "kpi_id": "wage_ratio",
+  "kpi_name": "Public / Private Wage Bill Ratio",
+  "description": "Public-sector compensation of employees as a percentage of the private-sector wage bill. A rising ratio means the public payroll is growing relative to the market economy that funds it.",
+  "unit": "percent",
+  "source": "INSEE BDM CNT-2020-CSI (D1_S13) + Urssaf masse salariale (CVS)",
+  "methodology": "D1_S13 (public compensation of employees, annual) / private-sector wage bill (Urssaf ms_t_60j_cvs, seasonally adjusted, summed over 4 quarters) × 100. INSEE CNT-2020-CSI is in millions of euros while Urssaf is in absolute euros, so the public figure is scaled by 1e6 to match units. Years with fewer than 4 Urssaf quarters are dropped.",
+  "last_updated": "2026-05-21T10:03:37Z",
+  "france": [
+    {
+      "year": 1997,
+      "value": 57.06
+    },
+    {
+      "year": 1998,
+      "value": 56.05
+    },
+    {
+      "year": 1999,
+      "value": 55.75
+    },
+    {
+      "year": 2000,
+      "value": 54.7
+    },
+    {
+      "year": 2001,
+      "value": 53.31
+    },
+    {
+      "year": 2002,
+      "value": 54.11
+    },
+    {
+      "year": 2003,
+      "value": 55.0
+    },
+    {
+      "year": 2004,
+      "value": 54.64
+    },
+    {
+      "year": 2005,
+      "value": 54.95
+    },
+    {
+      "year": 2006,
+      "value": 53.97
+    },
+    {
+      "year": 2007,
+      "value": 53.19
+    },
+    {
+      "year": 2008,
+      "value": 52.63
+    },
+    {
+      "year": 2009,
+      "value": 55.21
+    },
+    {
+      "year": 2010,
+      "value": 55.15
+    },
+    {
+      "year": 2011,
+      "value": 54.44
+    },
+    {
+      "year": 2012,
+      "value": 54.14
+    },
+    {
+      "year": 2013,
+      "value": 54.56
+    },
+    {
+      "year": 2014,
+      "value": 54.67
+    },
+    {
+      "year": 2015,
+      "value": 54.16
+    },
+    {
+      "year": 2016,
+      "value": 53.36
+    },
+    {
+      "year": 2017,
+      "value": 52.82
+    },
+    {
+      "year": 2018,
+      "value": 51.34
+    },
+    {
+      "year": 2019,
+      "value": 50.45
+    },
+    {
+      "year": 2020,
+      "value": 54.75
+    },
+    {
+      "year": 2021,
+      "value": 51.81
+    },
+    {
+      "year": 2022,
+      "value": 49.75
+    },
+    {
+      "year": 2023,
+      "value": 49.24
+    },
+    {
+      "year": 2024,
+      "value": 49.84
+    },
+    {
+      "year": 2025,
+      "value": 49.77
+    }
+  ],
+  "peers": {},
+  "latest": {
+    "year": 2025,
+    "value": 49.77,
+    "yoy_change": -0.07
+  }
+}
