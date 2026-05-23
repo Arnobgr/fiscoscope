@@ -1,5 +1,6 @@
 import type {
   KpiView, ViewSeries, Unit, RawPoint, StdSeriesKpi, SustainabilityKpi,
+  OutcomesKpi, TaxExpenditureKpi, MonthlyKpi,
 } from "./types";
 
 export interface AdaptBase { slug: string; title: string; explainer: string; unit: Unit }
@@ -62,5 +63,58 @@ export function adaptSustainability(raw: SustainabilityKpi, b: AdaptBase): KpiVi
     latest: latestFrom(raw.france, "percent", raw.latest),
     hasBreak2020: false,
     ...meta(raw),
+  };
+}
+
+export function adaptOutcomes(raw: OutcomesKpi, b: AdaptBase): KpiView {
+  const spend = raw.health.spend_pct_gdp;
+  const life = raw.health.life_expectancy_years;
+  return {
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    unit: "percent", xKind: "year",
+    series: [{ id: "health_spend", label: "Dépenses de santé (% du PIB)", role: "france", points: yearPoints(spend) }],
+    secondary: {
+      title: "Espérance de vie à la naissance", unit: "years",
+      series: [{ id: "life_exp", label: "Espérance de vie", role: "secondary", points: yearPoints(life) }],
+    },
+    latest: latestFrom(spend, "percent"),
+    hasBreak2020: detectBreak(spend),
+    ...meta(raw),
+  };
+}
+
+export function adaptTaxExpenditure(raw: TaxExpenditureKpi, b: AdaptBase): KpiView {
+  const points = raw.france.map((r) => ({ x: r.year, y: r.total_cost_eur_bn, projection: r.projection }));
+  const rows = raw.france;
+  const last = rows[rows.length - 1];
+  const prev = rows[rows.length - 2];
+  return {
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    unit: "eur_bn", xKind: "year",
+    series: [{ id: "tax_cost", label: "Coût des dépenses fiscales", role: "france", points }],
+    latest: last
+      ? { year: last.year, value: last.total_cost_eur_bn, unit: "eur_bn",
+          yoy: last.yoy_change_pct ?? (prev ? ((last.total_cost_eur_bn - prev.total_cost_eur_bn) / prev.total_cost_eur_bn) * 100 : undefined) }
+      : undefined,
+    hasBreak2020: false,
+    ...meta(raw),
+  };
+}
+
+export function adaptMonthly(raw: MonthlyKpi, b: AdaptBase): KpiView {
+  const months = raw.revenues.months;
+  const toPoints = (vals: number[]) => months.map((m, i) => ({ x: m, y: vals[i] }));
+  const lastIdx = months.length - 1;
+  return {
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    unit: "eur", xKind: "month",
+    series: [
+      { id: "revenues", label: "Recettes (cumul, €)", role: "france", points: toPoints(raw.revenues.total as number[]) },
+      { id: "spending", label: "Dépenses (cumul, €)", role: "secondary", points: toPoints(raw.spending.total as number[]) },
+    ],
+    latest: { year: raw.last_month, value: (raw.balance.cumulative as number[])[lastIdx], unit: "eur",
+              yoy: raw.yoy.revenue_change_pct },
+    hasBreak2020: false,
+    source: "", methodology: "",
   };
 }
