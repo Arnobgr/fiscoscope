@@ -1,0 +1,141 @@
+{
+  "kpi_id": "debt_service",
+  "kpi_name": "Debt Service Burden",
+  "description": "Interest paid on public debt as a percentage of total government revenue. A rising burden crowds out service delivery.",
+  "unit": "percent",
+  "source": "INSEE BDM — CNT-2020-CSI (D41_S13, OTE_S13, B9NF_S13)",
+  "methodology": "D41_S13 (interest paid, all APU) / total government revenue, where revenue = total APU expenditure (OTE) + fiscal balance (B9NF). All from CNT-2020-CSI quarterly accounts summed to annual.",
+  "last_updated": "2026-05-21T10:03:35Z",
+  "france": [
+    {
+      "year": 1995,
+      "value": 6.79
+    },
+    {
+      "year": 1996,
+      "value": 6.94
+    },
+    {
+      "year": 1997,
+      "value": 6.85
+    },
+    {
+      "year": 1998,
+      "value": 6.56
+    },
+    {
+      "year": 1999,
+      "value": 5.91
+    },
+    {
+      "year": 2000,
+      "value": 5.77
+    },
+    {
+      "year": 2001,
+      "value": 5.94
+    },
+    {
+      "year": 2002,
+      "value": 5.96
+    },
+    {
+      "year": 2003,
+      "value": 5.72
+    },
+    {
+      "year": 2004,
+      "value": 5.56
+    },
+    {
+      "year": 2005,
+      "value": 5.35
+    },
+    {
+      "year": 2006,
+      "value": 5.09
+    },
+    {
+      "year": 2007,
+      "value": 5.31
+    },
+    {
+      "year": 2008,
+      "value": 5.66
+    },
+    {
+      "year": 2009,
+      "value": 5.03
+    },
+    {
+      "year": 2010,
+      "value": 5.03
+    },
+    {
+      "year": 2011,
+      "value": 5.25
+    },
+    {
+      "year": 2012,
+      "value": 4.99
+    },
+    {
+      "year": 2013,
+      "value": 4.34
+    },
+    {
+      "year": 2014,
+      "value": 4.08
+    },
+    {
+      "year": 2015,
+      "value": 3.78
+    },
+    {
+      "year": 2016,
+      "value": 3.55
+    },
+    {
+      "year": 2017,
+      "value": 3.3
+    },
+    {
+      "year": 2018,
+      "value": 3.27
+    },
+    {
+      "year": 2019,
+      "value": 2.86
+    },
+    {
+      "year": 2020,
+      "value": 2.43
+    },
+    {
+      "year": 2021,
+      "value": 2.62
+    },
+    {
+      "year": 2022,
+      "value": 3.58
+    },
+    {
+      "year": 2023,
+      "value": 3.63
+    },
+    {
+      "year": 2024,
+      "value": 4.01
+    },
+    {
+      "year": 2025,
+      "value": 4.15
+    }
+  ],
+  "peers": {},
+  "latest": {
+    "year": 2025,
+    "value": 4.15,
+    "yoy_change": 0.14
+  }
+}

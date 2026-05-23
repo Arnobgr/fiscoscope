@@ -1,0 +1,284 @@
+{
+  "kpi_id": "outcomes",
+  "kpi_name": "Spend vs. Outcome — Health",
+  "description": "France public health spend (COFOG GF07) as % of GDP set against life expectancy at birth, as two parallel time series. A widening gap between rising spend and flat outcomes signals declining efficiency.",
+  "unit": "mixed",
+  "source": "INSEE BDM + OECD GIP 2025 (health spend, % of GDP); OECD Health Statistics (life expectancy at birth)",
+  "methodology": "Health block: GF07 (health) COFOG spend / nominal GDP × 100, stitched INSEE 1995–2020 + OECD 2021+ (each point source-tagged). Life expectancy at birth, total population, from OECD Health Statistics (DF_LE). Education (spend vs. PISA) is omitted — PISA is not available via OECD's SDMX API. Peer benchmarking deferred. INSEE's CNA-2014-DEP-APU COFOG family is frozen at 2020; post-2020 values are sourced from OECD Government at a Glance 2025 (France only), converted from % of GDP to EUR via INSEE nominal GDP. Each datapoint is tagged with its source. INSEE and OECD agree within ±0.4 percentage points of GDP at the 2020 seam.",
+  "last_updated": "2026-05-21T10:03:35Z",
+  "health": {
+    "spend_pct_gdp": [
+      {
+        "year": 1995,
+        "value": 7.13,
+        "source": "INSEE"
+      },
+      {
+        "year": 1996,
+        "value": 7.26,
+        "source": "INSEE"
+      },
+      {
+        "year": 1997,
+        "value": 7.1,
+        "source": "INSEE"
+      },
+      {
+        "year": 1998,
+        "value": 7.01,
+        "source": "INSEE"
+      },
+      {
+        "year": 1999,
+        "value": 6.93,
+        "source": "INSEE"
+      },
+      {
+        "year": 2000,
+        "value": 7.01,
+        "source": "INSEE"
+      },
+      {
+        "year": 2001,
+        "value": 7.06,
+        "source": "INSEE"
+      },
+      {
+        "year": 2002,
+        "value": 7.33,
+        "source": "INSEE"
+      },
+      {
+        "year": 2003,
+        "value": 7.58,
+        "source": "INSEE"
+      },
+      {
+        "year": 2004,
+        "value": 7.62,
+        "source": "INSEE"
+      },
+      {
+        "year": 2005,
+        "value": 7.69,
+        "source": "INSEE"
+      },
+      {
+        "year": 2006,
+        "value": 7.59,
+        "source": "INSEE"
+      },
+      {
+        "year": 2007,
+        "value": 7.48,
+        "source": "INSEE"
+      },
+      {
+        "year": 2008,
+        "value": 7.46,
+        "source": "INSEE"
+      },
+      {
+        "year": 2009,
+        "value": 7.96,
+        "source": "INSEE"
+      },
+      {
+        "year": 2010,
+        "value": 7.98,
+        "source": "INSEE"
+      },
+      {
+        "year": 2011,
+        "value": 7.92,
+        "source": "INSEE"
+      },
+      {
+        "year": 2012,
+        "value": 8.01,
+        "source": "INSEE"
+      },
+      {
+        "year": 2013,
+        "value": 8.05,
+        "source": "INSEE"
+      },
+      {
+        "year": 2014,
+        "value": 8.17,
+        "source": "INSEE"
+      },
+      {
+        "year": 2015,
+        "value": 8.07,
+        "source": "INSEE"
+      },
+      {
+        "year": 2016,
+        "value": 8.13,
+        "source": "INSEE"
+      },
+      {
+        "year": 2017,
+        "value": 8.13,
+        "source": "INSEE"
+      },
+      {
+        "year": 2018,
+        "value": 8.05,
+        "source": "INSEE"
+      },
+      {
+        "year": 2019,
+        "value": 7.98,
+        "source": "INSEE"
+      },
+      {
+        "year": 2020,
+        "value": 8.93,
+        "source": "INSEE"
+      },
+      {
+        "year": 2021,
+        "value": 9.36,
+        "source": "OECD"
+      },
+      {
+        "year": 2022,
+        "value": 9.09,
+        "source": "OECD"
+      },
+      {
+        "year": 2023,
+        "value": 8.87,
+        "source": "OECD"
+      }
+    ],
+    "life_expectancy_years": [
+      {
+        "year": 1995,
+        "value": 78.1
+      },
+      {
+        "year": 1996,
+        "value": 78.2
+      },
+      {
+        "year": 1997,
+        "value": 78.6
+      },
+      {
+        "year": 1998,
+        "value": 78.7
+      },
+      {
+        "year": 1999,
+        "value": 78.9
+      },
+      {
+        "year": 2000,
+        "value": 79.2
+      },
+      {
+        "year": 2001,
+        "value": 79.3
+      },
+      {
+        "year": 2002,
+        "value": 79.4
+      },
+      {
+        "year": 2003,
+        "value": 79.3
+      },
+      {
+        "year": 2004,
+        "value": 80.3
+      },
+      {
+        "year": 2005,
+        "value": 80.3
+      },
+      {
+        "year": 2006,
+        "value": 80.9
+      },
+      {
+        "year": 2007,
+        "value": 81.3
+      },
+      {
+        "year": 2008,
+        "value": 81.4
+      },
+      {
+        "year": 2009,
+        "value": 81.5
+      },
+      {
+        "year": 2010,
+        "value": 81.8
+      },
+      {
+        "year": 2011,
+        "value": 82.3
+      },
+      {
+        "year": 2012,
+        "value": 82.1
+      },
+      {
+        "year": 2013,
+        "value": 82.4
+      },
+      {
+        "year": 2014,
+        "value": 82.9
+      },
+      {
+        "year": 2015,
+        "value": 82.4
+      },
+      {
+        "year": 2016,
+        "value": 82.7
+      },
+      {
+        "year": 2017,
+        "value": 82.7
+      },
+      {
+        "year": 2018,
+        "value": 82.8
+      },
+      {
+        "year": 2019,
+        "value": 83.0
+      },
+      {
+        "year": 2020,
+        "value": 82.3
+      },
+      {
+        "year": 2021,
+        "value": 82.4
+      },
+      {
+        "year": 2022,
+        "value": 82.3
+      },
+      {
+        "year": 2023,
+        "value": 83.0
+      }
+    ]
+  },
+  "education": null,
+  "peers": {},
+  "latest": {
+    "spend_year": 2023,
+    "spend_pct_gdp": 8.87,
+    "life_expectancy_year": 2023,
+    "life_expectancy_years": 83.0
+  }
+}

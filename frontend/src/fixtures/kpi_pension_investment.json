@@ -1,0 +1,162 @@
+{
+  "kpi_id": "pension_investment",
+  "kpi_name": "Pension / Investment Ratio",
+  "description": "Social protection expenditure relative to public investment. A rising ratio means the state increasingly consumes its own productive capacity rather than building it.",
+  "unit": "ratio",
+  "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
+  "methodology": "COFOG GF10 (social protection expenditure, all APU) / P5K2 (gross fixed capital formation, all APU). INSEE's CNA-2014-DEP-APU COFOG family is frozen at 2020; post-2020 values are sourced from OECD Government at a Glance 2025 (France only), converted from % of GDP to EUR via INSEE nominal GDP. Each datapoint is tagged with its source. INSEE and OECD agree within ±0.4 percentage points of GDP at the 2020 seam.",
+  "last_updated": "2026-05-21T10:03:35Z",
+  "france": [
+    {
+      "year": 1995,
+      "value": 4.45,
+      "source": "INSEE"
+    },
+    {
+      "year": 1996,
+      "value": 4.57,
+      "source": "INSEE"
+    },
+    {
+      "year": 1997,
+      "value": 5.15,
+      "source": "INSEE"
+    },
+    {
+      "year": 1998,
+      "value": 4.95,
+      "source": "INSEE"
+    },
+    {
+      "year": 1999,
+      "value": 4.93,
+      "source": "INSEE"
+    },
+    {
+      "year": 2000,
+      "value": 4.65,
+      "source": "INSEE"
+    },
+    {
+      "year": 2001,
+      "value": 4.71,
+      "source": "INSEE"
+    },
+    {
+      "year": 2002,
+      "value": 4.8,
+      "source": "INSEE"
+    },
+    {
+      "year": 2003,
+      "value": 4.85,
+      "source": "INSEE"
+    },
+    {
+      "year": 2004,
+      "value": 4.77,
+      "source": "INSEE"
+    },
+    {
+      "year": 2005,
+      "value": 4.65,
+      "source": "INSEE"
+    },
+    {
+      "year": 2006,
+      "value": 4.79,
+      "source": "INSEE"
+    },
+    {
+      "year": 2007,
+      "value": 4.8,
+      "source": "INSEE"
+    },
+    {
+      "year": 2008,
+      "value": 4.76,
+      "source": "INSEE"
+    },
+    {
+      "year": 2009,
+      "value": 4.72,
+      "source": "INSEE"
+    },
+    {
+      "year": 2010,
+      "value": 4.79,
+      "source": "INSEE"
+    },
+    {
+      "year": 2011,
+      "value": 5.12,
+      "source": "INSEE"
+    },
+    {
+      "year": 2012,
+      "value": 5.09,
+      "source": "INSEE"
+    },
+    {
+      "year": 2013,
+      "value": 5.15,
+      "source": "INSEE"
+    },
+    {
+      "year": 2014,
+      "value": 5.56,
+      "source": "INSEE"
+    },
+    {
+      "year": 2015,
+      "value": 5.99,
+      "source": "INSEE"
+    },
+    {
+      "year": 2016,
+      "value": 6.05,
+      "source": "INSEE"
+    },
+    {
+      "year": 2017,
+      "value": 6.1,
+      "source": "INSEE"
+    },
+    {
+      "year": 2018,
+      "value": 5.93,
+      "source": "INSEE"
+    },
+    {
+      "year": 2019,
+      "value": 5.54,
+      "source": "INSEE"
+    },
+    {
+      "year": 2020,
+      "value": 6.23,
+      "source": "INSEE"
+    },
+    {
+      "year": 2021,
+      "value": 5.9,
+      "source": "OECD"
+    },
+    {
+      "year": 2022,
+      "value": 5.5,
+      "source": "OECD"
+    },
+    {
+      "year": 2023,
+      "value": 5.37,
+      "source": "OECD"
+    }
+  ],
+  "peers": {},
+  "latest": {
+    "year": 2023,
+    "value": 5.37,
+    "yoy_change": -0.13
+  }
+}

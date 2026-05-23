@@ -1,0 +1,120 @@
+{
+  "last_run": "2026-05-21T10:03:39Z",
+  "pipeline_version": "1.0.0",
+  "mode": "full",
+  "sources": {
+    "insee_idbanks": {
+      "last_fetched": "2026-05-21T10:02:42Z",
+      "status": "ok"
+    },
+    "insee_bdm": {
+      "last_fetched": "2026-05-21T10:02:43Z",
+      "status": "ok"
+    },
+    "oecd_cofog": {
+      "last_fetched": "2026-05-21T10:02:53Z",
+      "status": "ok"
+    },
+    "oecd_fiscal": {
+      "last_fetched": "2026-05-21T10:02:58Z",
+      "status": "ok"
+    },
+    "oecd_life_expectancy": {
+      "last_fetched": "2026-05-21T10:03:03Z",
+      "status": "ok"
+    },
+    "oecd_deficit": {
+      "last_fetched": "2026-05-21T10:03:08Z",
+      "status": "ok"
+    },
+    "oecd_debt": {
+      "last_fetched": "2026-05-21T10:03:15Z",
+      "status": "ok"
+    },
+    "budget_plrg": {
+      "last_fetched": "2026-05-21T10:03:15Z",
+      "status": "skipped",
+      "error": "PLRG 2025 datasets on data.economie.gouv.fr now contain only a PDF notice; the tabular export was discontinued. Re-enable when a CSV/Excel resource reappears."
+    },
+    "tax_expenditure": {
+      "last_fetched": "2026-05-21T10:03:34Z",
+      "status": "ok"
+    },
+    "kpi_overhead_rate": {
+      "last_fetched": "2026-05-21T10:03:34Z",
+      "status": "ok",
+      "latest_year": 2025
+    },
+    "kpi_friction_ratio": {
+      "last_fetched": "2026-05-21T10:03:35Z",
+      "status": "ok",
+      "latest_year": 2023
+    },
+    "kpi_productive_spend": {
+      "last_fetched": "2026-05-21T10:03:35Z",
+      "status": "ok",
+      "latest_year": 2023
+    },
+    "kpi_pension_investment": {
+      "last_fetched": "2026-05-21T10:03:35Z",
+      "status": "ok",
+      "latest_year": 2023
+    },
+    "kpi_sustainability": {
+      "last_fetched": "2026-05-21T10:03:35Z",
+      "status": "ok",
+      "latest_year": 2024
+    },
+    "kpi_debt_service": {
+      "last_fetched": "2026-05-21T10:03:35Z",
+      "status": "ok",
+      "latest_year": 2025
+    },
+    "kpi_outcomes": {
+      "last_fetched": "2026-05-21T10:03:35Z",
+      "status": "ok"
+    },
+    "kpi_tax_expenditure": {
+      "last_fetched": "2026-05-21T10:03:36Z",
+      "status": "ok",
+      "latest_year": 2025
+    },
+    "budget_execution": {
+      "last_fetched": "2026-05-21T10:03:36Z",
+      "status": "ok"
+    },
+    "urssaf": {
+      "last_fetched": "2026-05-21T10:03:37Z",
+      "status": "error",
+      "error": "HTTPSConnectionPool(host='open.urssaf.fr', port=443): Max retries exceeded with url: /api/explore/v2.1/catalog/datasets/masse-salariale-du-secteur-prive-france-entiere/records?limit=100&offset=0&timezone=UTC (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1000)')))"
+    },
+    "kpi_wage_ratio": {
+      "last_fetched": "2026-05-21T10:03:37Z",
+      "status": "ok",
+      "latest_year": 2025
+    },
+    "france_travail": {
+      "last_fetched": "2026-05-21T10:03:39Z",
+      "status": "ok"
+    },
+    "kpi_monthly_execution": {
+      "last_fetched": "2026-05-21T10:03:39Z",
+      "status": "ok",
+      "latest_month": "2026-03",
+      "latest_year": 2026
+    }
+  },
+  "output_files": [
+    "meta.json",
+    "kpi_debt_service.json",
+    "kpi_friction_ratio.json",
+    "kpi_monthly_execution.json",
+    "kpi_outcomes.json",
+    "kpi_overhead_rate.json",
+    "kpi_pension_investment.json",
+    "kpi_productive_spend.json",
+    "kpi_sustainability.json",
+    "kpi_tax_expenditure.json",
+    "kpi_wage_ratio.json"
+  ]
+}
