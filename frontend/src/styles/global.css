@@ -1,1 +1,488 @@
-/* Global styles authored in Task 14 (visual design pass). */
+@import "./tokens.css";
+
+/* ---- Reset / base ----------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  font-family: var(--font-body);
+  background-color: var(--cream);
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 17px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv05";
+  /* slim coral masthead rule — the Anthropic accent (chrome, not tricolore) */
+  border-top: 3px solid var(--coral);
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+a {
+  color: var(--coral-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: var(--ink);
+}
+ul {
+  padding-left: 1.1em;
+}
+:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ---- App shell -------------------------------------------------------- */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.app-shell > main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-5) var(--space-8);
+}
+
+.app-header {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--rule);
+}
+.brand {
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-decoration: none;
+  line-height: 1;
+}
+.brand:hover {
+  color: var(--coral-ink);
+}
+.tagline {
+  grid-column: 1;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  font-family: var(--font-display);
+  max-width: 42ch;
+}
+.last-updated {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  justify-self: end;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.35em 0.85em;
+  white-space: nowrap;
+}
+
+.app-footer {
+  border-top: 1px solid var(--rule);
+  background: var(--cream-deep);
+}
+.app-footer p {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-5);
+  font-size: 0.86rem;
+  color: var(--ink-faint);
+}
+
+/* ---- Overview -------------------------------------------------------- */
+.overview__intro {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  line-height: 1.4;
+  color: var(--ink-soft);
+  max-width: 34ch;
+  margin-bottom: var(--space-8);
+  text-wrap: balance;
+}
+@media (min-width: 720px) {
+  .overview__intro {
+    max-width: 56ch;
+  }
+}
+
+.theme-section {
+  margin-bottom: var(--space-8);
+}
+.theme-section__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--rule);
+}
+.theme-section__title::before {
+  content: "";
+  width: 1.6rem;
+  height: 3px;
+  background: var(--coral);
+  flex: none;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: var(--space-5);
+}
+
+/* ---- KPI card -------------------------------------------------------- */
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 200px;
+  padding: var(--space-5);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+.kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--coral);
+  box-shadow: var(--shadow-lift);
+  color: inherit;
+}
+.kpi-card__title {
+  font-size: 1.12rem;
+  font-weight: 600;
+}
+.kpi-card__figure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+.kpi-card__value {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.kpi-card__yoy,
+.stat-callout__yoy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.yoy--up {
+  color: var(--positive-ink);
+}
+.yoy--down {
+  color: var(--rouge-ink);
+}
+.yoy--flat {
+  color: var(--ink-faint);
+}
+.kpi-card .recharts-wrapper {
+  margin-top: auto;
+}
+.kpi-card svg {
+  overflow: visible;
+}
+.kpi-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.kpi-card__badge::before {
+  content: "";
+  width: 1.1rem;
+  height: 0;
+  border-top: 2px dashed var(--taupe);
+}
+
+/* ---- KPI detail ------------------------------------------------------ */
+.breadcrumb {
+  margin-bottom: var(--space-5);
+  font-size: 0.9rem;
+}
+.breadcrumb a {
+  text-decoration: none;
+  font-weight: 500;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+.kpi-detail > h1 {
+  font-size: clamp(2rem, 4.5vw, 3.1rem);
+  margin-bottom: var(--space-4);
+}
+.kpi-detail__explainer {
+  font-size: 1.18rem;
+  color: var(--ink-soft);
+  max-width: var(--measure);
+  margin-bottom: var(--space-6);
+}
+.kpi-detail__secondary {
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--rule);
+}
+.kpi-detail__secondary h2 {
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  margin-bottom: var(--space-5);
+}
+
+/* ---- Stat callout ---------------------------------------------------- */
+.stat-callout {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--bleu);
+  border-radius: var(--radius-lg);
+}
+.stat-callout__value {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.stat-callout__year {
+  font-size: 0.95rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+.stat-callout__yoy {
+  font-size: 0.95rem;
+}
+
+/* ---- Chart ----------------------------------------------------------- */
+.chart {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+.chart__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  margin-bottom: var(--space-4);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  user-select: none;
+}
+.chart__toggle input {
+  width: 1.05em;
+  height: 1.05em;
+  accent-color: var(--coral);
+  cursor: pointer;
+}
+.chart__note {
+  margin-top: var(--space-3);
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--rouge);
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+
+/* recharts theming */
+.recharts-surface text,
+.recharts-legend-item-text {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+}
+.recharts-cartesian-axis-tick text {
+  fill: var(--ink-faint);
+}
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line {
+  stroke: var(--rule-strong);
+}
+.recharts-legend-item-text {
+  color: var(--ink-soft) !important;
+}
+.recharts-default-tooltip {
+  background: var(--paper) !important;
+  border: 1px solid var(--rule-strong) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-lift);
+  font-family: var(--font-body);
+}
+
+/* ---- Methodology disclosure + page ----------------------------------- */
+.methodology {
+  margin-top: var(--space-6);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+}
+.methodology > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: var(--space-4) var(--space-5);
+  font-weight: 600;
+  color: var(--coral-ink);
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.methodology > summary::-webkit-details-marker {
+  display: none;
+}
+.methodology > summary::before {
+  content: "▸";
+  transition: transform 0.18s ease;
+  color: var(--coral);
+}
+.methodology[open] > summary::before {
+  transform: rotate(90deg);
+}
+.methodology__body,
+.methodology__source {
+  padding: 0 var(--space-5) var(--space-4);
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  max-width: var(--measure);
+}
+.methodology__source strong {
+  color: var(--ink);
+}
+
+.methodology-page {
+  max-width: var(--measure);
+}
+.methodology-page h1 {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  margin-bottom: var(--space-5);
+}
+.methodology-page h2 {
+  font-size: 1.4rem;
+  margin: var(--space-6) 0 var(--space-3);
+}
+.methodology-page p,
+.methodology-page li {
+  color: var(--ink-soft);
+}
+.methodology-page li {
+  margin-bottom: var(--space-2);
+}
+
+.state {
+  padding: var(--space-7) 0;
+  color: var(--ink-faint);
+  font-size: 1.05rem;
+}
+
+/* ---- Motion ---------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-section,
+  .kpi-detail,
+  .methodology-page {
+    animation: rise 0.5s ease both;
+  }
+  .kpi-card {
+    animation: rise 0.5s ease both;
+  }
+  .kpi-grid .kpi-card:nth-child(2) {
+    animation-delay: 0.05s;
+  }
+  .kpi-grid .kpi-card:nth-child(3) {
+    animation-delay: 0.1s;
+  }
+  .kpi-grid .kpi-card:nth-child(4) {
+    animation-delay: 0.15s;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ---- Responsive ------------------------------------------------------ */
+@media (max-width: 620px) {
+  body {
+    font-size: 16px;
+  }
+  .app-header {
+    grid-template-columns: 1fr;
+  }
+  .last-updated {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+  .app-shell > main {
+    padding: var(--space-6) var(--space-4) var(--space-7);
+  }
+  .stat-callout {
+    padding: var(--space-5);
+  }
+}
