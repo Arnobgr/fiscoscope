@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    image: french-dashboard-backend
+    restart: unless-stopped
+    environment:
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      RATE_LIMIT: ${RATE_LIMIT:-60/minute}
+    volumes:
+      - ./backend/data:/app/data
+    ports:
+      - "127.0.0.1:8077:8000"   # localhost-only — host nginx is the only client
+
+  pipeline:
+    build: .
+    image: french-dashboard-backend
+    profiles: ["tools"]          # never starts with `up`; run on demand / via cron
+    volumes:
+      - ./backend/data:/app/data
+    entrypoint: ["python", "run_pipeline.py"]

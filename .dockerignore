@@ -1,0 +1,10 @@
+backend/.venv
+backend/data
+**/__pycache__
+*.pyc
+.git
+frontend
+docs
+PRD.md
+CLAUDE.md
+VPS_CONTEXT.md
