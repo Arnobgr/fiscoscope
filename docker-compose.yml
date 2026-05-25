@@ -1,7 +1,8 @@
+name: fiscoscope
 services:
   api:
     build: .
-    image: french-dashboard-backend
+    image: fiscoscope-backend
     restart: unless-stopped
     environment:
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
@@ -13,7 +14,7 @@ services:
 
   pipeline:
     build: .
-    image: french-dashboard-backend
+    image: fiscoscope-backend
     profiles: ["tools"]          # never starts with `up`; run on demand / via cron
     volumes:
       - ./backend/data:/app/data
