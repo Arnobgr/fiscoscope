@@ -143,14 +143,14 @@ services:
     entrypoint: ["python", "run_pipeline.py"]
 ```
 
-- [ ] **Step 1.4: Create `.env`** (gitignored — do NOT commit). The Pages URL gets filled in for real in Phase 5; for now, use a placeholder that matches your intended project name:
+- [x] **Step 1.4: Create `.env`** (gitignored — do NOT commit). The Pages URL gets filled in for real in Phase 5; for now, use a placeholder that matches your intended project name:
 
 ```
 ALLOWED_ORIGINS=https://fisc-o-scope.pages.dev
 RATE_LIMIT=60/minute
 ```
 
-- [ ] **Step 1.5: Verify `.env` is gitignored**
+- [x] **Step 1.5: Verify `.env` is gitignored**
 
 ```bash
 cd /home/arnobgr/french-efficiency-dashboard
@@ -158,7 +158,7 @@ git check-ignore .env && echo "OK: .env is gitignored"
 ```
 Expected: `.env` printed, then `OK: .env is gitignored`.
 
-- [ ] **Step 1.6 (recommended): Commit the deployment files**
+- [x] **Step 1.6 (recommended): Commit the deployment files**
 
 ```bash
 git add Dockerfile .dockerignore docker-compose.yml
@@ -171,10 +171,10 @@ git commit -m "deploy: docker stack (api + pipeline) for host-nginx reverse prox
 
 This replaces the original plan's Caddy phases. Pattern matches your existing `situation-room` vhost exactly.
 
-- [ ] **Step 2.1: Create the HTTP-only vhost** (certbot will rewrite it to add TLS in step 2.3)
+- [x] **Step 2.1: Create the HTTP-only vhost** (certbot will rewrite it to add TLS in step 2.3)
 
 ```bash
-sudo tee /etc/nginx/sites-available/fisc-o-scope >/dev/null <<'NGINX'
+sudo tee /etc/nginx/sites-available/fiscoscope >/dev/null <<'NGINX'
 server {
     listen 80;
     server_name fisc.159-69-91-118.sslip.io;
@@ -190,16 +190,16 @@ server {
 NGINX
 ```
 
-- [ ] **Step 2.2: Enable the vhost and reload nginx**
+- [x] **Step 2.2: Enable the vhost and reload nginx**
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/fisc-o-scope /etc/nginx/sites-enabled/fisc-o-scope
+sudo ln -s /etc/nginx/sites-available/fiscoscope /etc/nginx/sites-enabled/fiscoscope
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 Expected: `nginx: configuration file /etc/nginx/nginx.conf test is successful`, then a clean reload.
 
-- [ ] **Step 2.3: Obtain the TLS cert and have certbot rewrite the vhost for HTTPS**
+- [x] **Step 2.3: Obtain the TLS cert and have certbot rewrite the vhost for HTTPS**
 
 ```bash
 sudo certbot --nginx -d fisc.159-69-91-118.sslip.io
@@ -212,7 +212,7 @@ Answer prompts:
 
 Expected: certbot reports the cert was obtained, writes `listen 443 ssl` and the cert paths into the vhost, adds an HTTP→HTTPS 301 server block, and reloads nginx.
 
-- [ ] **Step 2.4: Verify the cert renewal will work**
+- [x] **Step 2.4: Verify the cert renewal will work**
 
 ```bash
 sudo certbot certificates | grep -A2 fisc.159-69-91-118.sslip.io
