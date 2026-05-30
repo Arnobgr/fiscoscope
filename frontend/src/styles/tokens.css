@@ -23,7 +23,7 @@
   --positive-ink: #2c6e49; /* AA-safe positive text */
 
   /* Typography */
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: "Lora", Georgia, "Times New Roman", serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* Spacing scale */

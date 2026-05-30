@@ -6,7 +6,7 @@ export function AppShell({ lastUpdated, children }: { lastUpdated?: string; chil
   return (
     <div className="app-shell">
       <header role="banner" className="app-header">
-        <Link to="/" className="brand">fisc-o-scope</Link>
+        <Link to="/" className="brand">🇫🇷 Fiscoscope</Link>
         <p className="tagline">L’efficacité de l’administration publique française, en chiffres</p>
         {lastUpdated && (
           <p className="last-updated">Dernière mise à jour : {fmtDateFr(lastUpdated)}</p>
