@@ -23,7 +23,7 @@ The target audience is citizens, journalists, and researchers who want a clear, 
 
 ### 1.3 Project Name
 
-`fisc-o-scope` (working title, can be changed)
+**Fiscoscope**
 
 ---
 
@@ -82,7 +82,7 @@ object storage.
 ### 2.3 Backend Directory Structure
 
 ```
-fisc-o-scope/
+fiscoscope/
 ├── backend/
 │   ├── fetchers/
 │   │   ├── __init__.py
@@ -130,12 +130,12 @@ The pipeline runs via a `systemd` timer on the VPS. Two schedules:
 - **Annual** (February 1st): fetches INSEE COFOG national accounts, OECD data, PLF annexes (published ~May, so a second annual run in June)
 
 ```ini
-# /etc/systemd/system/fisoscope-monthly.timer
+# /etc/systemd/system/fiscoscope-monthly.timer
 [Timer]
 OnCalendar=*-*-01 06:00:00
 Persistent=true
 
-# /etc/systemd/system/fisoscope-annual.timer
+# /etc/systemd/system/fiscoscope-annual.timer
 [Timer]
 OnCalendar=*-02-01 06:00:00
 Persistent=true
@@ -1095,7 +1095,7 @@ from slowapi.util import get_remote_address
 from config import ALLOWED_ORIGINS, OUTPUT_DATA_DIR, RATE_LIMIT
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[RATE_LIMIT])
-app = FastAPI(title="fisc-o-scope API", docs_url=None, redoc_url=None)
+app = FastAPI(title="Fiscoscope API", docs_url=None, redoc_url=None)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)

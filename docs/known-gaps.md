@@ -1,4 +1,4 @@
-# Known gaps & blocked attempts — fisc-o-scope
+# Known gaps & blocked attempts — Fiscoscope
 
 Moved out of `CLAUDE.md` (2026-05-22); consolidated 2026-05-21 from the
 session-by-session notes now in `runtime-discoveries.md`. This is the single

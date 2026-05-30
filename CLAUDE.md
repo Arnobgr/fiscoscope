@@ -1,4 +1,4 @@
-# CLAUDE.md — fisc-o-scope
+# CLAUDE.md — Fiscoscope
 
 This file is read at the start of every session. It holds only what's needed to
 start work. The build history and the blocked-work reference live in `docs/`:
@@ -7,7 +7,7 @@ start work. The build history and the blocked-work reference live in `docs/`:
   KPI; append new session notes here, not in this file): `docs/runtime-discoveries.md`
 - **Known gaps & blocked attempts** (don't re-attempt without new upstream data):
   `docs/known-gaps.md`
-- **Full specification:** `PRD.md`
+- **Full specification:** `docs/PRD.md`
 
 ---
 
@@ -40,8 +40,15 @@ each step. Bias toward caution over speed.
 
 ## Project overview
 
-**fisc-o-scope** — an open-source dashboard measuring the productivity and
+**Fiscoscope** — an open-source dashboard measuring the productivity and
 efficiency of the French public administration using publicly available fiscal data.
+
+> **Naming rule (non-negotiable):** the project is always written **Fiscoscope**
+> (single word, capital F) in prose, titles, and Python docstrings. Lowercase
+> `fiscoscope` is acceptable only in identifier contexts (URLs, package names,
+> image tags, systemd units, env files, directory names). Never `fisc-o-scope`,
+> `fisoscope`, or any other variant — those were earlier working names and must
+> not reappear anywhere.
 
 - Ratio-focused (efficiency per euro, not raw accounting figures)
 - Longitudinal (1995–present time series)
@@ -98,7 +105,10 @@ french-efficiency-dashboard/
 │   └── run_pipeline.py                # Main entry point (--mode monthly|annual|full)
 ├── frontend/                          # Phase 2 — Vite + React + Recharts (not started)
 ├── .env                               # Environment settings (ALLOWED_ORIGINS, RATE_LIMIT) — never commit
-├── PRD.md
+├── docs/PRD.md
+├── README.md
+├── CONTRIBUTING.md
+├── LICENSE                            # MIT
 └── CLAUDE.md                          # ← this file
 ```
 
