@@ -150,7 +150,7 @@ with:
 # API server (FastAPI — see PRD §8). Read from the environment; in production
 # the systemd unit / `uvicorn --env-file` supplies these.
 # ALLOWED_ORIGINS: comma-separated list of browser origins allowed by CORS
-#   (e.g. "https://fisc-o-scope.pages.dev"). Empty = no cross-origin reads.
+#   (e.g. "https://fiscoscope.pages.dev"). Empty = no cross-origin reads.
 ALLOWED_ORIGINS = [
     o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()
 ]
@@ -322,7 +322,7 @@ Expected: collection error / FAIL — `ModuleNotFoundError: No module named 'api
 Create `backend/api.py`:
 
 ```python
-"""fisc-o-scope read-only API — serves the pipeline's output JSON over HTTP.
+"""fiscoscope read-only API — serves the pipeline's output JSON over HTTP.
 
 Replaces the former R2 publisher (see PRD §8). The frontend (Cloudflare Pages)
 fetches these endpoints. The data is public, so there is no authentication;
@@ -356,7 +356,7 @@ _NAME_RE = re.compile(r"^[a-z0-9_]+$")
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[RATE_LIMIT])
 
-app = FastAPI(title="fisc-o-scope API", docs_url=None, redoc_url=None)
+app = FastAPI(title="fiscoscope API", docs_url=None, redoc_url=None)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Order matters: SlowAPI added first (inner), CORS added last so it is the
@@ -567,7 +567,7 @@ from slowapi.util import get_remote_address
 from config import ALLOWED_ORIGINS, OUTPUT_DATA_DIR, RATE_LIMIT
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[RATE_LIMIT])
-app = FastAPI(title="fisc-o-scope API", docs_url=None, redoc_url=None)
+app = FastAPI(title="fiscoscope API", docs_url=None, redoc_url=None)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)

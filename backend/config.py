@@ -24,7 +24,7 @@ OUTPUT_DATA_DIR = "data/output"
 # API server (FastAPI — see PRD §8). Read from the environment; in production
 # the systemd unit / `uvicorn --env-file` supplies these.
 # ALLOWED_ORIGINS: comma-separated list of browser origins allowed by CORS
-#   (e.g. "https://fisc-o-scope.pages.dev"). Empty = no cross-origin reads.
+#   (e.g. "https://fiscoscope.pages.dev"). Empty = no cross-origin reads.
 ALLOWED_ORIGINS = [
     o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()
 ]

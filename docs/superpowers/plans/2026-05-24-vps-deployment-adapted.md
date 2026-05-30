@@ -11,7 +11,7 @@
 >
 > This is a manual operator runbook. Run each step yourself on the VPS.
 
-**Goal:** Run the fisc-o-scope FastAPI app as an always-on, HTTPS, rate-limited service at `https://fisc.159-69-91-118.sslip.io`, fed by a scheduled containerized pipeline, with a Cloudflare Pages project reserved for the frontend.
+**Goal:** Run the fiscoscope FastAPI app as an always-on, HTTPS, rate-limited service at `https://fisc.159-69-91-118.sslip.io`, fed by a scheduled containerized pipeline, with a Cloudflare Pages project reserved for the frontend.
 
 **Architecture:** Docker Compose stack with two services off one image: `api` (uvicorn serving `backend/data/output/*.json`, published only on `127.0.0.1:8077` so only host nginx can reach it) and `pipeline` (one-shot, `profiles: [tools]`, invoked by host cron). Host nginx terminates TLS for `fisc.159-69-91-118.sslip.io` (Let's Encrypt via certbot, same pattern as your existing vhosts) and reverse-proxies to `127.0.0.1:8077`. Abuse is bounded by in-app slowapi rate limiting + the existing UFW firewall.
 
@@ -26,7 +26,7 @@
 | `docker-compose.yml` | Define `api` + `pipeline` services (no caddy) |
 | `.env` | Operator-supplied, gitignored: `ALLOWED_ORIGINS`, `RATE_LIMIT` |
 
-Plus one file at `/etc/nginx/sites-available/fisc-o-scope` (the nginx vhost — created in Phase 2).
+Plus one file at `/etc/nginx/sites-available/fiscoscope` (the nginx vhost — created in Phase 2).
 
 ---
 
@@ -73,7 +73,7 @@ git log -1 --oneline
 ```
 Expected: clean working tree (or at least no surprises), on the branch you intend to deploy (likely `dev` per CLAUDE.md).
 
-- [ ] **Step 0.6: Decide the Cloudflare Pages project name** (used in Phase 5). Suggest `fisc-o-scope`. Note your choice.
+- [ ] **Step 0.6: Decide the Cloudflare Pages project name** (used in Phase 5). Suggest `fiscoscope`. Note your choice.
 
 ---
 
@@ -124,7 +124,7 @@ docs
 services:
   api:
     build: .
-    image: fisc-o-scope-backend
+    image: fiscoscope-backend
     restart: unless-stopped
     environment:
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
@@ -136,7 +136,7 @@ services:
 
   pipeline:
     build: .
-    image: fisc-o-scope-backend
+    image: fiscoscope-backend
     profiles: ["tools"]          # never starts with `up`; run on demand / via cron
     volumes:
       - ./backend/data:/app/data
@@ -146,7 +146,7 @@ services:
 - [x] **Step 1.4: Create `.env`** (gitignored — do NOT commit). The Pages URL gets filled in for real in Phase 5; for now, use a placeholder that matches your intended project name:
 
 ```
-ALLOWED_ORIGINS=https://fisc-o-scope.pages.dev
+ALLOWED_ORIGINS=https://fiscoscope.pages.dev
 RATE_LIMIT=60/minute
 ```
 
@@ -284,16 +284,16 @@ crontab -e
 Add these two lines (cron has a minimal PATH, so the absolute `docker` path and the `cd` are required):
 
 ```cron
-# fisc-o-scope: monthly sources — 5th of each month, 03:00
+# fiscoscope: monthly sources — 5th of each month, 03:00
 0 3 5 * * cd /home/arnobgr/french-efficiency-dashboard && /usr/bin/docker compose run --rm pipeline --mode monthly >> /home/arnobgr/fisc-pipeline.log 2>&1
-# fisc-o-scope: annual sources — Feb 1 and Jun 1, 04:00 (per PRD: published May–June)
+# fiscoscope: annual sources — Feb 1 and Jun 1, 04:00 (per PRD: published May–June)
 0 4 1 2,6 * cd /home/arnobgr/french-efficiency-dashboard && /usr/bin/docker compose run --rm pipeline --mode annual >> /home/arnobgr/fisc-pipeline.log 2>&1
 ```
 
 - [ ] **Step 4.4: Verify the cron entries are registered**
 
 ```bash
-crontab -l | grep fisc-o-scope
+crontab -l | grep fiscoscope
 ```
 Expected: the two lines above. (No sudo: you run `docker` directly via the docker group.)
 
@@ -313,22 +313,22 @@ The frontend isn't built yet (Phase 2 of the project). Reserve the `*.pages.dev`
 - [ ] **Step 5.1: Create a placeholder site**
 
 ```bash
-mkdir -p /tmp/fisc-placeholder && printf '<!doctype html><title>fisc-o-scope</title><h1>fisc-o-scope — coming soon</h1>\n' > /tmp/fisc-placeholder/index.html
+mkdir -p /tmp/fisc-placeholder && printf '<!doctype html><title>fiscoscope</title><h1>fiscoscope — coming soon</h1>\n' > /tmp/fisc-placeholder/index.html
 ```
 
 - [ ] **Step 5.2: Create the Pages project**
 
 1. Log in at `https://dash.cloudflare.com` (free account).
 2. Left sidebar → **Workers & Pages** → **Create** → **Pages** tab → **Upload assets**.
-3. Project name: the name from Step 0.6 (`fisc-o-scope`).
+3. Project name: the name from Step 0.6 (`fiscoscope`).
 4. Drag in `index.html` (or the folder) → **Deploy**.
 
-CLI alternative: `npx wrangler pages deploy /tmp/fisc-placeholder --project-name fisc-o-scope`.
+CLI alternative: `npx wrangler pages deploy /tmp/fisc-placeholder --project-name fiscoscope`.
 
 - [ ] **Step 5.3: Capture the real production URL**
 
 ```bash
-curl -sI https://fisc-o-scope.pages.dev | head -1
+curl -sI https://fiscoscope.pages.dev | head -1
 ```
 Expected: `HTTP/2 200`. If Cloudflare appended a suffix because the name was taken, use the actual URL.
 
@@ -351,9 +351,9 @@ docker compose up -d api
 - [ ] **Step 5.5: Verify the CORS header is returned for that origin**
 
 ```bash
-curl -sI -H "Origin: https://fisc-o-scope.pages.dev" https://fisc.159-69-91-118.sslip.io/api/meta | grep -i access-control-allow-origin
+curl -sI -H "Origin: https://fiscoscope.pages.dev" https://fisc.159-69-91-118.sslip.io/api/meta | grep -i access-control-allow-origin
 ```
-Expected: `access-control-allow-origin: https://fisc-o-scope.pages.dev`. A different/absent origin should NOT be echoed.
+Expected: `access-control-allow-origin: https://fiscoscope.pages.dev`. A different/absent origin should NOT be echoed.
 
 ---
 
@@ -392,7 +392,7 @@ Expected: both still respond (`HTTP/2 200` or whatever each app normally returns
 - **Manual data refresh:** `docker compose run --rm pipeline --mode full`.
 - **Pipeline cron logs:** `tail -f /home/arnobgr/fisc-pipeline.log`.
 - **Cert renewal:** automatic via `certbot.timer` (already running; no action needed).
-- **nginx vhost changes:** edit `/etc/nginx/sites-available/fisc-o-scope`, then `sudo nginx -t && sudo systemctl reload nginx`.
+- **nginx vhost changes:** edit `/etc/nginx/sites-available/fiscoscope`, then `sudo nginx -t && sudo systemctl reload nginx`.
 - **When the real frontend exists:** set its API base URL to `https://fisc.159-69-91-118.sslip.io/api`, redeploy to the same Pages project (keeping the same origin so `ALLOWED_ORIGINS` still matches), or wire the Pages project to git for auto-deploys.
 
 ---

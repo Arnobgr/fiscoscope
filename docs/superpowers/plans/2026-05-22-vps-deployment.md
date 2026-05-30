@@ -2,7 +2,7 @@
 
 > **For agentic workers:** This is a **manual operator runbook**, not an agent-executed plan. It touches a live VPS, public DNS, a firewall, and a Cloudflare account — perform these steps yourself (you = the operator on the VPS / at the Cloudflare dashboard). Do NOT hand this to a subagent. Steps use checkbox (`- [ ]`) syntax so you can track progress.
 
-**Goal:** Run the fisc-o-scope FastAPI app as an always-on, HTTPS, rate-limited, firewalled service on the VPS (TLS via an `<ip>.sslip.io` Let's Encrypt cert), keep its data fresh via a scheduled containerized pipeline run, and stand up a Cloudflare Pages project so the frontend origin + CORS are ready.
+**Goal:** Run the fiscoscope FastAPI app as an always-on, HTTPS, rate-limited, firewalled service on the VPS (TLS via an `<ip>.sslip.io` Let's Encrypt cert), keep its data fresh via a scheduled containerized pipeline run, and stand up a Cloudflare Pages project so the frontend origin + CORS are ready.
 
 **Architecture:** A Docker Compose stack on the VPS with three services off one image: `api` (uvicorn serving `backend/data/output/*.json`, internal-only — never published to the host), `caddy` (reverse proxy owning host ports 80/443, auto-provisioning + renewing the Let's Encrypt cert for the sslip.io hostname, proxying to `api`), and `pipeline` (one-shot, `profiles: [tools]`, invoked by host cron to refresh the data). The API is reachable from the internet *only* through Caddy; abuse is bounded by in-app slowapi rate limiting + a host firewall. The frontend lives on Cloudflare Pages and calls the API cross-origin (allowed via the CORS allowlist).
 
@@ -58,7 +58,7 @@ sudo ss -ltnp '( sport = :80 or sport = :443 )'
 ```
 Expected: **no output** (nothing listening). If something is already on 80/443 (e.g. a pre-existing nginx for your other projects), STOP — you have a host reverse proxy already; see "Alternative: existing host proxy" at the bottom before continuing, because two things can't both own 443.
 
-- [ ] **Step 0.5: Decide your Cloudflare Pages project name now** so CORS can be wired later. Pick e.g. `fisc-o-scope` → the URL will be `https://fisc-o-scope.pages.dev` (if the name is taken globally, Cloudflare appends a random suffix; you'll capture the real URL in Phase 5). Note your choice.
+- [ ] **Step 0.5: Decide your Cloudflare Pages project name now** so CORS can be wired later. Pick e.g. `fiscoscope` → the URL will be `https://fiscoscope.pages.dev` (if the name is taken globally, Cloudflare appends a random suffix; you'll capture the real URL in Phase 5). Note your choice.
 
 ---
 
@@ -108,7 +108,7 @@ docs
 services:
   api:
     build: .
-    image: fisc-o-scope-backend
+    image: fiscoscope-backend
     restart: unless-stopped
     environment:
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
@@ -136,7 +136,7 @@ services:
 
   pipeline:
     build: .
-    image: fisc-o-scope-backend
+    image: fiscoscope-backend
     profiles: ["tools"]        # never starts with `up`; run on demand / via cron
     volumes:
       - ./backend/data:/app/data
@@ -161,7 +161,7 @@ volumes:
 
 ```
 SITE_ADDRESS=203-0-113-45.sslip.io
-ALLOWED_ORIGINS=https://fisc-o-scope.pages.dev
+ALLOWED_ORIGINS=https://fiscoscope.pages.dev
 RATE_LIMIT=60/minute
 ```
 
@@ -277,16 +277,16 @@ crontab -e
 Add these two lines (cron has a minimal PATH, so the absolute `docker` path and `cd` into the repo are required):
 
 ```cron
-# fisc-o-scope: monthly sources — 5th of each month, 03:00
+# fiscoscope: monthly sources — 5th of each month, 03:00
 0 3 5 * * cd /home/arnobgr/french-efficiency-dashboard && /usr/bin/docker compose run --rm pipeline --mode monthly >> /home/arnobgr/fisc-pipeline.log 2>&1
-# fisc-o-scope: annual sources — Feb 1 and Jun 1, 04:00 (per PRD: published May–June)
+# fiscoscope: annual sources — Feb 1 and Jun 1, 04:00 (per PRD: published May–June)
 0 4 1 2,6 * cd /home/arnobgr/french-efficiency-dashboard && /usr/bin/docker compose run --rm pipeline --mode annual >> /home/arnobgr/fisc-pipeline.log 2>&1
 ```
 
 - [ ] **Step 4.4: Verify the cron entries are registered**
 
 ```bash
-crontab -l | grep fisc-o-scope
+crontab -l | grep fiscoscope
 ```
 Expected: the two lines above. (The pipeline runs as your user via the docker group — no sudo needed.)
 
@@ -308,24 +308,24 @@ The frontend isn't built yet (Phase 2 of the project), but you can reserve the `
 On your laptop (or the VPS), make a one-file placeholder:
 
 ```bash
-mkdir -p /tmp/fisc-placeholder && printf '<!doctype html><title>fisc-o-scope</title><h1>fisc-o-scope — coming soon</h1>\n' > /tmp/fisc-placeholder/index.html
+mkdir -p /tmp/fisc-placeholder && printf '<!doctype html><title>fiscoscope</title><h1>fiscoscope — coming soon</h1>\n' > /tmp/fisc-placeholder/index.html
 ```
 
 - [ ] **Step 5.2: Create the Pages project (dashboard route — easiest)**
 
 1. Log in at `https://dash.cloudflare.com` (free account).
 2. Left sidebar → **Workers & Pages** → **Create** → **Pages** tab → **Upload assets**.
-3. Project name: the name you chose in Step 0.5 (e.g. `fisc-o-scope`).
+3. Project name: the name you chose in Step 0.5 (e.g. `fiscoscope`).
 4. Drag in the `index.html` from Step 5.1 (or the whole `/tmp/fisc-placeholder` folder) → **Deploy**.
 
-(CLI alternative, if you prefer: `npx wrangler pages deploy /tmp/fisc-placeholder --project-name fisc-o-scope`.)
+(CLI alternative, if you prefer: `npx wrangler pages deploy /tmp/fisc-placeholder --project-name fiscoscope`.)
 
 - [ ] **Step 5.3: Capture the real production URL**
 
-After deploy, Cloudflare shows the URL, e.g. `https://fisc-o-scope.pages.dev` (it may differ if the name was taken). Confirm it loads:
+After deploy, Cloudflare shows the URL, e.g. `https://fiscoscope.pages.dev` (it may differ if the name was taken). Confirm it loads:
 
 ```bash
-curl -sI https://fisc-o-scope.pages.dev | head -1
+curl -sI https://fiscoscope.pages.dev | head -1
 ```
 Expected: `HTTP/2 200`. Note the exact URL.
 
@@ -334,7 +334,7 @@ Expected: `HTTP/2 200`. Note the exact URL.
 On the VPS, edit `.env` so `ALLOWED_ORIGINS` is the exact Pages URL (scheme + host, no trailing slash):
 
 ```
-ALLOWED_ORIGINS=https://fisc-o-scope.pages.dev
+ALLOWED_ORIGINS=https://fiscoscope.pages.dev
 ```
 
 Then recreate the `api` container so it picks up the new env (a plain `restart` does NOT reload env — use `up -d`):
@@ -347,9 +347,9 @@ docker compose up -d api
 - [ ] **Step 5.5: Verify the CORS header is returned for that origin**
 
 ```bash
-curl -sI -H "Origin: https://fisc-o-scope.pages.dev" https://203-0-113-45.sslip.io/api/meta | grep -i access-control-allow-origin
+curl -sI -H "Origin: https://fiscoscope.pages.dev" https://203-0-113-45.sslip.io/api/meta | grep -i access-control-allow-origin
 ```
-Expected: `access-control-allow-origin: https://fisc-o-scope.pages.dev`. (A different/absent origin should NOT be echoed — that's the allowlist working.)
+Expected: `access-control-allow-origin: https://fiscoscope.pages.dev`. (A different/absent origin should NOT be echoed — that's the allowlist working.)
 
 ---
 

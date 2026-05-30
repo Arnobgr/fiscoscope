@@ -1,4 +1,4 @@
-# Runtime discoveries — fisc-o-scope
+# Runtime discoveries — Fiscoscope
 
 Session-by-session build log, moved out of `CLAUDE.md` (2026-05-22) so the
 session-start file stays short. These notes persist across sessions; append a

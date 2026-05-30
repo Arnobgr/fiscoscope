@@ -1,4 +1,4 @@
-# fisc-o-scope Frontend Implementation Plan
+# fiscoscope Frontend Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. **Task 14 additionally REQUIRES the `frontend-design` skill** for the visual layer.
 
@@ -815,7 +815,7 @@ describe("AppShell", () => {
         </AppShell>
       </MemoryRouter>,
     );
-    expect(screen.getByRole("banner")).toHaveTextContent(/fisc-o-scope/i);
+    expect(screen.getByRole("banner")).toHaveTextContent(/fiscoscope/i);
     expect(screen.getByText(/Dernière mise à jour/i)).toHaveTextContent(/21 mai 2026/);
     expect(screen.getByText("contenu")).toBeInTheDocument();
   });
@@ -838,7 +838,7 @@ export function AppShell({ lastUpdated, children }: { lastUpdated?: string; chil
   return (
     <div className="app-shell">
       <header role="banner" className="app-header">
-        <Link to="/" className="brand">fisc-o-scope</Link>
+        <Link to="/" className="brand">fiscoscope</Link>
         <p className="tagline">L’efficacité de l’administration publique française, en chiffres</p>
         {lastUpdated && (
           <p className="last-updated">Dernière mise à jour : {fmtDateFr(lastUpdated)}</p>
@@ -1413,7 +1413,7 @@ export function Methodology() {
       <nav className="breadcrumb"><Link to="/">← Tous les indicateurs</Link></nav>
       <h1>Méthodologie</h1>
       <p>
-        fisc-o-scope mesure la productivité et l’efficacité de l’administration publique française
+        fiscoscope mesure la productivité et l’efficacité de l’administration publique française
         à partir de données publiques, sous forme de ratios (par euro dépensé), sur longue période
         (depuis 1995) et, lorsque c’est possible, en comparaison de la moyenne de l’OCDE.
       </p>

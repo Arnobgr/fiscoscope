@@ -803,8 +803,8 @@ The PRD also implies a **second annual run in June** for the PLF / "Voies et moy
 
 ### Files
 
-- Create (on VPS, **not committed**): `/etc/systemd/system/fisoscope-monthly.{service,timer}`
-- Create (on VPS, **not committed**): `/etc/systemd/system/fisoscope-annual.{service,timer}`
+- Create (on VPS, **not committed**): `/etc/systemd/system/fiscoscope-monthly.{service,timer}`
+- Create (on VPS, **not committed**): `/etc/systemd/system/fiscoscope-annual.{service,timer}`
 - Create: `backend/.env` on the VPS (filled with R2 credentials — never committed)
 - Create: `docs/deployment.md` — a short runbook covering the systemd install, R2 setup, and how to inspect logs (this *is* committed)
 - May modify: `backend/publishers/r2_upload.py` — add a dry-run / list-only mode if helpful for the first upload (optional)
@@ -857,30 +857,30 @@ Open one file through the R2 public URL (`$R2_PUBLIC_URL/meta.json`) in a browse
 
 - [ ] **Write the four unit files on the VPS**
 
-`/etc/systemd/system/fisoscope-monthly.service`:
+`/etc/systemd/system/fiscoscope-monthly.service`:
 
 ```ini
 [Unit]
-Description=fisc-o-scope monthly pipeline
+Description=fiscoscope monthly pipeline
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=oneshot
-User=fisoscope
-WorkingDirectory=/home/fisoscope/french-efficiency-dashboard/backend
-EnvironmentFile=/home/fisoscope/french-efficiency-dashboard/.env
-ExecStart=/home/fisoscope/french-efficiency-dashboard/backend/.venv/bin/python run_pipeline.py --mode monthly
+User=fiscoscope
+WorkingDirectory=/home/fiscoscope/french-efficiency-dashboard/backend
+EnvironmentFile=/home/fiscoscope/french-efficiency-dashboard/.env
+ExecStart=/home/fiscoscope/french-efficiency-dashboard/backend/.venv/bin/python run_pipeline.py --mode monthly
 StandardOutput=journal
 StandardError=journal
 ```
 
-`/etc/systemd/system/fisoscope-monthly.timer`:
+`/etc/systemd/system/fiscoscope-monthly.timer`:
 
 ```ini
 [Unit]
-Description=Run fisc-o-scope monthly pipeline on the 1st of each month
-Requires=fisoscope-monthly.service
+Description=Run fiscoscope monthly pipeline on the 1st of each month
+Requires=fiscoscope-monthly.service
 
 [Timer]
 OnCalendar=*-*-01 06:00:00
@@ -891,14 +891,14 @@ RandomizedDelaySec=900
 WantedBy=timers.target
 ```
 
-The two annual units mirror this with `--mode annual` and `OnCalendar=*-02-01 06:00:00` (plus a second `fisoscope-plf.timer` at `*-10-15 06:00:00` if the PLF annex publication date is known by then — otherwise skip).
+The two annual units mirror this with `--mode annual` and `OnCalendar=*-02-01 06:00:00` (plus a second `fiscoscope-plf.timer` at `*-10-15 06:00:00` if the PLF annex publication date is known by then — otherwise skip).
 
 - [ ] **Enable and check the timers**
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now fisoscope-monthly.timer fisoscope-annual.timer
-systemctl list-timers --all | grep fisoscope
+sudo systemctl enable --now fiscoscope-monthly.timer fiscoscope-annual.timer
+systemctl list-timers --all | grep fiscoscope
 ```
 
 Expected: both timers listed with non-zero `NEXT` and `LEFT` fields.
@@ -908,8 +908,8 @@ Expected: both timers listed with non-zero `NEXT` and `LEFT` fields.
 - [ ] **Manual trigger to confirm the systemd plumbing works**
 
 ```bash
-sudo systemctl start fisoscope-monthly.service
-journalctl -u fisoscope-monthly.service -n 100 --no-pager
+sudo systemctl start fiscoscope-monthly.service
+journalctl -u fiscoscope-monthly.service -n 100 --no-pager
 ```
 
 Expected: full pipeline run log, ending with `Pipeline complete` and `Uploaded meta.json`. Any failure here points to env-file path, working directory, or python interpreter path — fix in the `.service` file.
@@ -918,7 +918,7 @@ Expected: full pipeline run log, ending with `Pipeline complete` and `Uploaded m
 
 - [ ] **Write `docs/deployment.md`**
 
-Include: VPS user setup, `.env` template (without secrets), the four unit files verbatim, `systemctl enable` commands, log inspection commands (`journalctl -u fisoscope-monthly -f`), R2 public URL location, rollback procedure (`sudo systemctl disable --now fisoscope-*.timer`).
+Include: VPS user setup, `.env` template (without secrets), the four unit files verbatim, `systemctl enable` commands, log inspection commands (`journalctl -u fiscoscope-monthly -f`), R2 public URL location, rollback procedure (`sudo systemctl disable --now fiscoscope-*.timer`).
 
 - [ ] **Commit + CLAUDE.md update**
 

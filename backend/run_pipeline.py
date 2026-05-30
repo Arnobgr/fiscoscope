@@ -1,4 +1,4 @@
-"""fisc-o-scope pipeline entry point — see PRD §6.
+"""Fiscoscope pipeline entry point — see PRD §6.
 
 Modes:
   monthly  — budget execution + Urssaf + France Travail, then the monthly KPI.
@@ -149,7 +149,7 @@ def run_annual(sources: dict) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="fisc-o-scope pipeline")
+    parser = argparse.ArgumentParser(description="Fiscoscope pipeline")
     parser.add_argument(
         "--mode", choices=["monthly", "annual", "full"], default="full"
     )

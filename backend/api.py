@@ -1,4 +1,4 @@
-"""fisc-o-scope read-only API — serves the pipeline's output JSON over HTTP.
+"""Fiscoscope read-only API — serves the pipeline's output JSON over HTTP.
 
 Replaces the former R2 publisher (see PRD §8). The frontend (Cloudflare Pages)
 fetches these endpoints. The data is public, so there is no authentication;
@@ -32,7 +32,7 @@ _NAME_RE = re.compile(r"^[a-z0-9_]+$")
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[RATE_LIMIT])
 
-app = FastAPI(title="fisc-o-scope API", docs_url=None, redoc_url=None)
+app = FastAPI(title="Fiscoscope API", docs_url=None, redoc_url=None)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Order matters: SlowAPI added first (inner), CORS added last so it is the

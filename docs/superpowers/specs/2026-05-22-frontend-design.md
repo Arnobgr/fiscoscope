@@ -1,4 +1,4 @@
-# fisc-o-scope Frontend — Design Spec
+# fiscoscope Frontend — Design Spec
 
 **Date:** 2026-05-22
 **Status:** Approved (brainstorm) — pending spec review before plan
