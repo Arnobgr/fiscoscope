@@ -6,7 +6,7 @@ export function Methodology() {
       <nav className="breadcrumb"><Link to="/">← Tous les indicateurs</Link></nav>
       <h1>Méthodologie</h1>
       <p>
-        fisc-o-scope mesure la productivité et l’efficacité de l’administration publique française
+        Fiscoscope mesure la productivité et l’efficacité de l’administration publique française
         à partir de données publiques, sous forme de ratios (par euro dépensé), sur longue période
         (depuis 1995) et, lorsque c’est possible, en comparaison de la moyenne de l’OCDE.
       </p>
