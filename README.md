@@ -6,6 +6,8 @@ Government communications tend to report spending the way a household reports it
 
 The dashboard is built for people who want to look at public finance numbers without someone explaining first why they're good or bad. Mostly: journalists, researchers, and anyone who's tired of budget debates that never cite a denominator.
 
+It is available [here](https://fiscoscope.pages.dev/)
+
 ---
 
 ## What it does differently
