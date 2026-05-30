@@ -128,6 +128,20 @@ ul {
   font-size: 0.86rem;
   color: var(--ink-faint);
 }
+.footer-links {
+  display: flex;
+  gap: var(--space-5);
+  justify-content: center;
+  padding: 0 var(--space-5) var(--space-5);
+  font-size: 0.86rem;
+}
+.footer-links a {
+  color: var(--ink-faint);
+  text-decoration: none;
+}
+.footer-links a:hover {
+  color: var(--coral);
+}
 
 /* ---- Overview -------------------------------------------------------- */
 .overview__intro {
