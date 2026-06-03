@@ -61,11 +61,13 @@ def compute_wage_ratio() -> dict:
         "unit": "percent",
         "source": "INSEE BDM CNT-2020-CSI (D1_S13) + Urssaf masse salariale (CVS)",
         "methodology": (
-            "D1_S13 (public compensation of employees, annual) / private-sector "
-            "wage bill (Urssaf ms_t_60j_cvs, seasonally adjusted, summed over 4 "
-            "quarters) × 100. INSEE CNT-2020-CSI is in millions of euros while "
-            "Urssaf is in absolute euros, so the public figure is scaled by 1e6 "
-            "to match units. Years with fewer than 4 Urssaf quarters are dropped."
+            "D1_S13 (rémunération des salariés publics, annuelle) / masse "
+            "salariale du secteur privé (Urssaf ms_t_60j_cvs, corrigée des "
+            "variations saisonnières, cumulée sur 4 trimestres) × 100. "
+            "CNT-2020-CSI de l'INSEE est exprimée en millions d'euros tandis "
+            "qu'Urssaf est en euros absolus ; le montant public est donc "
+            "multiplié par 1e6 pour harmoniser les unités. Les années comptant "
+            "moins de 4 trimestres Urssaf sont écartées."
         ),
         "last_updated": now_iso(),
         "france": france,

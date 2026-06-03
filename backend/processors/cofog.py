@@ -45,18 +45,19 @@ for _bucket, _gfs in BUCKETS.items():
         _GF_TO_BUCKET[_gf.replace("cofog_gf", "GF").upper()] = _bucket
 
 CLASSIFICATION_CAVEAT = (
-    "COFOG functions are grouped into productive/redistributive/administrative "
-    "buckets per the dashboard's own classification (PRD §4). Education (GF09) "
-    "and Health (GF07) mix investment and transfer components and are classified "
-    "by dominant component — this is an approximation."
+    "Les fonctions COFOG sont regroupées en blocs productif / redistributif / "
+    "administratif selon la classification propre au tableau de bord (PRD §4). "
+    "L'éducation (GF09) et la santé (GF07) mêlent des composantes "
+    "d'investissement et de transfert et sont classées selon leur composante "
+    "dominante — il s'agit d'une approximation."
 )
 
 STITCH_NOTE = (
-    "INSEE's CNA-2014-DEP-APU COFOG family is frozen at 2020; post-2020 values "
-    "are sourced from OECD Government at a Glance 2025 (France only), converted "
-    "from % of GDP to EUR via INSEE nominal GDP. Each datapoint is tagged with "
-    "its source. INSEE and OECD agree within ±0.4 percentage points of GDP at "
-    "the 2020 seam."
+    "La famille COFOG CNA-2014-DEP-APU de l'INSEE s'arrête en 2020 ; les valeurs "
+    "postérieures à 2020 proviennent de l'OCDE (Government at a Glance 2025, "
+    "France uniquement), converties de % du PIB en euros via le PIB nominal "
+    "INSEE. Chaque point de données est associé à sa source. L'INSEE et l'OCDE "
+    "concordent à ±0,4 point de pourcentage du PIB au raccord de 2020."
 )
 
 _TOP_GF_RE = re.compile(r"^GF(0[1-9]|10)$")
