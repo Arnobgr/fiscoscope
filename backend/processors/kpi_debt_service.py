@@ -42,9 +42,10 @@ def compute_debt_service() -> dict:
         "unit": "percent",
         "source": "INSEE BDM — CNT-2020-CSI (D41_S13, OTE_S13, B9NF_S13)",
         "methodology": (
-            "D41_S13 (interest paid, all APU) / total government revenue, where "
-            "revenue = total APU expenditure (OTE) + fiscal balance (B9NF). All "
-            "from CNT-2020-CSI quarterly accounts summed to annual."
+            "D41_S13 (intérêts versés, ensemble des APU) / total des recettes "
+            "publiques, où recette = dépense totale des APU (OTE) + solde public "
+            "(B9NF). Le tout issu des comptes trimestriels CNT-2020-CSI cumulés "
+            "sur l'année."
         ),
         "last_updated": now_iso(),
         "france": france,

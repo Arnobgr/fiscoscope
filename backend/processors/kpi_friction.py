@@ -67,17 +67,19 @@ def compute_friction_ratio() -> dict:
         "unit": "percent",
         "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
         "methodology": (
-            "Administrative COFOG bucket (GF01 + GF02 + GF03) treated as "
-            "friction; debt interest is included within GF01 and is not "
-            "added separately. Denominator is total government revenue, "
-            "derived as total COFOG expenditure + fiscal balance "
-            "(B9_S13, INSEE) since no direct tax-revenue series is resolved. "
-            "This is an approximation — see PRD §5.3. " + STITCH_NOTE
-            + " Peers: OECD GIP 2025, administrative bucket (GF01+GF02+GF03) / "
-            "total COFOG. NOTE: the France-side denominator is revenue "
-            "(expenditure + balance) while the peer denominator is total "
-            "expenditure, so peers are TREND-comparable, not level-comparable. "
-            "OECD_AVG = unweighted mean of the 6 peers; peer series start 2007."
+            "Le bloc administratif COFOG (GF01 + GF02 + GF03) est considéré "
+            "comme de la friction ; les intérêts de la dette sont compris dans "
+            "GF01 et ne sont pas ajoutés séparément. Le dénominateur est le "
+            "total des recettes publiques, calculé comme la dépense COFOG totale "
+            "+ le solde public (B9_S13, INSEE), faute de série directe de "
+            "recettes fiscales. Il s'agit d'une approximation — voir PRD §5.3. "
+            + STITCH_NOTE
+            + " Pays comparés : OCDE GIP 2025, bloc administratif "
+            "(GF01+GF02+GF03) / COFOG total. NB : côté France, le dénominateur "
+            "est la recette (dépense + solde) tandis que côté pays comparés "
+            "c'est la dépense totale ; les comparaisons portent donc sur les "
+            "TENDANCES, et non sur les niveaux. OECD_AVG = moyenne non pondérée "
+            "des 6 pays comparés ; les séries des pays comparés débutent en 2007."
         ),
         "last_updated": now_iso(),
         "france": france,

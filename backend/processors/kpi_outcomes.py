@@ -98,12 +98,13 @@ def compute_outcomes() -> dict:
             "OECD Health Statistics (life expectancy at birth)"
         ),
         "methodology": (
-            "Health block: GF07 (health) COFOG spend / nominal GDP × 100, "
-            "stitched INSEE 1995–2020 + OECD 2021+ (each point source-tagged). "
-            "Life expectancy at birth, total population, from OECD Health "
-            "Statistics (DF_LE). Education (spend vs. PISA) is omitted — PISA "
-            "is not available via OECD's SDMX API. Peer benchmarking deferred. "
-            + STITCH_NOTE
+            "Bloc santé : dépense COFOG GF07 (santé) / PIB nominal × 100, "
+            "raccordée INSEE 1995–2020 + OCDE à partir de 2021 (chaque point "
+            "associé à sa source). Espérance de vie à la naissance, population "
+            "totale, issue des statistiques de santé de l'OCDE (DF_LE). "
+            "L'éducation (dépense vs. PISA) est omise — PISA n'est pas "
+            "disponible via l'API SDMX de l'OCDE. Comparaison entre pays "
+            "reportée. " + STITCH_NOTE
         ),
         "last_updated": now_iso(),
         "health": {
@@ -184,16 +185,19 @@ def compute_tax_expenditure() -> dict:
             "CNT-2020-CSI (OTE_S13 + B9NF_S13)."
         ),
         "methodology": (
-            "Per year: total_cost_eur_bn = Σ revenue forgone across all France "
-            "provisions (GTED 'RF (LCU)', EUR); count = number of provisions "
-            "reported that year (includes provisions costed at zero); "
-            "ratio_to_revenue_pct = total cost / total government revenue × 100, "
-            "where revenue = total APU expenditure (OTE) + fiscal balance (B9NF) "
-            "from CNT-2020-CSI — emitted only for years with INSEE revenue. The "
-            "two most recent years are GTED projections (projection: true); "
-            "earlier years are estimates. GTED is a third-party compilation of "
-            "France's PLF Voies-et-Moyens Tome II; its provision count and "
-            "revenue-forgone definition differ slightly from the official annex."
+            "Par année : total_cost_eur_bn = Σ des recettes auxquelles l'État "
+            "renonce sur l'ensemble des dispositifs français (GTED « RF (LCU) », "
+            "en euros) ; count = nombre de dispositifs recensés cette année-là "
+            "(y compris ceux chiffrés à zéro) ; ratio_to_revenue_pct = coût "
+            "total / total des recettes publiques × 100, où recette = dépense "
+            "totale des APU (OTE) + solde public (B9NF) issus de CNT-2020-CSI — "
+            "calculé uniquement pour les années où la recette INSEE est "
+            "disponible. Les deux années les plus récentes sont des projections "
+            "GTED (projection: true) ; les années antérieures sont des "
+            "estimations. Le GTED est une compilation tierce du tome II « Voies "
+            "et Moyens » du PLF français ; son décompte des dispositifs et sa "
+            "définition des recettes non perçues diffèrent légèrement de "
+            "l'annexe officielle."
         ),
         "last_updated": now_iso(),
         "france": france,

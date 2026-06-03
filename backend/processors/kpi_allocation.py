@@ -78,10 +78,11 @@ def compute_productive_spend() -> dict:
         "unit": "percent",
         "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
         "methodology": (
-            "COFOG productive bucket (GF04 + GF05 + GF06) / total COFOG "
-            "expenditure × 100. " + CLASSIFICATION_CAVEAT + " " + STITCH_NOTE
-            + " Peers: OECD GIP 2025, productive bucket / total COFOG (both % of "
-            "GDP); OECD_AVG = unweighted mean of the 6 peers; peer series start 2007."
+            "Bloc productif COFOG (GF04 + GF05 + GF06) / dépenses COFOG totales "
+            "× 100. " + CLASSIFICATION_CAVEAT + " " + STITCH_NOTE
+            + " Pays comparés : OCDE GIP 2025, bloc productif / COFOG total (en % "
+            "du PIB de part et d'autre) ; OECD_AVG = moyenne non pondérée des 6 "
+            "pays comparés ; les séries des pays comparés débutent en 2007."
         ),
         "last_updated": now_iso(),
         "france": france,
@@ -120,8 +121,8 @@ def compute_pension_investment() -> dict:
         "unit": "ratio",
         "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
         "methodology": (
-            "COFOG GF10 (social protection expenditure, all APU) / P5K2 "
-            "(gross fixed capital formation, all APU). " + STITCH_NOTE
+            "COFOG GF10 (dépenses de protection sociale, ensemble des APU) / "
+            "P5K2 (formation brute de capital fixe, ensemble des APU). " + STITCH_NOTE
         ),
         "last_updated": now_iso(),
         "france": france,

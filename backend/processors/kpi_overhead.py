@@ -56,12 +56,13 @@ def compute_overhead_rate() -> dict:
         "unit": "percent",
         "source": "INSEE BDM — CNT-2020-CSI (quarterly, base 2020)",
         "methodology": (
-            "D1_S13 (compensation of employees, all APU) / OTE_S13 (total APU "
-            "expenditure) × 100. Quarterly series summed to annual; incomplete "
-            "years dropped."
-            " Peers: OECD GIP 2025, D1/total-expenditure (both % of GDP) — "
-            "comparable to the France ratio; OECD_AVG is the unweighted mean of "
-            "DEU/GBR/ITA/ESP/NLD/SWE; peer series start 2007."
+            "D1_S13 (rémunération des salariés, ensemble des APU) / OTE_S13 "
+            "(dépense totale des APU) × 100. Séries trimestrielles cumulées sur "
+            "l'année ; les années incomplètes sont écartées."
+            " Pays comparés : OCDE GIP 2025, D1 / dépense totale (en % du PIB de "
+            "part et d'autre) — comparable au ratio français ; OECD_AVG est la "
+            "moyenne non pondérée de DEU/GBR/ITA/ESP/NLD/SWE ; les séries des "
+            "pays comparés débutent en 2007."
         ),
         "last_updated": now_iso(),
         "france": france,

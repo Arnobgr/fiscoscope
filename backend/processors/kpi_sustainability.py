@@ -69,12 +69,14 @@ def compute_fiscal_sustainability() -> dict:
             "(Maastricht debt); peers OECD GIP 2025 (DSD_GOV, % of GDP)"
         ),
         "methodology": (
-            "Deficit: B9NF_S13 (net lending/borrowing, all APU) summed to annual "
-            "/ nominal GDP × 100. Debt: Maastricht public-debt-to-GDP "
-            "(DETTE-TRIM-APU-2020, base 2020), taken at the year-end (Q4) quarter "
-            "since debt is a stock. Peers: OECD GIP 2025 net lending/borrowing "
-            "(GNLB) and Maastricht gross debt (GGDM), both % of GDP — OECD_AVG is "
-            "the unweighted mean of DEU/GBR/ITA/ESP/NLD/SWE; peer series start 2007."
+            "Déficit : B9NF_S13 (capacité/besoin de financement, ensemble des "
+            "APU) cumulé sur l'année / PIB nominal × 100. Dette : ratio dette "
+            "publique/PIB au sens de Maastricht (DETTE-TRIM-APU-2020, base 2020), "
+            "relevé au dernier trimestre de l'année (T4) puisque la dette est un "
+            "stock. Pays comparés : OCDE GIP 2025, capacité/besoin de financement "
+            "(GNLB) et dette brute de Maastricht (GGDM), en % du PIB de part et "
+            "d'autre — OECD_AVG est la moyenne non pondérée de "
+            "DEU/GBR/ITA/ESP/NLD/SWE ; les séries des pays comparés débutent en 2007."
         ),
         "last_updated": now_iso(),
         "france": france,

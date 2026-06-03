@@ -4,7 +4,7 @@
   "description": "Social protection expenditure relative to public investment. A rising ratio means the state increasingly consumes its own productive capacity rather than building it.",
   "unit": "ratio",
   "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
-  "methodology": "COFOG GF10 (social protection expenditure, all APU) / P5K2 (gross fixed capital formation, all APU). INSEE's CNA-2014-DEP-APU COFOG family is frozen at 2020; post-2020 values are sourced from OECD Government at a Glance 2025 (France only), converted from % of GDP to EUR via INSEE nominal GDP. Each datapoint is tagged with its source. INSEE and OECD agree within ±0.4 percentage points of GDP at the 2020 seam.",
+  "methodology": "COFOG GF10 (dépenses de protection sociale, ensemble des APU) / P5K2 (formation brute de capital fixe, ensemble des APU). La famille COFOG CNA-2014-DEP-APU de l'INSEE s'arrête en 2020 ; les valeurs postérieures à 2020 proviennent de l'OCDE (Government at a Glance 2025, France uniquement), converties de % du PIB en euros via le PIB nominal INSEE. Chaque point de données est associé à sa source. L'INSEE et l'OCDE concordent à ±0,4 point de pourcentage du PIB au raccord de 2020.",
   "last_updated": "2026-05-21T10:03:35Z",
   "france": [
     {
