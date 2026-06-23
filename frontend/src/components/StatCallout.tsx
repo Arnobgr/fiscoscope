@@ -1,13 +1,14 @@
 import type { KpiView } from "../data/types";
-import { fmtPercent, fmtEurBn, fmtYears, fmtYoy } from "../data/format";
+import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtYoy } from "../data/format";
 
 export function StatCallout({ view }: { view: KpiView }) {
   if (!view.latest) return null;
   const { unit, value, year, yoy } = view.latest;
   const v = unit === "eur_bn" ? fmtEurBn(value) : unit === "years" ? fmtYears(value)
+    : unit === "ratio" ? fmtRatio(value)
     : unit === "eur" ? new Intl.NumberFormat("fr-FR", { notation: "compact", style: "currency", currency: "EUR" }).format(value)
     : fmtPercent(value);
-  const y = yoy != null ? fmtYoy(yoy) : null;
+  const y = yoy != null ? fmtYoy(yoy, unit) : null;
   return (
     <div className="stat-callout">
       <span className="stat-callout__value">{v}</span>

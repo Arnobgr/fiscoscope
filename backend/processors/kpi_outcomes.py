@@ -88,9 +88,11 @@ def compute_outcomes() -> dict:
         "kpi_name": "Spend vs. Outcome — Health",
         "description": (
             "France public health spend (COFOG GF07) as % of GDP set against "
-            "life expectancy at birth, as two parallel time series. A widening "
-            "gap between rising spend and flat outcomes signals declining "
-            "efficiency."
+            "life expectancy at birth, as two parallel time series for the "
+            "reader to judge. Life expectancy reflects the whole health system "
+            "(public and private) and non-health factors, not public spend "
+            "alone, so the two series are shown side by side rather than as a "
+            "causal efficiency verdict."
         ),
         "unit": "mixed",
         "source": (
@@ -102,6 +104,10 @@ def compute_outcomes() -> dict:
             "raccordée INSEE 1995–2020 + OCDE à partir de 2021 (chaque point "
             "associé à sa source). Espérance de vie à la naissance, population "
             "totale, issue des statistiques de santé de l'OCDE (DF_LE). "
+            "L'espérance de vie dépend de l'ensemble du système de santé "
+            "(public et privé) et de facteurs hors santé, et non de la seule "
+            "dépense publique GF07 : les deux séries sont présentées en "
+            "parallèle, sans en déduire un lien de causalité. "
             "L'éducation (dépense vs. PISA) est omise — PISA n'est pas "
             "disponible via l'API SDMX de l'OCDE. Comparaison entre pays "
             "reportée. " + STITCH_NOTE
