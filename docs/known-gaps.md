@@ -30,7 +30,7 @@ needed series for several, and three KPIs are France-only by construction.
 | KPI | Peer status | Reason |
 |-----|-------------|--------|
 | overhead, productive, sustainability (deficit+debt) | ✅ DONE (Sessions A/B) | OECD GIP raw has the series (peer floor 2007) |
-| friction | ✅ DONE but **trend-only** | France denominator is revenue; peer denominator is total expenditure — not level-comparable |
+| friction | ❌ REMOVED by design (2026-06) | Peers were wired (Session A) but dropped: France denominator is revenue, peer denominator is total expenditure — not level-comparable, and a trends-only overlay is too easily misread on a public chart. Now France-only |
 | pension/investment | ❌ BLOCKED | OECD fiscal raw has **no P51 / gross fixed capital formation**; PRD §5.5 names no peer source |
 | outcomes — education | ❌ BLOCKED | PISA not in OECD SDMX (see C) |
 | outcomes — health | ⚠️ FEASIBLE, not built | OECD life-expectancy peers exist; peers deferred (shipped France-only dual series) |

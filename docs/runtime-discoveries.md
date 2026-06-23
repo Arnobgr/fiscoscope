@@ -580,3 +580,43 @@ section below, then commit.
       impossible for a public SPA + public API, and unneeded for public data;
       CORS only enables the frontend, rate-limit + firewall bound abuse.
     - The first live deployment + the frontend (Phase 2) remain to be built.
+
+---
+
+- **Session F (2026-06-23) — pre-launch KPI review: one display bug + framing
+  fixes so every on-screen claim is defensible.** Driven by a full review of all
+  10 live KPIs before public communication. User-approved decisions:
+    - **`pension_investment` display bug (frontend).** Backend emits
+      `unit: "ratio"` (e.g. `5.39` = 5.39×) but the registry hard-coded
+      `unit: "percent"`, so the value rendered as "5,39 %". Added a `"ratio"`
+      `Unit` + `fmtRatio` (→ `5,4×`) and made `fmtYoy` unit-aware (no "%" for
+      ratios); wired into `KpiCard`/`StatCallout`; flipped the registry unit.
+    - **`pension_investment` relabel.** GF10 is *all* social protection, not
+      pensions. Renamed "Retraites/Pension → Investment" to "Protection sociale /
+      Social Protection / Investment" across `registry.ts` (title+explainer) and
+      `kpi_allocation.py` (`kpi_name`, description, methodology). Kept GF10 — we
+      did **not** isolate GF1002 (old-age); the resolver/OECD raw only carry
+      top-level GF codes, so true-pension isolation stays a data-fetch gap.
+    - **`friction_ratio` — peers removed + reframed.** Dropped the OECD peer
+      overlay (`peers: {}`, removed the `_cofog_bucket_peers` import) because
+      France's denominator is revenue while peers' is expenditure — not
+      level-comparable, and trends-only is too easily misread on a public chart
+      (supersedes the Session A wiring; see known-gaps §B). Reworded copy so
+      GF01–03 reads as "core support/sovereign functions… not a measure of
+      waste" rather than administrative overhead (esp. defence).
+    - **`outcomes` (health) reframed neutral.** Removed the "widening gap →
+      declining efficiency" verdict (life expectancy actually rose ~5 yrs in the
+      data); now two parallel series + a caveat that life expectancy reflects the
+      whole health system and non-health factors, not GF07 spend alone.
+    - **`tax_expenditure` source clarity.** Frontend explainer now flags the
+      figure as the **GTED estimate**, with the higher official PLF *Voies et
+      Moyens* total (~80–90 Md€) as context. No data change.
+    - **Per-card "données jusqu'à {year}"** label added to `KpiCard` for the
+      mixed recency (COFOG KPIs stop ~2023; others reach 2025/2026).
+    - **`wage_ratio` 2025 = 50.0 verified genuine** — 4 complete quarters on
+      both INSEE and Urssaf sides; the round value is coincidental rounding of
+      49.996, not a partial-data artifact. No code change.
+    - **Deploy note:** backend copy changes (friction/pension/outcomes) only
+      reach production after re-running those processors on the VPS to regenerate
+      `data/output/*.json`; the FastAPI app reads JSON fresh per request.
+      Commit `ab62e1f` on `dev`.
