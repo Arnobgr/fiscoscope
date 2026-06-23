@@ -15,6 +15,9 @@ export function fmtEurBn(v: number): string {
 export function fmtYears(v: number): string {
   return `${num(v, 1, 1)} ans`;
 }
+export function fmtRatio(v: number): string {
+  return `${num(v, 1, 1)}×`;
+}
 export function fmtNumber(v: number): string {
   return num(v, 0, 0);
 }
@@ -23,8 +26,10 @@ export function fmtDateFr(iso: string): string {
     .format(new Date(iso));
 }
 export type YoyDir = "up" | "down" | "flat";
-export function fmtYoy(v: number): { text: string; dir: YoyDir } {
+// `unit` "ratio" → YoY is a delta of multiples (×), shown without a "%" suffix.
+export function fmtYoy(v: number, unit?: string): { text: string; dir: YoyDir } {
   const dir: YoyDir = v > 0 ? "up" : v < 0 ? "down" : "flat";
   const sign = v > 0 ? "+" : ""; // negatives carry U+2212 via num()
-  return { text: `${sign}${num(v, 1, 2)} %`, dir }; // 1–2 decimals (e.g. +1,2 / −0,41)
+  const suffix = unit === "ratio" ? "×" : " %";
+  return { text: `${sign}${num(v, 1, 2)}${suffix}`, dir }; // 1–2 decimals (e.g. +1,2 / −0,41)
 }

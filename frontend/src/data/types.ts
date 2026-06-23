@@ -40,7 +40,7 @@ export interface Meta {
 }
 
 // ---- Normalized view model (what components consume) --------------------
-export type Unit = "percent" | "eur_bn" | "years" | "eur" | "mixed";
+export type Unit = "percent" | "eur_bn" | "years" | "eur" | "ratio" | "mixed";
 export type XKind = "year" | "month";
 export interface ViewPoint { x: number | string; y: number; projection?: boolean }
 export interface ViewSeries { id: string; label: string; role: "france" | "oecd" | "secondary"; points: ViewPoint[] }

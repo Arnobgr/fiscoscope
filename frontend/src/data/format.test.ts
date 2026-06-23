@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { fmtPercent, fmtEurBn, fmtYears, fmtNumber, fmtDateFr, fmtYoy } from "./format";
+import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtNumber, fmtDateFr, fmtYoy } from "./format";
 
 const NB = " "; // narrow no-break space — fr-FR thousands grouping
 const MIN = "−"; // U+2212 minus sign (not ASCII hyphen)
@@ -15,6 +15,10 @@ describe("french formatters", () => {
   it("formats years (life expectancy)", () => {
     expect(fmtYears(83)).toBe("83,0 ans");
   });
+  it("formats a ratio as a multiple (×, not %)", () => {
+    expect(fmtRatio(5.39)).toBe("5,4×");
+    expect(fmtRatio(5.39)).not.toContain("%");
+  });
   it("formats plain numbers with fr grouping", () => {
     expect(fmtNumber(1456129)).toBe(`1${NB}456${NB}129`);
   });
@@ -25,5 +29,8 @@ describe("french formatters", () => {
     expect(fmtYoy(-0.41)).toEqual({ text: `${MIN}0,41 %`, dir: "down" });
     expect(fmtYoy(1.2)).toEqual({ text: "+1,2 %", dir: "up" });
     expect(fmtYoy(0)).toEqual({ text: "0,0 %", dir: "flat" });
+  });
+  it("formats a ratio YoY with × instead of %", () => {
+    expect(fmtYoy(0.12, "ratio")).toEqual({ text: "+0,12×", dir: "up" });
   });
 });

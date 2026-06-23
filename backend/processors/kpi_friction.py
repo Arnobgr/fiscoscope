@@ -26,7 +26,6 @@ from processors import (
     write_output,
 )
 from processors.cofog import STITCH_NOTE, bucket_cofog
-from processors.kpi_allocation import _cofog_bucket_peers
 
 log = logging.getLogger(__name__)
 
@@ -60,30 +59,28 @@ def compute_friction_ratio() -> dict:
         "kpi_id": "friction_ratio",
         "kpi_name": "Friction Ratio",
         "description": (
-            "Share of government revenue consumed by administrative friction "
-            "(general public services, defence, public order, debt interest) "
-            "rather than reaching end beneficiaries as services or transfers."
+            "Share of government revenue absorbed by the State's core support "
+            "and sovereign functions (general public services, defence, public "
+            "order and safety) — the running cost of the apparatus before "
+            "service delivery and transfers. Not a measure of waste."
         ),
         "unit": "percent",
         "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
         "methodology": (
-            "Le bloc administratif COFOG (GF01 + GF02 + GF03) est considéré "
-            "comme de la friction ; les intérêts de la dette sont compris dans "
-            "GF01 et ne sont pas ajoutés séparément. Le dénominateur est le "
-            "total des recettes publiques, calculé comme la dépense COFOG totale "
-            "+ le solde public (B9_S13, INSEE), faute de série directe de "
-            "recettes fiscales. Il s'agit d'une approximation — voir PRD §5.3. "
-            + STITCH_NOTE
-            + " Pays comparés : OCDE GIP 2025, bloc administratif "
-            "(GF01+GF02+GF03) / COFOG total. NB : côté France, le dénominateur "
-            "est la recette (dépense + solde) tandis que côté pays comparés "
-            "c'est la dépense totale ; les comparaisons portent donc sur les "
-            "TENDANCES, et non sur les niveaux. OECD_AVG = moyenne non pondérée "
-            "des 6 pays comparés ; les séries des pays comparés débutent en 2007."
+            "Le bloc COFOG « fonctions support et régaliennes de base » (GF01 "
+            "services publics généraux + GF02 défense + GF03 ordre et sécurité "
+            "publics) rapporté aux recettes publiques. Les intérêts de la dette "
+            "sont compris dans GF01 et ne sont pas ajoutés séparément. Le "
+            "dénominateur est le total des recettes publiques, calculé comme la "
+            "dépense COFOG totale + le solde public (B9_S13, INSEE), faute de "
+            "série directe de recettes fiscales — il s'agit d'une approximation "
+            "(voir PRD §5.3). Indicateur France uniquement : aucune comparaison "
+            "internationale n'est affichée, le périmètre du dénominateur "
+            "(recettes) n'étant pas comparable d'un pays à l'autre. " + STITCH_NOTE
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": _cofog_bucket_peers(["GF01", "GF02", "GF03"]),
+        "peers": {},
         "latest": build_latest(france),
     }
     write_output("kpi_friction_ratio.json", payload)

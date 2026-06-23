@@ -112,17 +112,22 @@ def compute_pension_investment() -> dict:
 
     payload = {
         "kpi_id": "pension_investment",
-        "kpi_name": "Pension / Investment Ratio",
+        "kpi_name": "Social Protection / Investment Ratio",
         "description": (
-            "Social protection expenditure relative to public investment. A "
-            "rising ratio means the state increasingly consumes its own "
-            "productive capacity rather than building it."
+            "Total social protection expenditure (COFOG GF10 — pensions, "
+            "unemployment, family, sickness and other transfers, not pensions "
+            "alone) relative to public investment, as a multiple. A rising "
+            "ratio means the state increasingly consumes its own productive "
+            "capacity rather than building it."
         ),
         "unit": "ratio",
         "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
         "methodology": (
-            "COFOG GF10 (dépenses de protection sociale, ensemble des APU) / "
-            "P5K2 (formation brute de capital fixe, ensemble des APU). " + STITCH_NOTE
+            "COFOG GF10 (dépenses de protection sociale dans leur ensemble — "
+            "retraites, chômage, famille, maladie, etc., et non les seules "
+            "retraites — pour l'ensemble des APU) / P5K2 (formation brute de "
+            "capital fixe, ensemble des APU). Le résultat est un multiple "
+            "(sans unité). " + STITCH_NOTE
         ),
         "last_updated": now_iso(),
         "france": france,
