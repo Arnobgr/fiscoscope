@@ -111,7 +111,7 @@ french-efficiency-dashboard/
 │   │   ├── cofog.py                   # COFOG bucketing (productive/redis./admin.)
 │   │   ├── kpi_overhead.py            # Administrative Overhead Rate
 │   │   ├── kpi_friction.py            # Friction Ratio
-│   │   ├── kpi_allocation.py          # Productive Spend Ratio + Pension/Investment
+│   │   ├── kpi_allocation.py          # Productive Spend Ratio + Social Protection/Investment
 │   │   ├── kpi_outcomes.py            # Spend vs. Outcome + Tax Expenditure
 │   │   ├── kpi_sustainability.py      # Fiscal Deficit Trend
 │   │   └── kpi_monthly.py             # Monthly Budget Execution

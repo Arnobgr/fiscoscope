@@ -29,13 +29,13 @@ No institutional backing. The code and the methodology are in this repo.
 | KPI | What it measures |
 |---|---|
 | Administrative Overhead Rate | Public sector wage bill as % of total public expenditure |
-| Friction Ratio | Share of taxes consumed by administrative overhead and debt interest before reaching beneficiaries |
+| Friction Ratio | Share of revenue absorbed by the State's core support and sovereign functions (general services, defence, public order) — the running cost of the apparatus, not a measure of waste (France-only) |
 | Productive Spend Ratio | Share of expenditure flowing to productive COFOG functions (infrastructure, R&D, environment) |
-| Pension / Investment Ratio | Social protection spending vs. gross fixed capital formation |
+| Social Protection / Investment Ratio | Total social protection spending (COFOG GF10 — pensions, unemployment, family, etc.) vs. gross fixed capital formation, as a multiple |
 | Monthly Budget Execution | Live cumulative revenues, spending, and balance for the current year |
 | Fiscal Deficit Trend | Balance and debt as % of GDP, France vs. peers |
-| Tax Expenditure Cost | Total cost of *niches fiscales* as % of tax revenues |
-| Spend vs. Outcome | Health and education spend indexed against life expectancy and PISA scores |
+| Tax Expenditure Cost | Cost of *niches fiscales* (GTED estimate; lower than the official PLF figure) as % of revenue |
+| Spend vs. Outcome (health) | Public health spend (% of GDP) and life expectancy at birth, shown as two parallel series (education/PISA not yet available) |
 
 Full KPI specifications and methodology are in [`docs/PRD.md`](docs/PRD.md) §5.
 
@@ -62,7 +62,7 @@ Full KPI specifications and methodology are in [`docs/PRD.md`](docs/PRD.md) §5.
 └────────────────────────────────────────────────────┘
 ```
 
-Two systemd timers drive the pipeline: a monthly one for budget execution, Urssaf, and France Travail, and an annual one for INSEE COFOG, OECD, and the PLF annexes.
+Two systemd timers drive the pipeline: a monthly one for budget execution, Urssaf, and France Travail, and an annual one for INSEE COFOG, OECD, and the GTED tax-expenditure data.
 
 The FastAPI app serves `data/output/*.json` over read-only HTTP. No auth, because the data is public anyway. Abuse is bounded by `slowapi` rate limiting and a CORS allowlist, which is enough for a small read-only API.
 
@@ -79,7 +79,7 @@ All sources are public. None require an API key.
 - **OECD Data Explorer** for COFOG and fiscal indicators on peer countries.
 - **open.urssaf.fr** for the private sector wage bill, used in the public/private ratio.
 - **data.gouv.fr / France Travail** for monthly unemployment-insurance allocataires.
-- **PLF tax expenditure annexes** for the annual cost of tax expenditures.
+- **GTED (Global Tax Expenditures Database)** for the annual cost of tax expenditures — a CC-BY academic compilation of France's PLF *Voies et Moyens* tome II (not the official annex directly, and narrower in scope than it).
 
 ---
 
