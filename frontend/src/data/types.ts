@@ -40,6 +40,7 @@ export interface Meta {
 }
 
 // ---- Normalized view model (what components consume) --------------------
+import type { Polarity } from "./format";
 export type Unit = "percent" | "eur_bn" | "years" | "eur" | "ratio" | "mixed";
 export type XKind = "year" | "month";
 export interface ViewPoint { x: number | string; y: number; projection?: boolean }
@@ -52,6 +53,7 @@ export interface KpiView {
   title: string;           // French label (from registry)
   explainer: string;       // French explainer (from registry)
   unit: Unit;
+  polarity: Polarity;      // whether a rise is good/bad/neutral (drives YoY color)
   xKind: XKind;
   series: ViewSeries[];        // primary chart series (france first)
   comparison?: ViewSeries;     // OECD average (undefined when unavailable)
