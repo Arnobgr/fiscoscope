@@ -27,3 +27,8 @@ Thumbs.db
 
 # Context
 VPS_CONTEXT.md
+
+# Impeccable design tooling — local state & cache
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+.claude/settings.local.json

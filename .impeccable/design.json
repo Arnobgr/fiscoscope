@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-29T00:00:00Z",
+  "title": "Design System: Fiscoscope",
+  "extensions": {
+    "colorMeta": {
+      "bleu": { "role": "primary", "displayName": "Republic Bleu", "canonical": "#0055a4", "tonalRamp": ["#0a1726", "#0e2540", "#123a66", "#0055a4", "#2f78c0", "#6aa3d6", "#a9caea", "#dce9f6"] },
+      "coral": { "role": "secondary", "displayName": "Editorial Coral", "canonical": "#cc785c", "tonalRamp": ["#341c14", "#532c20", "#7c4131", "#a8553a", "#cc785c", "#dd9a83", "#ecc1b1", "#f6e3da"] },
+      "rouge": { "role": "tertiary", "displayName": "Signal Rouge", "canonical": "#ef4135", "tonalRamp": ["#350b08", "#561310", "#871d17", "#b3261e", "#ef4135", "#f47a71", "#f9aaa4", "#fcdcd9"] },
+      "positive-ink": { "role": "tertiary", "displayName": "Positive Ink", "canonical": "#2c6e49", "tonalRamp": ["#0c1f15", "#143726", "#1f523a", "#2c6e49", "#3f9466", "#69b58c", "#9fd2b6", "#d6ede0"] },
+      "taupe": { "role": "tertiary", "displayName": "OECD Taupe", "canonical": "#8a8576", "tonalRamp": ["#221f1a", "#393529", "#5c5648", "#7a745f", "#8a8576", "#aaa698", "#cbc8bd", "#e7e5de"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#28261f", "tonalRamp": ["#161510", "#28261f", "#3b3830", "#514c40", "#6f695a", "#8a8576", "#b3aea0", "#ddd9cf"] },
+      "cream": { "role": "neutral", "displayName": "Cream Canvas", "canonical": "#f4f1ea", "tonalRamp": ["#2a281f", "#46422f", "#6c6650", "#968f74", "#c2bca5", "#ddd8c8", "#ece7db", "#f4f1ea"] },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#fbfaf6", "tonalRamp": ["#2c2b25", "#4a473c", "#716c59", "#9c9680", "#c8c3ae", "#e2dccd", "#f1eee6", "#fbfaf6"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Brand wordmark and page H1s; Lora serif." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles, each led by a coral tick." },
+      "figure": { "displayName": "Figure", "purpose": "The hero statistic on a KPI detail page; Lora, tabular nums." },
+      "body": { "displayName": "Body", "purpose": "All prose; Inter, held to a 64ch measure." },
+      "label": { "displayName": "Label", "purpose": "Badges, pills, uppercase metadata; Inter 600." }
+    },
+    "shadows": [
+      { "name": "card-rest", "value": "0 1px 2px rgba(40, 38, 31, 0.04)", "purpose": "Barely-there seam under a resting surface." },
+      { "name": "lift-hover", "value": "0 12px 30px -12px rgba(40, 38, 31, 0.22)", "purpose": "Hover/active state for interactive cards; the only real depth in the system." }
+    ],
+    "motion": [
+      { "name": "card-transition", "value": "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease", "purpose": "Card hover lift and border-color shift." },
+      { "name": "rise", "value": "0.5s ease (translateY 10px → 0, opacity 0 → 1)", "purpose": "Entrance for sections and cards; staggered 50ms across the KPI grid. Gated behind prefers-reduced-motion: no-preference." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "620px" },
+      { "name": "md", "value": "720px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "container", "value": "1120px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "KPI Card",
+      "kind": "card",
+      "refersTo": "kpi-card",
+      "description": "The primary navigation unit on the overview — a linked card showing a KPI title, its latest figure, a year-over-year delta, and a sparkline.",
+      "html": "<a class=\"ds-kpi-card\" href=\"#\"><h3 class=\"ds-kpi-card__title\">Taux de frais administratifs</h3><div class=\"ds-kpi-card__figure\"><span class=\"ds-kpi-card__value\">8,4&nbsp;%</span><span class=\"ds-kpi-card__yoy ds-yoy--good\">▼ 0,3&nbsp;pt</span></div><span class=\"ds-kpi-card__asof\">données jusqu’à 2024</span><span class=\"ds-kpi-card__badge\">vs moyenne OCDE</span></a>",
+      "css": ".ds-kpi-card { display: flex; flex-direction: column; gap: 0.75rem; min-height: 200px; padding: 1.5rem; background: var(--paper, #fbfaf6); border: 1px solid var(--rule, #e2dccd); border-radius: 12px; box-shadow: 0 1px 2px rgba(40,38,31,0.04); text-decoration: none; color: var(--ink, #28261f); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; } .ds-kpi-card:hover { transform: translateY(-3px); border-color: var(--coral, #cc785c); box-shadow: 0 12px 30px -12px rgba(40,38,31,0.22); } .ds-kpi-card__title { font-family: Lora, Georgia, serif; font-size: 1.12rem; font-weight: 600; } .ds-kpi-card__figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem 0.75rem; } .ds-kpi-card__value { font-family: Lora, Georgia, serif; font-size: 2.1rem; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink, #28261f); } .ds-kpi-card__yoy { display: inline-flex; align-items: center; gap: 0.35em; font-family: Inter, sans-serif; font-size: 0.82rem; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-yoy--good { color: #2c6e49; } .ds-kpi-card__asof { font-family: Inter, sans-serif; font-size: 0.7rem; color: #8a8576; } .ds-kpi-card__badge { display: inline-flex; align-items: center; gap: 0.45em; font-family: Inter, sans-serif; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: #8a8576; } .ds-kpi-card__badge::before { content: ''; width: 1.1rem; height: 0; border-top: 2px dashed #8a8576; }"
+    },
+    {
+      "name": "Stat Callout",
+      "kind": "custom",
+      "refersTo": "stat-callout",
+      "description": "The hero figure on a KPI detail page. Paper surface with a 4px Republic-Bleu left edge — sanctioned because it is a data signal (France's figure), not decoration.",
+      "html": "<div class=\"ds-stat-callout\"><span class=\"ds-stat-callout__value\">110,6&nbsp;%</span><span class=\"ds-stat-callout__year\">en 2024</span><span class=\"ds-stat-callout__yoy ds-yoy--bad\">▲ 2,1&nbsp;pt sur un an</span></div>",
+      "css": ".ds-stat-callout { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.75rem 1.5rem; padding: 1.5rem 2rem; background: var(--paper, #fbfaf6); border: 1px solid var(--rule, #e2dccd); border-left: 4px solid var(--bleu, #0055a4); border-radius: 12px; } .ds-stat-callout__value { font-family: Lora, Georgia, serif; font-size: clamp(2.6rem, 6vw, 3.6rem); font-weight: 600; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ink, #28261f); } .ds-stat-callout__year { font-family: Inter, sans-serif; font-size: 0.95rem; color: #8a8576; } .ds-stat-callout__yoy { font-family: Inter, sans-serif; font-size: 0.95rem; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-yoy--bad { color: #b3261e; }"
+    },
+    {
+      "name": "Last-updated Pill",
+      "kind": "chip",
+      "refersTo": "last-updated-pill",
+      "description": "A rounded metadata chip in the masthead showing the data freshness date.",
+      "html": "<span class=\"ds-pill\">Dernière mise à jour : 29 juin 2026</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; font-family: Inter, sans-serif; font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase; color: #8a8576; background: var(--paper, #fbfaf6); border: 1px solid var(--rule, #e2dccd); border-radius: 999px; padding: 0.35em 0.85em; white-space: nowrap; }"
+    },
+    {
+      "name": "Methodology Disclosure",
+      "kind": "custom",
+      "refersTo": "methodology",
+      "description": "A collapsible 'Méthodologie & sources' panel — the trust mechanism, available on every KPI. Coral summary with a rotating caret.",
+      "html": "<details class=\"ds-methodology\" open><summary class=\"ds-methodology__summary\">Méthodologie &amp; sources</summary><div class=\"ds-methodology__body\">Ratio des dépenses de fonctionnement sur les dépenses totales (COFOG, base 2020). Source&nbsp;: INSEE, comptes des administrations publiques.</div></details>",
+      "css": ".ds-methodology { border: 1px solid var(--rule, #e2dccd); border-radius: 12px; background: var(--paper, #fbfaf6); } .ds-methodology__summary { list-style: none; cursor: pointer; padding: 1rem 1.5rem; font-family: Inter, sans-serif; font-weight: 600; color: #a8553a; display: flex; align-items: center; gap: 0.6em; } .ds-methodology__summary::-webkit-details-marker { display: none; } .ds-methodology__summary::before { content: '\\25b8'; color: var(--coral, #cc785c); transition: transform 0.18s ease; } .ds-methodology[open] .ds-methodology__summary::before { transform: rotate(90deg); } .ds-methodology__body { padding: 0 1.5rem 1rem; color: #514c40; font-size: 0.95rem; max-width: 64ch; }"
+    },
+    {
+      "name": "Inline Link",
+      "kind": "nav",
+      "refersTo": "link",
+      "description": "The primary interaction affordance in a read-only dashboard. Coral-ink text with a thin underline; hover shifts to ink.",
+      "html": "<a class=\"ds-link\" href=\"#\">Méthodologie</a>",
+      "css": ".ds-link { font-family: Inter, sans-serif; color: #a8553a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; } .ds-link:hover { color: var(--ink, #28261f); } .ds-link:focus-visible { outline: 2px solid var(--coral, #cc785c); outline-offset: 2px; border-radius: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Public Ledger",
+    "overview": "Fiscoscope reads like an honest civic instrument, not an argument. The system is built on editorial restraint: a warm cream canvas, a Lora serif for figures and headings, an Inter sans for prose, and color spent almost entirely on meaning. The data is the protagonist; the interface is the quiet, well-set page it sits on. The single most distinctive decision is a strict separation of roles for color: the French tricolore is reserved for data semantics (bleu is the France series, rouge marks meaningful negatives only) while coral carries all interaction. Color never decorates; if it appears, it means something. The system rejects the government-portal look, partisan coloring, the generic SaaS dashboard, and crypto/fintech flash.",
+    "keyCharacteristics": [
+      "Warm cream editorial canvas (#f4f1ea), never stark white, paired with a serif — a committed identity choice, not the AI sand-beige cliché.",
+      "Lora serif for every figure and heading; Inter for body. Contrast by axis (serif × sans).",
+      "Tricolore = data only; coral = interaction only. The two never cross.",
+      "Flat surfaces at rest, hairline borders, lift only on hover.",
+      "Tabular numerals wherever figures are read; a 64ch measure for prose."
+    ],
+    "rules": [
+      { "name": "The Tricolore-Is-Data Rule", "body": "Bleu and rouge belong to the data layer and nowhere else. Coral owns interaction. If you are reaching for blue or red to style a button, a header, or a card, you are wrong — use coral or ink. The flag is never decoration.", "section": "colors" },
+      { "name": "The Color-Earns-Its-Place Rule", "body": "On any given screen, meaningful color covers a small fraction of the surface. The default state of everything is ink-on-cream. Rarity is what makes a colored mark legible.", "section": "colors" },
+      { "name": "The Serif-For-Numbers Rule", "body": "Every figure the reader is meant to weigh is set in Lora with tabular numerals. Numbers carry the editorial authority; sans is for the words around them.", "section": "typography" },
+      { "name": "The One-Measure Rule", "body": "Prose never exceeds the 64ch measure. A wide column of body text is the government-portal tell.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest, defined by tone and a 1px rule. Shadow is earned by interaction, never applied for decoration.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep bleu and rouge for the data layer only; style all interaction with coral (#cc785c / Coral Ink #a8553a for text).",
+      "Do set every reader-facing figure in Lora with tabular numerals.",
+      "Do keep surfaces flat at rest and let depth appear only on hover (0 12px 30px -12px rgba(40,38,31,0.22) + coral border).",
+      "Do pair color encodings with a second cue — the OECD line is dashed, not just taupe — so charts survive color-vision deficiency.",
+      "Do hold prose to the 64ch measure and use the cream canvas (#f4f1ea), never stark white.",
+      "Do disclose breaks and caveats in a rouge-ruled note below the chart, not hidden."
+    ],
+    "donts": [
+      "Don't look like a government portal: no dense undifferentiated tables, no full-width prose, no low-trust clutter.",
+      "Don't read as partisan or activist: no flag-waving chrome, no outrage callouts, no editorializing color.",
+      "Don't fall into the generic SaaS dashboard: no hero-metric template, no identical icon-card grids, no gradient text.",
+      "Don't add crypto/fintech flash: no dark-neon theme, no animated tickers, no hype motion.",
+      "Don't use a border-left/border-right colored stripe as decoration. The only sanctioned thick edge is the 4px bleu stat-callout edge, because it is a data signal.",
+      "Don't apply shadow to a resting surface, and don't put a heavy shadow anywhere — it reads as a 2014 app.",
+      "Don't introduce a third type family or pair two similar sans; the system is Lora × Inter, full stop."
+    ]
+  }
+}
