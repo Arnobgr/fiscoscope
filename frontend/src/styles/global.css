@@ -199,15 +199,19 @@ ul {
   text-decoration: none;
   color: inherit;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
+    transform 0.18s var(--ease-out-quart),
+    box-shadow 0.18s var(--ease-out-quart),
+    border-color 0.18s var(--ease-out-quart);
 }
 .kpi-card:hover {
   transform: translateY(-3px);
   border-color: var(--coral);
   box-shadow: var(--shadow-lift);
   color: inherit;
+}
+.kpi-card:active {
+  transform: translateY(-1px);
+  transition-duration: 0.09s;
 }
 .kpi-card__title {
   font-size: 1.12rem;
@@ -453,25 +457,124 @@ ul {
   color: var(--ink-faint);
   font-size: 1.05rem;
 }
+.state--error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--ink-soft);
+}
+
+/* Visually hidden, still read by assistive tech */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Text-styled button that reads like a link (retry actions) */
+.link-button {
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--coral-ink);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.link-button:hover {
+  color: var(--ink);
+}
+
+/* ---- KPI card: loading & error states -------------------------------- */
+.kpi-card--skeleton,
+.kpi-card--error {
+  pointer-events: none;
+}
+.kpi-card--error {
+  pointer-events: auto;
+  justify-content: flex-start;
+}
+.kpi-card--skeleton:hover,
+.kpi-card--error:hover {
+  transform: none;
+  border-color: var(--rule);
+  box-shadow: var(--shadow-card);
+}
+.kpi-card__error-text {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.skeleton-line {
+  border-radius: var(--radius);
+  background: var(--cream-deep);
+}
+.skeleton-line--title {
+  height: 1.15rem;
+  width: 70%;
+}
+.skeleton-line--value {
+  height: 2rem;
+  width: 45%;
+}
+.skeleton-line--spark {
+  height: 36px;
+  width: 100%;
+  margin-top: auto;
+}
+.skeleton-line--meta {
+  height: 0.7rem;
+  width: 40%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-line {
+    background: linear-gradient(
+      90deg,
+      var(--cream-deep) 25%,
+      var(--rule) 37%,
+      var(--cream-deep) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+  }
+  @keyframes skeleton-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+}
 
 /* ---- Motion ---------------------------------------------------------- */
 @media (prefers-reduced-motion: no-preference) {
-  .theme-section,
+  /* Route-level entrance for single-column pages (no children to stagger). */
   .kpi-detail,
   .methodology-page {
-    animation: rise 0.5s ease both;
+    animation: rise 0.5s var(--ease-out-quart) backwards;
   }
+  /* The cards carry the Overview entrance; the theme heading stays put.
+     `backwards` (not `both`) so the filled end-state doesn't lock transform
+     and override the :hover / :active lift after the animation completes. */
   .kpi-card {
-    animation: rise 0.5s ease both;
+    animation: rise 0.45s var(--ease-out-quart) backwards;
+    animation-delay: calc(var(--i, 0) * 55ms);
   }
-  .kpi-grid .kpi-card:nth-child(2) {
-    animation-delay: 0.05s;
-  }
-  .kpi-grid .kpi-card:nth-child(3) {
-    animation-delay: 0.1s;
-  }
-  .kpi-grid .kpi-card:nth-child(4) {
-    animation-delay: 0.15s;
+  /* Skeletons are placeholders, not content: a quiet simultaneous fade. */
+  .kpi-card--skeleton {
+    animation: fade 0.3s var(--ease-out-quart) backwards;
   }
   @keyframes rise {
     from {
@@ -481,6 +584,14 @@ ul {
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
     }
   }
 }
