@@ -2,8 +2,9 @@ import type {
   KpiView, ViewSeries, Unit, RawPoint, StdSeriesKpi, SustainabilityKpi,
   OutcomesKpi, TaxExpenditureKpi, MonthlyKpi,
 } from "./types";
+import type { Polarity } from "./format";
 
-export interface AdaptBase { slug: string; title: string; explainer: string; unit: Unit }
+export interface AdaptBase { slug: string; title: string; explainer: string; unit: Unit; polarity: Polarity }
 
 const OECD = "OECD_AVG";
 
@@ -37,7 +38,7 @@ function meta(raw: { source: string; methodology: string }) {
 
 export function adaptStandard(raw: StdSeriesKpi, b: AdaptBase): KpiView {
   return {
-    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
     unit: b.unit, xKind: "year",
     series: [franceSeries(raw.france)],
     comparison: oecdSeries(raw.peers),
@@ -51,7 +52,7 @@ export function adaptSustainability(raw: SustainabilityKpi, b: AdaptBase): KpiVi
   const deficitPeers = (raw.peers as any)?.deficit as Record<string, RawPoint[]> | undefined;
   const debtPeers = (raw.peers as any)?.debt as Record<string, RawPoint[]> | undefined;
   return {
-    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
     unit: "percent", xKind: "year",
     series: [franceSeries(raw.france)],
     comparison: oecdSeries(deficitPeers),
@@ -70,7 +71,7 @@ export function adaptOutcomes(raw: OutcomesKpi, b: AdaptBase): KpiView {
   const spend = raw.health.spend_pct_gdp;
   const life = raw.health.life_expectancy_years;
   return {
-    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
     unit: "percent", xKind: "year",
     series: [{ id: "health_spend", label: "Dépenses de santé (% du PIB)", role: "france", points: yearPoints(spend) }],
     secondary: {
@@ -89,7 +90,7 @@ export function adaptTaxExpenditure(raw: TaxExpenditureKpi, b: AdaptBase): KpiVi
   const last = rows[rows.length - 1];
   const prev = rows[rows.length - 2];
   return {
-    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
     unit: "eur_bn", xKind: "year",
     series: [{ id: "tax_cost", label: "Coût des dépenses fiscales", role: "france", points }],
     latest: last
@@ -106,7 +107,7 @@ export function adaptMonthly(raw: MonthlyKpi, b: AdaptBase): KpiView {
   const toPoints = (vals: number[]) => months.map((m, i) => ({ x: m, y: vals[i] }));
   const lastIdx = months.length - 1;
   return {
-    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer,
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
     unit: "eur", xKind: "month",
     series: [
       { id: "revenues", label: "Recettes (cumul, €)", role: "france", points: toPoints(raw.revenues.total as number[]) },
