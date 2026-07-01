@@ -106,7 +106,10 @@ def write_output(filename: str, payload: dict) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / filename
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
-    log.info(f"Wrote {filename} ({len(payload.get('france', []))} France data points)")
+    if "france" in payload:
+        log.info(f"Wrote {filename} ({len(payload['france'])} France data points)")
+    else:
+        log.info(f"Wrote {filename}")
     return path
 
 
