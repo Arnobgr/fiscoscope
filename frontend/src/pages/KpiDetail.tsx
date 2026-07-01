@@ -7,7 +7,7 @@ import { MethodologyDisclosure } from "../components/MethodologyDisclosure";
 export function KpiDetail() {
   const { slug = "" } = useParams();
   const { view, error } = useKpiView(slug);
-  if (error) return <p className="state">Indicateur introuvable. <Link to="/">Retour</Link></p>;
+  if (error) return <p className="state">Cet indicateur n’a pas pu être chargé. <Link to="/">Tous les indicateurs</Link></p>;
   if (!view) return <p className="state">Chargement…</p>;
   return (
     <article className="kpi-detail">
