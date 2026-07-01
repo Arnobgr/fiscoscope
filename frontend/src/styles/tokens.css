@@ -36,6 +36,9 @@
   --space-7: 3rem;
   --space-8: 4.5rem;
 
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
   /* Form */
   --radius: 6px;
   --radius-lg: 12px;
