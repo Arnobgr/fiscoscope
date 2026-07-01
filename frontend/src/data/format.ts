@@ -33,3 +33,16 @@ export function fmtYoy(v: number, unit?: string): { text: string; dir: YoyDir } 
   const suffix = unit === "ratio" ? "×" : " %";
   return { text: `${sign}${num(v, 1, 2)}${suffix}`, dir }; // 1–2 decimals (e.g. +1,2 / −0,41)
 }
+
+// Per-KPI direction of "better": for most ratios a rise is bad (overhead, debt
+// service, niches…); for a few a rise is good (productive spend, public balance);
+// some are informational with no good/bad reading (outcomes, monthly tracking).
+export type Polarity = "higher_good" | "higher_bad" | "neutral";
+export type Sentiment = "good" | "bad" | "neutral";
+// Map a raw YoY direction to a good/bad sentiment for coloring. The arrow still
+// shows the real direction (▲/▼); only the color uses this sentiment.
+export function yoySentiment(dir: YoyDir, polarity: Polarity): Sentiment {
+  if (dir === "flat" || polarity === "neutral") return "neutral";
+  const increaseIsGood = polarity === "higher_good";
+  return (dir === "up") === increaseIsGood ? "good" : "bad";
+}

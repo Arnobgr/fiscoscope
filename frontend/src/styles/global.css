@@ -237,13 +237,13 @@ ul {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.yoy--up {
+.yoy--good {
   color: var(--positive-ink);
 }
-.yoy--down {
+.yoy--bad {
   color: var(--rouge-ink);
 }
-.yoy--flat {
+.yoy--neutral {
   color: var(--ink-faint);
 }
 .kpi-card .recharts-wrapper {

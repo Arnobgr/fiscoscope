@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { KpiView } from "../data/types";
 import { Sparkline } from "./Sparkline";
-import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtYoy } from "../data/format";
+import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtYoy, yoySentiment } from "../data/format";
 
 function fmtValue(unit: KpiView["unit"], v: number): string {
   if (unit === "eur_bn") return fmtEurBn(v);
@@ -13,6 +13,7 @@ function fmtValue(unit: KpiView["unit"], v: number): string {
 
 export function KpiCard({ view }: { view: KpiView }) {
   const yoy = view.latest?.yoy != null ? fmtYoy(view.latest.yoy, view.latest.unit) : null;
+  const sentiment = yoy ? yoySentiment(yoy.dir, view.polarity) : "neutral";
   const hasOecd = !!view.comparison;
   return (
     <Link to={`/kpi/${view.slug}`} className="kpi-card">
@@ -24,7 +25,7 @@ export function KpiCard({ view }: { view: KpiView }) {
           </span>
         )}
         {yoy && (
-          <span data-testid="kpi-yoy" data-dir={yoy.dir} className={`kpi-card__yoy yoy--${yoy.dir}`}>
+          <span data-testid="kpi-yoy" data-dir={yoy.dir} data-sentiment={sentiment} className={`kpi-card__yoy yoy--${sentiment}`}>
             {yoy.dir === "up" ? "▲" : yoy.dir === "down" ? "▼" : "▬"} {yoy.text}
           </span>
         )}

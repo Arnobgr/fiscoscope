@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtNumber, fmtDateFr, fmtYoy } from "./format";
+import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtNumber, fmtDateFr, fmtYoy, yoySentiment } from "./format";
 
 const NB = " "; // narrow no-break space — fr-FR thousands grouping
 const MIN = "−"; // U+2212 minus sign (not ASCII hyphen)
@@ -32,5 +32,16 @@ describe("french formatters", () => {
   });
   it("formats a ratio YoY with × instead of %", () => {
     expect(fmtYoy(0.12, "ratio")).toEqual({ text: "+0,12×", dir: "up" });
+  });
+  it("colors YoY by per-KPI polarity, not raw direction", () => {
+    // higher_bad (overhead, debt service, niches…): a rise is bad, a fall is good
+    expect(yoySentiment("up", "higher_bad")).toBe("bad");
+    expect(yoySentiment("down", "higher_bad")).toBe("good");
+    // higher_good (productive spend, public balance): a rise is good
+    expect(yoySentiment("up", "higher_good")).toBe("good");
+    expect(yoySentiment("down", "higher_good")).toBe("bad");
+    // neutral (outcomes, monthly) and flat are always neutral
+    expect(yoySentiment("up", "neutral")).toBe("neutral");
+    expect(yoySentiment("flat", "higher_bad")).toBe("neutral");
   });
 });
