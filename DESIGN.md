@@ -148,7 +148,7 @@ A warm, low-chroma editorial neutral base, with a tightly rationed set of meanin
 - **Rule** (#e2dccd) / **Rule Strong** (#d3cab4): Hairline borders and dividers; the stronger tone for axis lines and tooltips.
 
 ### Named Rules
-**The Tricolore-Is-Data Rule.** Bleu and rouge belong to the data layer and nowhere else. Coral owns interaction. If you are reaching for blue or red to style a button, a header, or a card, you are wrong — use coral or ink. The flag is never decoration.
+**The Tricolore-Is-Data Rule.** Bleu and rouge belong to the data layer and nowhere else. Coral owns interaction *and* the interface's structural accents — the slim masthead rule and the tick before each section heading — where it is the brand's quiet chrome signature, not a data mark. If you are reaching for blue or red to style a button, a header, or a card, you are wrong — use coral or ink. The flag is never decoration, and it never appears as an emoji or banner in the chrome.
 
 **The Color-Earns-Its-Place Rule.** On any given screen, meaningful color (bleu/rouge/green/coral) covers a small fraction of the surface. The default state of everything is ink-on-cream. Rarity is what makes a colored mark legible.
 
@@ -210,13 +210,13 @@ This is a read-only dashboard; it has almost no buttons. Interaction is carried 
 - **Internal Padding:** 1.5rem (`--space-5`); min-height 200px so a grid of cards stays even.
 
 ### Stat Callout (signature)
-The single hero figure on a KPI detail page. Paper surface, 12px radius, 1px rule, with a **4px Republic-Bleu left edge** — the one place a thick colored edge is sanctioned, because here it is a data signal (this is France's figure), not a decorative side-stripe. Lora figure type at clamp up to 3.6rem, tabular nums, with year and year-over-year change beside it.
+The single hero figure on a KPI detail page. Paper surface, 12px radius, 1px rule — no colored edge or legend swatch (the chart below already establishes bleu = France; a marker here is redundant clutter). Lora figure type at clamp up to 3.6rem, tabular nums, with year and year-over-year change beside it.
 
 ### Charts (signature)
-Recharts, themed to the system: Inter axis labels in Ink Faint, Rule-Strong axis lines, France series in bleu, OECD average as a **dashed taupe** line, tooltips on Paper with a Rule-Strong border and the lift shadow. A "compare to OECD" toggle sits above. Break/caveat notes sit below the chart, set small in Ink Soft with a 3px rouge left rule — reserved for genuine data caveats (structural breaks), the one editorial use of a colored rule.
+Recharts, themed to the system: Inter axis labels in Ink Faint, Rule-Strong axis lines, France series in bleu, OECD average as a **dashed taupe** line, tooltips on Paper with a Rule-Strong border and the lift shadow. A "compare to OECD" toggle sits above. Break/caveat notes sit below the chart, set small in Ink Soft and led by a small **rouge dot with a rouge-ink label** (e.g. "Rupture de série 2020.") — reserved for genuine data caveats (structural breaks), a marker rather than a colored side-rule.
 
 ### Navigation
-Minimal. A masthead with the 🇫🇷 Fiscoscope wordmark (Lora) as the home link, an italic Lora tagline, and a last-updated pill. No top nav bar; the KPI grid is the navigation. Footer carries sources, a Méthodologie link, and personal links in Ink Faint.
+Minimal. A masthead with the typographic **Fiscoscope** wordmark (Lora, no emoji) as the home link, an italic Lora tagline, and a last-updated pill. No top nav bar; the KPI grid is the navigation. Footer carries sources and a Méthodologie link, with a quiet "Réalisé par" author credit and personal links set small in Ink Faint below.
 
 ## 6. Do's and Don'ts
 
@@ -233,6 +233,6 @@ Minimal. A masthead with the 🇫🇷 Fiscoscope wordmark (Lora) as the home lin
 - **Don't** read as **partisan or activist**: no flag-waving chrome, no outrage callouts, no editorializing color. The tricolore is data, not a banner.
 - **Don't** fall into the **generic SaaS dashboard**: no hero-metric template (gradient accent + tiny label), no endless identical icon-card grids, no gradient text.
 - **Don't** add **crypto/fintech flash**: no dark-neon theme, no animated tickers, no hype motion.
-- **Don't** use a `border-left`/`border-right` colored stripe as decoration. The only sanctioned thick edge is the 4px bleu stat-callout edge, and only because it is a *data* signal.
+- **Don't** use a `border-left`/`border-right` colored stripe anywhere — no exceptions. The structural-break caveat that once leaned on a colored edge is carried by a **labelled marker** (a rouge dot + rouge-ink label) instead.
 - **Don't** apply shadow to a resting surface, and **don't** put a heavy shadow anywhere — it reads as a 2014 app.
 - **Don't** introduce a third type family or pair two similar sans; the system is Lora × Inter, full stop.
