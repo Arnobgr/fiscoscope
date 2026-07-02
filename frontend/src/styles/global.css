@@ -129,11 +129,27 @@ ul {
   color: var(--ink-faint);
 }
 .footer-links {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
   display: flex;
-  gap: var(--space-5);
-  justify-content: center;
-  padding: 0 var(--space-5) var(--space-5);
-  font-size: 0.86rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  padding: 0 var(--space-5) var(--space-6);
+  font-size: 0.8rem;
+}
+.footer-links__by {
+  color: var(--ink-faint);
+  margin-right: var(--space-1);
+}
+.footer-links__name {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.footer-links__name:hover {
+  color: var(--coral);
 }
 .footer-links a {
   color: var(--ink-faint);
@@ -319,7 +335,6 @@ ul {
   margin-bottom: var(--space-6);
   background: var(--paper);
   border: 1px solid var(--rule);
-  border-left: 4px solid var(--bleu);
   border-radius: var(--radius-lg);
 }
 .stat-callout__value {
@@ -362,12 +377,27 @@ ul {
   accent-color: var(--coral);
   cursor: pointer;
 }
+/* Data-caveat note: a rouge dot + rouge-ink label carry the "meaningful
+   negative" signal (a structural break), replacing the colored side-stripe. */
 .chart__note {
+  display: flex;
+  gap: 0.6em;
   margin-top: var(--space-3);
-  padding-left: var(--space-3);
-  border-left: 3px solid var(--rouge);
   font-size: 0.84rem;
   color: var(--ink-soft);
+}
+.chart__note::before {
+  content: "";
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.45em;
+  border-radius: 50%;
+  background: var(--rouge);
+}
+.chart__note-label {
+  color: var(--rouge-ink);
+  font-weight: 600;
 }
 
 /* recharts theming */

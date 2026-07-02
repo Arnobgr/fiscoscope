@@ -12,7 +12,7 @@ describe("AppShell", () => {
         </AppShell>
       </MemoryRouter>,
     );
-    expect(screen.getByRole("banner")).toHaveTextContent(/🇫🇷 Fiscoscope/i);
+    expect(screen.getByRole("banner")).toHaveTextContent(/Fiscoscope/i);
     expect(screen.getByText(/Dernière mise à jour/i)).toHaveTextContent(/21 mai 2026/);
     expect(screen.getByText("contenu")).toBeInTheDocument();
   });

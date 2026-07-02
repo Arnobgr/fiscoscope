@@ -48,7 +48,12 @@ export function TimeSeriesChart({ view }: { view: KpiView }) {
         </LineChart>
       </ResponsiveContainer>
       {view.hasBreak2020 && (
-        <p className="chart__note">Changement de base méthodologique en 2020 (INSEE → OCDE).</p>
+        <p className="chart__note">
+          <span className="chart__note-text">
+            <strong className="chart__note-label">Rupture de série 2020.</strong>{" "}
+            Changement de base méthodologique (INSEE → OCDE).
+          </span>
+        </p>
       )}
     </div>
   );

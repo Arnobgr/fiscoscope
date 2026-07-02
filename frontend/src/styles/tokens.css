@@ -17,7 +17,7 @@
   --rouge: #ef4135; /* meaningful negatives — marks only */
   --rouge-ink: #b3261e; /* AA-safe negative text */
   --taupe: #8a8576; /* OECD-average line (dashed) */
-  --coral: #cc785c; /* interaction accent (links, hover, focus) */
+  --coral: #cc785c; /* interaction + structural accent (links, hover, focus, masthead rule, ticks) */
   --coral-ink: #a8553a; /* AA-safe coral text */
   --coral-soft: #f0e4dc; /* coral tint wash */
   --positive-ink: #2c6e49; /* AA-safe positive text */
