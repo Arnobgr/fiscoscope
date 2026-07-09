@@ -39,7 +39,7 @@ export function Overview() {
         Fiscoscope — indicateurs d’efficacité de l’administration publique française
       </h1>
       <p className="overview__intro">
-        Des indicateurs longitudinaux (depuis 1995) mesurant l’efficacité de l’administration
+        Des indicateurs (depuis 1995) mesurant l’efficacité de l’administration
         publique française, à partir de données publiques, comparés à la moyenne de l’OCDE.
       </p>
 
