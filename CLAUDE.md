@@ -8,6 +8,8 @@ start work. The build history and the blocked-work reference live in `docs/`:
 - **Known gaps & blocked attempts** (don't re-attempt without new upstream data):
   `docs/known-gaps.md`
 - **Full specification:** `docs/PRD.md`
+- **Forward plan** (verified new data sources, phased work items, implementation
+  guide — start here for new feature work): `docs/roadmap.md`
 
 ---
 
