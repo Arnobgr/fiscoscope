@@ -361,11 +361,26 @@ ul {
   border-radius: var(--radius-lg);
   padding: var(--space-5) var(--space-5) var(--space-4);
 }
+.chart__compare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  border: 0;
+}
+.chart__compare-label {
+  float: left; /* keeps the legend inline with the flex row */
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
 .chart__toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.55em;
-  margin-bottom: var(--space-4);
   font-size: 0.9rem;
   color: var(--ink-soft);
   cursor: pointer;

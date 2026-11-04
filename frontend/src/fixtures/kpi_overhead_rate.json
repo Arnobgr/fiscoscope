@@ -1,10 +1,10 @@
 {
   "kpi_id": "overhead_rate",
-  "kpi_name": "Administrative Overhead Rate",
-  "description": "Public sector wage bill as % of total public expenditure. Measures how much of every euro spent goes to running the administrative apparatus rather than delivering services or transfers.",
+  "kpi_name": "Public Wage Bill Share",
+  "description": "Public sector wage bill as % of total public expenditure. Covers all public employees — teachers, health staff, police, soldiers — not only administrative functions, so it is not an overhead rate.",
   "unit": "percent",
   "source": "INSEE BDM — CNT-2020-CSI (quarterly, base 2020)",
-  "methodology": "D1_S13 (rémunération des salariés, ensemble des APU) / OTE_S13 (dépense totale des APU) × 100. Séries trimestrielles cumulées sur l'année ; les années incomplètes sont écartées. Pays comparés : OCDE GIP 2025, D1 / dépense totale (en % du PIB de part et d'autre) — comparable au ratio français ; OECD_AVG est la moyenne non pondérée de DEU/GBR/ITA/ESP/NLD/SWE ; les séries des pays comparés débutent en 2007.",
+  "methodology": "D1_S13 (rémunération des salariés, ensemble des APU) / OTE_S13 (dépense totale des APU) × 100. Séries trimestrielles cumulées sur l'année ; les années incomplètes sont écartées. La rémunération des salariés (D1) couvre l'ensemble des agents publics — enseignants, personnels de santé, forces de l'ordre, militaires — et pas seulement les fonctions administratives : ce ratio n'est donc pas un taux de frais administratifs. Pays comparés : OCDE GIP 2025, D1 / dépense totale (en % du PIB de part et d'autre) — comparable au ratio français ; la « moyenne des 6 pays » (clé OECD_AVG) est la moyenne non pondérée de DEU/GBR/ITA/ESP/NLD/SWE, et non la moyenne de l'OCDE ; les séries des pays comparés débutent en 2007.",
   "last_updated": "2026-05-21T10:03:34Z",
   "france": [
     {

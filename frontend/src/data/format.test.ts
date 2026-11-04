@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtNumber, fmtDateFr, fmtYoy, yoySentiment } from "./format";
+import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtNumber, fmtDateFr, fmtYoy, yoySentiment, fmtValue, fmtAxis } from "./format";
 
 const NB = " "; // narrow no-break space — fr-FR thousands grouping
 const MIN = "−"; // U+2212 minus sign (not ASCII hyphen)
@@ -19,6 +19,19 @@ describe("french formatters", () => {
     expect(fmtRatio(5.39)).toBe("5,4×");
     expect(fmtRatio(5.39)).not.toContain("%");
   });
+  it("formats chart tooltip values by unit", () => {
+    expect(fmtValue(21.537, "percent")).toBe("21,54 %");
+    expect(fmtValue(5.391, "ratio")).toBe("5,4×");
+    expect(fmtValue(81.73, "eur_bn")).toBe("81,7 Md€");
+    expect(fmtValue(152_345_000_000, "eur")).toBe("152,3 Md€");
+    expect(fmtValue(82.94, "years")).toBe("82,9 ans");
+  });
+  it("formats chart axis ticks by unit", () => {
+    expect(fmtAxis(20, "percent")).toBe("20 %");
+    expect(fmtAxis(-2.5, "percent")).toBe(`${MIN}2,5 %`);
+    expect(fmtAxis(150_000_000_000, "eur")).toBe("150 Md€");
+    expect(fmtAxis(4, "ratio")).toBe("4×");
+  });
   it("formats plain numbers with fr grouping", () => {
     expect(fmtNumber(1456129)).toBe(`1${NB}456${NB}129`);
   });
@@ -37,7 +50,7 @@ describe("french formatters", () => {
     // higher_bad (overhead, debt service, niches…): a rise is bad, a fall is good
     expect(yoySentiment("up", "higher_bad")).toBe("bad");
     expect(yoySentiment("down", "higher_bad")).toBe("good");
-    // higher_good (productive spend, public balance): a rise is good
+    // higher_good (public balance): a rise is good
     expect(yoySentiment("up", "higher_good")).toBe("good");
     expect(yoySentiment("down", "higher_good")).toBe("bad");
     // neutral (outcomes, monthly) and flat are always neutral

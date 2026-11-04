@@ -85,7 +85,7 @@ appendix). Status legend:
   28.7 %, health 19.3 %, general public services only 13.1 % (public order 10.1 %,
   social protection 8.9 %, defence 5.9 %). The current "Coût administratif" KPI
   (= total D1 / total spending, 21.5 %) therefore counts teachers and nurses as
-  overhead.
+  overhead. *(Fixed in 0.1: renamed "Part de la masse salariale publique".)*
 - **Unblocks** (`known-gaps.md`): pension isolation (GF1002 vs all of GF10);
   investment peers (P51G is present for all peers); COFOG past 2023 without the
   INSEE→OECD stitch; finer functional detail for all KPIs.
@@ -282,22 +282,22 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 
 | # | Item | Files | Done when |
 |---|------|-------|-----------|
-| 0.1 | Rename "Coût administratif" → "Part de la masse salariale publique"; rewrite explainer to say it includes teachers, health staff, police (Eurostat split above). Replaced by a real overhead KPI in 1.2. | `frontend/src/data/registry.ts`, `backend/processors/kpi_overhead.py` (kpi_name/methodology) | No on-screen text calls total D1 "administrative" |
-| 0.2 | "Dépenses productives": state the value judgement in the explainer (education & health excluded by convention), or rename "Part des dépenses d'infrastructure et d'affaires économiques" | `registry.ts`, `processors/kpi_allocation.py` | Explainer names what is excluded and why |
-| 0.3 | Fix overview intro: "depuis 1995 … comparés à la moyenne de l'OCDE" is true for 3/10 KPIs → "lorsque c'est possible" | `frontend/src/pages/Overview.tsx` | Intro claim matches data |
-| 0.4 | Show the country peers already computed (DEU, ESP, GBR, ITA, NLD, SWE), not only OECD avg; France highlighted, peers muted, toggle per country | `frontend/src/data/adapters.ts` (`oecdSeries` keeps only `OECD_AVG`), `components/TimeSeriesChart.tsx` | Overhead, productive, deficit, debt charts can show each peer |
-| 0.5 | Methodology page lists all sources behind displayed KPIs — today it names only INSEE, OECD, GTED; add Urssaf (`wage_ratio`) and data.economie.gouv.fr (`monthly_execution`). France Travail is fetched but unused (orphaned, see `known-gaps.md` A) — don't list it | `frontend/src/pages/Methodology.tsx` | Every source feeding a visible KPI is named |
-| 0.6 | Chart tooltips/axes formatted with units (%, Md€, ×) in fr-FR | `TimeSeriesChart.tsx`, `data/format.ts` | No raw unformatted floats in tooltips |
+| 0.1 | Rename "Coût administratif" → "Part de la masse salariale publique"; rewrite explainer to say it includes teachers, health staff, police (Eurostat split above). Replaced by a real overhead KPI in 1.2. | `frontend/src/data/registry.ts`, `backend/processors/kpi_overhead.py` (kpi_name/methodology) | No on-screen text calls total D1 "administrative" ✅ 2026-11-04 |
+| 0.2 | "Dépenses productives": state the value judgement in the explainer (education & health excluded by convention), or rename "Part des dépenses d'infrastructure et d'affaires économiques" | `registry.ts`, `processors/kpi_allocation.py` | Explainer names what is excluded and why ✅ 2026-11-04 — then renamed "Affaires économiques, environnement et logement" (the COFOG function names), polarity neutral |
+| 0.3 | Fix overview intro: "depuis 1995 … comparés à la moyenne de l'OCDE" is true for 3/10 KPIs → "lorsque c'est possible" | `frontend/src/pages/Overview.tsx` | Intro claim matches data ✅ 2026-11-04 |
+| 0.4 | Show the country peers already computed (DEU, ESP, GBR, ITA, NLD, SWE), not only OECD avg; France highlighted, peers muted, toggle per country | `frontend/src/data/adapters.ts` (`oecdSeries` keeps only `OECD_AVG`), `components/TimeSeriesChart.tsx` | Overhead, productive, deficit, debt charts can show each peer ✅ 2026-11-04 |
+| 0.5 | Methodology page lists all sources behind displayed KPIs — today it names only INSEE, OECD, GTED; add Urssaf (`wage_ratio`) and data.economie.gouv.fr (`monthly_execution`). France Travail is fetched but unused (orphaned, see `known-gaps.md` A) — don't list it | `frontend/src/pages/Methodology.tsx` | Every source feeding a visible KPI is named ✅ 2026-11-04 |
+| 0.6 | Chart tooltips/axes formatted with units (%, Md€, ×) in fr-FR | `TimeSeriesChart.tsx`, `data/format.ts` | No raw unformatted floats in tooltips ✅ 2026-11-04 |
 
 ### Phase 1 — Eurostat & OECD foundation (M)
 
 | # | Item | Data | Done when |
 |---|------|------|-----------|
-| 1.1 | New `fetchers/eurostat.py` (JSON-stat decoder, cache raw per PRD §12.3) for S1–S4; peers DE/IT/ES/NL/SE + EU27 | S1–S4 | Raw cached; `meta.json` shows step `ok` |
-| 1.2 | **True overhead KPI**: compensation in GF01 (general public services) ÷ total expenditure, France vs peers, 1995–2024; optionally "wage bill by function" stacked view | S1 | New `kpi_admin_overhead.json` with peers; old KPI kept as "masse salariale" |
+| 1.1 | New `fetchers/eurostat.py` (JSON-stat decoder, cache raw per PRD §12.3) for S1–S4; peers DE/IT/ES/NL/SE + EU27 (`EU27_AVG`, label "Moyenne UE à 27"; see 4.2 on averages) | S1–S4 | Raw cached; `meta.json` shows step `ok` |
+| 1.2 | **True overhead KPI**: compensation in GF01 (general public services) ÷ total expenditure, France vs peers, 1995–2024; optionally "wage bill by function" stacked view | S1 | New `kpi_admin_overhead.json` with peers; keep `overhead_rate` (already "Part de la masse salariale publique" since 0.1) |
 | 1.3 | **Pensions isolated**: GF1002 (old age) as % of spending and % GDP vs peers; re-base "Protection sociale vs investissement" on P51G from Eurostat with peers | S1 | Closes known-gaps B "pension/investment peers ❌" |
 | 1.4 | **Who runs the deficit**: balance by sub-sector (State / local / social security), € bn and % GDP, 1995–2025 | S2 | New KPI under Soutenabilité |
-| 1.5 | **Tax burden** (prélèvements obligatoires) vs peers + OECD avg, 1965–2024 | S5 (or S3) | New KPI, one definition, named on chart |
+| 1.5 | **Tax burden** (prélèvements obligatoires) vs peers + OECD avg (`OECD_REP` is a true OECD aggregate — the only series that may be labelled "Moyenne OCDE"; give it its own key, not `OECD_AVG`), 1965–2024 | S5 (or S3) | New KPI, one definition, named on chart |
 | 1.6 | **Who holds the debt**: non-residents / Banque de France / domestic, 2020–2025 | S4 | Detail panel on the debt KPI |
 | 1.7 | **Public employment** share vs peers, 2007–2023 | S6 | New KPI under Efficacité |
 | 1.8 | Peers for `debt_service` (interest payable, % GDP) | S2 `D41PAY` | Closes known-gaps B "debt_service ⚠️ unconfirmed" |
@@ -356,7 +356,7 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 
 ## Part 3 — Suggested order
 
-1. **Phase 0** in full (one session) — protects everything else.
+1. ~~**Phase 0** in full (one session) — protects everything else.~~ ✅ 2026-11-04
 2. **1.1–1.4** — one Eurostat fetcher closes most of `known-gaps.md` and gives
    the honest overhead KPI.
 3. **3.1** (performance scorecard) — highest accountability value per effort;
@@ -413,9 +413,17 @@ recent last period. Known drift points:
   `run_monthly`. `_run_step` is fail-soft; raise `NotImplementedError` to mark a
   step `skipped`.
 - **Peers naming:** existing payloads key peers by ISO3 (`DEU`, `GBR`…) plus
-  `OECD_AVG`. Eurostat uses ISO2 (`FR`, `DE`, `EL` for Greece) and
-  `EU27_2020`: map to ISO3 and introduce `EU27_AVG`; the frontend adapter must
-  learn the new key (today `adapters.ts` only reads `OECD_AVG`).
+  `OECD_AVG`. **`OECD_AVG` is a misnomer:** it is the unweighted mean of the 6
+  peers (`peer_series` in `processors/__init__.py`), shown on screen as
+  "Moyenne des 6 pays" — never label it as an OECD average. Eurostat uses ISO2
+  (`FR`, `DE`, `EL` for Greece) and `EU27_2020`: map to ISO3 and introduce
+  `EU27_AVG` (a true aggregate). Eurostat has **no UK**, so a peer mean computed
+  from Eurostat covers 5 countries — don't store it under `OECD_AVG` or reuse
+  the "6 pays" label. Frontend today: `adapters.ts` reads `OECD_AVG` into the
+  single `KpiView.comparison` slot and the 6 countries via its `PEERS` list
+  (order + French labels); `TimeSeriesChart.tsx` colours them via
+  `PEER_COLORS`. The first KPI with a second average (EU27, `OECD_REP`) must
+  turn `comparison` into a list of averages, each with its own label.
 - **Tests:** backend `pytest` in `backend/tests/` (only `test_api.py` today —
   add tests for new decoders/parsers with small fixture files); frontend
   `npm test` (vitest) in `frontend/`.
@@ -459,7 +467,10 @@ Filters are repeated query params (`geo=FR&geo=DE`); `sinceTimePeriod=1995`.
 
 ### 4.5 Frontend wiring for a new KPI
 1. Add an entry in `frontend/src/data/registry.ts` (`slug`, theme, unit,
-   polarity, French title + explainer, adapter).
+   polarity, French title + explainer, adapter). Name the KPI after what it
+   measures, not a judgement ("productive", "administrative" were both removed
+   in Phase 0). Use polarity `neutral` unless a rise is uncontroversially better
+   or worse (principle 2) — it colours the YoY arrow red/green.
 2. Add its `kpi_<id>` to `ALL_APP_IDS` in `frontend/src/data/api.ts`.
 3. Put a real pipeline output copy in `frontend/src/fixtures/kpi_<id>.json`
    (used in dev/tests when `VITE_API_BASE` is empty).

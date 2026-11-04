@@ -14,8 +14,8 @@ function renderAt(slug: string) {
 describe("KpiDetail", () => {
   it("renders title, explainer, and methodology disclosure for a standard KPI", async () => {
     renderAt("overhead_rate");
-    await waitFor(() => expect(screen.getByRole("heading", { name: /Coût administratif/ })).toBeInTheDocument());
-    expect(screen.getByText(/chaque euro dépensé/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("heading", { name: /Part de la masse salariale publique/ })).toBeInTheDocument());
+    expect(screen.getByText(/comprend les enseignants, les soignants, les policiers/)).toBeInTheDocument();
     expect(screen.getByText(/Méthodologie & sources/i)).toBeInTheDocument();
   });
   it("renders the secondary block title for sustainability (debt)", async () => {

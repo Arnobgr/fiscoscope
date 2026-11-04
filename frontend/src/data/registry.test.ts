@@ -20,6 +20,12 @@ describe("registry", () => {
   it("buildView produces a KpiView via the entry's adapter", () => {
     const v = buildView("overhead_rate", overhead as any);
     expect(v.series[0].role).toBe("france");
-    expect(v.title).toMatch(/administratif/i);
+    expect(v.title).toMatch(/masse salariale publique/i);
+    expect(v.title).not.toMatch(/administratif/i);
+  });
+  it("names the COFOG functions instead of calling them productive", () => {
+    const title = bySlug("productive_spend")!.title;
+    expect(title).toBe("Affaires économiques, environnement et logement");
+    expect(title).not.toMatch(/productiv/i);
   });
 });

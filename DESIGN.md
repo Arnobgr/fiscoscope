@@ -167,7 +167,7 @@ is on the serif × sans axis, deliberately, so the two never compete.
 - **Headline** (Lora 600, clamp(1.35rem, 2.4vw, 1.9rem), 1.12): Theme-section and detail-page section titles, each led by a small coral tick.
 - **Figure** (Lora 600, clamp(2.6rem, 6vw, 3.6rem), 1, tabular-nums): The headline statistic in a stat callout — the single largest element on a KPI detail page. Letter-spacing -0.03em.
 - **Body** (Inter 400, 17px, 1.6): All prose. Hold prose to the 64ch measure (`--measure`). Font features ss01 + cv05 are on globally.
-- **Label** (Inter 600, 0.7rem, +0.05em, uppercase): Badges, pills, the OECD-comparison tag, "last updated" chip. Sparingly.
+- **Label** (Inter 600, 0.7rem, +0.05em, uppercase): Badges, pills, the peer-comparison tag, "last updated" chip. Sparingly.
 
 ### Named Rules
 **The Serif-For-Numbers Rule.** Every figure the reader is meant to weigh — KPI values, the stat callout, card values — is set in Lora with tabular numerals. Numbers carry the editorial authority; sans is for the words around them.
@@ -192,15 +192,15 @@ rest, and lifts on hover.
 ## 5. Components
 
 ### Buttons
-This is a read-only dashboard; it has almost no buttons. Interaction is carried by **links** and a single chart toggle, so style those, not invented CTAs.
+This is a read-only dashboard; it has almost no buttons. Interaction is carried by **links** and the chart comparison toggles, so style those, not invented CTAs.
 - **Links:** Coral Ink (#a8553a) text, 1px underline at 2px offset; hover shifts to Ink. Breadcrumb and footer links drop the underline until hover.
-- **Toggle (chart "compare" checkbox):** Native checkbox with `accent-color: var(--coral)`, an inline label in Ink Soft. No custom button chrome.
+- **Toggle (chart "compare" checkboxes):** A borderless fieldset led by a semibold "Comparer à" label, then one native checkbox per comparison (6-country average, then each peer country) with `accent-color: var(--coral)` and an inline label in Ink Soft, wrapping on narrow screens. No custom button chrome.
 - **Focus (all interactive elements):** 2px coral outline, 2px offset, 3px radius. Never removed.
 
 ### Chips / Badges
 - **Style:** Uppercase Inter label (0.7rem, +0.05em) in Ink Faint.
 - **Last-updated pill:** Paper fill, 1px rule border, fully rounded (999px), Ink Faint text.
-- **OECD badge:** Inline label preceded by a 2px dashed taupe rule (a legend swatch), signalling the dashed peer-average line.
+- **Peer badge ("vs 6 pays"):** Inline label preceded by a 2px dashed taupe rule (a legend swatch), signalling the dashed peer-average line.
 
 ### Cards / Containers
 - **Corner Style:** 12px radius (`--radius-lg`).
@@ -213,7 +213,7 @@ This is a read-only dashboard; it has almost no buttons. Interaction is carried 
 The single hero figure on a KPI detail page. Paper surface, 12px radius, 1px rule — no colored edge or legend swatch (the chart below already establishes bleu = France; a marker here is redundant clutter). Lora figure type at clamp up to 3.6rem, tabular nums, with year and year-over-year change beside it.
 
 ### Charts (signature)
-Recharts, themed to the system: Inter axis labels in Ink Faint, Rule-Strong axis lines, France series in bleu, OECD average as a **dashed taupe** line, tooltips on Paper with a Rule-Strong border and the lift shadow. A "compare to OECD" toggle sits above. Break/caveat notes sit below the chart, set small in Ink Soft and led by a small **rouge dot with a rouge-ink label** (e.g. "Rupture de série 2020.") — reserved for genuine data caveats (structural breaks), a marker rather than a colored side-rule.
+Recharts, themed to the system: Inter axis labels in Ink Faint, Rule-Strong axis lines, France series in bleu, the 6-country peer average ("Moyenne des 6 pays" — never labelled as an OECD average) as a **dashed taupe** line, peer countries as thin solid lines in muted, mutually distinct hues (never bleu) drawn beneath France, tooltips on Paper with a Rule-Strong border and the lift shadow. Tooltips and Y-axis ticks are unit-formatted in fr-FR (%, Md€, ×, ans). Per-comparison toggles sit above, all off by default. Break/caveat notes sit below the chart, set small in Ink Soft and led by a small **rouge dot with a rouge-ink label** (e.g. "Rupture de série 2020.") — reserved for genuine data caveats (structural breaks), a marker rather than a colored side-rule.
 
 ### Navigation
 Minimal. A masthead with the typographic **Fiscoscope** wordmark (Lora, no emoji) as the home link, an italic Lora tagline, and a last-updated pill. No top nav bar; the KPI grid is the navigation. Footer carries sources and a Méthodologie link, with a quiet "Réalisé par" author credit and personal links set small in Ink Faint below.
@@ -224,7 +224,7 @@ Minimal. A masthead with the typographic **Fiscoscope** wordmark (Lora, no emoji
 - **Do** keep bleu and rouge for the data layer only; style all interaction with **coral** (#cc785c / Coral Ink #a8553a for text).
 - **Do** set every reader-facing figure in **Lora with tabular numerals**.
 - **Do** keep surfaces flat at rest and let depth appear only on hover (`0 12px 30px -12px rgba(40,38,31,0.22)` + coral border).
-- **Do** pair color encodings with a second cue — the OECD line is **dashed**, not just taupe — so charts survive color-vision deficiency.
+- **Do** pair color encodings with a second cue — the peer-average line is **dashed**, not just taupe — so charts survive color-vision deficiency.
 - **Do** hold prose to the 64ch measure and use the cream canvas (#f4f1ea), never stark white.
 - **Do** disclose breaks and caveats in a rouge-ruled note below the chart, not hidden.
 

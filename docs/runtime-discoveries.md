@@ -620,3 +620,50 @@ section below, then commit.
       reach production after re-running those processors on the VPS to regenerate
       `data/output/*.json`; the FastAPI app reads JSON fresh per request.
       Commit `ab62e1f` on `dev`.
+
+- **Session G (2026-11-04) — roadmap Phase 0 (credibility fixes).** All six
+  items of `roadmap.md` Phase 0 done:
+    - **0.1 `overhead_rate` renamed "Part de la masse salariale publique"**
+      (backend `kpi_name` "Public Wage Bill Share"). Explainer and methodology now
+      say total D1 covers teachers, health staff, police and soldiers, with the
+      Eurostat 2024 split (education 28.7 %, health 19.3 %, general public
+      services 13.1 %), hard-coded with its year. `kpi_id`/slug unchanged
+      (URL stability). **Polarity changed `higher_bad` → `neutral`**: once the
+      ratio is not overhead, colouring a rise red would still imply waste.
+    - **0.2 `productive_spend`**: title kept; explainer and methodology state
+      that "productive" is a Fiscoscope convention and that education/health are
+      excluded by convention (classed redistributive by dominant component).
+    - **0.3** Overview intro now says "depuis 1995 pour la plupart" and
+      "lorsque c'est possible, comparaison avec d'autres pays" (tax_expenditure
+      starts 1999, wage_ratio 1997; peers exist on 4 charts only).
+    - **0.4** Adapters expose the 6 peer countries (`KpiView.peers`,
+      `SecondaryBlock.peers`, role `"peer"`, fixed order DEU/ESP/ITA/NLD/GBR/SWE,
+      French labels). The chart shows one checkbox per comparison (all off by
+      default); peers draw thin and muted beneath France.
+    - **0.5** Methodology page lists Urssaf and data.economie.gouv.fr; France
+      Travail deliberately not listed (orphaned).
+    - **0.6** `fmtValue`/`fmtAxis` in `format.ts` format tooltips and Y ticks by
+      unit (`eur` series → Md€). Fixed a latent bug on the way: KpiDetail's
+      secondary chart inherited the primary unit (life expectancy was formatted
+      as %); it now passes `secondary.unit`.
+    - **Found:** the `OECD_AVG` series is the unweighted mean of the 6 peers but
+      was labelled "Moyenne OCDE" on screen — relabelled in the follow-up below.
+    - **Deploy note:** the overhead/productive copy reaches production only after
+      re-running `kpi_overhead` and `kpi_allocation` on the VPS. Fixture copies
+      were updated to match processor output (verified by running the processors
+      with stubbed inputs).
+    - **Follow-up (same day):** `productive_spend` renamed **"Affaires
+      économiques, environnement et logement"** (backend `kpi_name` "Economic
+      Affairs, Environment & Housing Share") — the three COFOG function names
+      (GF04/05/06), so no convention needs explaining; polarity → `neutral`
+      (more economic-affairs spending is not self-evidently better). Methodology
+      no longer appends `CLASSIFICATION_CAVEAT` (import removed; constant left in
+      `cofog.py`). Slug/`kpi_id` unchanged.
+    - **"Moyenne OCDE" relabelled "Moyenne des 6 pays"** (chart toggle/legend,
+      card badge "vs 6 pays", Methodology page now says it is not the OECD
+      average). Processor methodology strings (overhead, productive,
+      sustainability) say the same; the `OECD_AVG` JSON key is unchanged so the
+      API contract holds.
+    - Backend tests now run locally from `backend/.venv` (requirements +
+      `pytest==9.2.0`, `httpx==0.28.1`); pytest/httpx are **not** in
+      `requirements.txt`.
