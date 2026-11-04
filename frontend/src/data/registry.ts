@@ -26,7 +26,7 @@ export const REGISTRY: Entry[] = [
     "Rémunération de l’ensemble des agents publics (État, collectivités locales, hôpitaux, sécurité sociale) rapportée à la dépense publique totale. Ce n’est pas un coût administratif : la masse salariale publique comprend les enseignants, les soignants, les policiers et les militaires. En 2024, l’éducation en représente 28,7 %, la santé 19,3 % et les services généraux des administrations seulement 13,1 % (Eurostat).", adaptStandard),
   e("friction_ratio", "efficacite", "percent", "higher_bad", "Ratio de friction",
     "Poids des fonctions support et régaliennes de base (services publics généraux, défense, ordre et sécurité publics) rapporté aux recettes : la part des recettes absorbée par le socle de fonctionnement de l’État.", adaptStandard),
-  e("productive_spend", "efficacite", "percent", "neutral", "Affaires économiques, environnement et logement",
+  e("productive_spend", "depenses", "percent", "neutral", "Affaires économiques, environnement et logement",
     "Part des dépenses publiques consacrée à trois fonctions de la nomenclature internationale COFOG : les affaires économiques (transports, énergie, agriculture, industrie…), la protection de l’environnement, et le logement et les équipements collectifs. L’éducation et la santé n’en font pas partie : elles sont comptées dans leurs propres fonctions.", adaptStandard),
   e("wage_ratio", "efficacite", "percent", "higher_bad", "Masse salariale public / privé",
     "Masse salariale publique rapportée à la masse salariale privée : mesure le poids relatif de l’emploi public dans la rémunération du pays.", adaptStandard),

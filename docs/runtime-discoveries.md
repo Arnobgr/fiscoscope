@@ -667,3 +667,6 @@ section below, then commit.
     - Backend tests now run locally from `backend/.venv` (requirements +
       `pytest==9.2.0`, `httpx==0.28.1`); pytest/httpx are **not** in
       `requirements.txt`.
+    - Moved `productive_spend` from the "Efficacité administrative" theme to
+      "Dépenses & résultats": it measures how spending is allocated, not
+      efficiency.
