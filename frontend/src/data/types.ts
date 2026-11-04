@@ -4,7 +4,7 @@ export interface StdSeriesKpi {            // overhead, friction, productive, de
   kpi_id: string; kpi_name: string; description: string; unit: string;
   source: string; methodology: string; last_updated: string;
   france: RawPoint[];
-  peers?: Record<string, RawPoint[]>;      // may include OECD_AVG + 6 countries; we use OECD_AVG only
+  peers?: Record<string, RawPoint[]>;      // may include OECD_AVG + 6 countries (ISO3 keys)
   latest?: { year: number; value: number; yoy_change?: number };
 }
 export interface SustainabilityKpi extends StdSeriesKpi {
@@ -44,8 +44,8 @@ import type { Polarity } from "./format";
 export type Unit = "percent" | "eur_bn" | "years" | "eur" | "ratio" | "mixed";
 export type XKind = "year" | "month";
 export interface ViewPoint { x: number | string; y: number; projection?: boolean }
-export interface ViewSeries { id: string; label: string; role: "france" | "oecd" | "secondary"; points: ViewPoint[] }
-export interface SecondaryBlock { title: string; unit: Unit; series: ViewSeries[]; comparison?: ViewSeries }
+export interface ViewSeries { id: string; label: string; role: "france" | "oecd" | "peer" | "secondary"; points: ViewPoint[] }
+export interface SecondaryBlock { title: string; unit: Unit; series: ViewSeries[]; comparison?: ViewSeries; peers?: ViewSeries[] }
 export interface LatestStat { year: number | string; value: number; unit: Unit; yoy?: number }
 export interface KpiView {
   slug: string;            // route slug, e.g. "overhead_rate"
@@ -57,6 +57,7 @@ export interface KpiView {
   xKind: XKind;
   series: ViewSeries[];        // primary chart series (france first)
   comparison?: ViewSeries;     // OECD average (undefined when unavailable)
+  peers?: ViewSeries[];        // individual peer countries (role "peer"), fixed order
   secondary?: SecondaryBlock;  // e.g. debt (sustainability), life expectancy (outcomes)
   latest?: LatestStat;
   hasBreak2020: boolean;       // true if any france point switches source around 2020

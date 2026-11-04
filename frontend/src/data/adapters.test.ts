@@ -11,9 +11,14 @@ describe("adaptStandard", () => {
     expect(v.series[0].role).toBe("france");
     expect(v.series[0].points[0]).toEqual({ x: 1995, y: 24.11 });
   });
-  it("exposes OECD_AVG as comparison and ignores the 6 countries", () => {
+  it("exposes OECD_AVG as comparison", () => {
     expect(v.comparison?.role).toBe("oecd");
     expect(v.comparison?.points.length).toBeGreaterThan(0);
+  });
+  it("exposes the 6 peer countries in a fixed order with French labels", () => {
+    expect(v.peers?.map((p) => p.id)).toEqual(["DEU", "ESP", "ITA", "NLD", "GBR", "SWE"]);
+    expect(v.peers?.[0]).toMatchObject({ label: "Allemagne", role: "peer" });
+    expect(v.peers?.every((p) => p.points.length > 0)).toBe(true);
   });
   it("derives latest with yoy", () => {
     expect(v.latest?.unit).toBe("percent");
@@ -34,6 +39,10 @@ describe("adaptSustainability", () => {
     expect(v.secondary?.series[0].points.find((p) => p.x === 2024)?.y).toBe(112.6);
     expect(v.secondary?.comparison?.points.length).toBeGreaterThan(0);
   });
+  it("exposes peers for both deficit and debt", () => {
+    expect(v.peers).toHaveLength(6);
+    expect(v.secondary?.peers).toHaveLength(6);
+  });
 });
 
 import { adaptOutcomes, adaptTaxExpenditure, adaptMonthly } from "./adapters";
@@ -50,6 +59,7 @@ describe("adaptOutcomes", () => {
     expect(v.secondary?.series[0].points.length).toBeGreaterThan(0);
   });
   it("no OECD comparison", () => expect(v.comparison).toBeUndefined());
+  it("no peers", () => expect(v.peers).toBeUndefined());
   it("flags the 2020 source break", () => expect(v.hasBreak2020).toBe(true));
 });
 

@@ -16,7 +16,7 @@ It reports ratios, not totals. Total spending tells you almost nothing on its ow
 
 Wherever the data goes back that far, series start in 1995, not just the last election cycle. A lot of trends only show up over decades.
 
-Peers are Germany, the UK, Italy, Spain, the Netherlands, Sweden, and the OECD average. France-only numbers are usually misleading.
+Peers are Germany, the UK, Italy, Spain, the Netherlands, Sweden, and their unweighted average. France-only numbers are usually misleading.
 
 The whole pipeline runs on a cron schedule. Nobody is editing spreadsheets by hand, which means the numbers can't drift from whatever INSEE and the OECD publish.
 
@@ -28,9 +28,9 @@ No institutional backing. The code and the methodology are in this repo.
 
 | KPI | What it measures |
 |---|---|
-| Administrative Overhead Rate | Public sector wage bill as % of total public expenditure |
+| Public Wage Bill Share | Public sector wage bill as % of total public expenditure — all public employees (teachers, health staff, police…), not an administrative-overhead measure |
 | Friction Ratio | Share of revenue absorbed by the State's core support and sovereign functions (general services, defence, public order) — the running cost of the apparatus, not a measure of waste (France-only) |
-| Productive Spend Ratio | Share of expenditure flowing to productive COFOG functions (infrastructure, R&D, environment) |
+| Economic Affairs, Environment & Housing Share | Share of expenditure on COFOG GF04–GF06 (economic affairs, environmental protection, housing & community amenities) |
 | Social Protection / Investment Ratio | Total social protection spending (COFOG GF10 — pensions, unemployment, family, etc.) vs. gross fixed capital formation, as a multiple |
 | Monthly Budget Execution | Live cumulative revenues, spending, and balance for the current year |
 | Fiscal Deficit Trend | Balance and debt as % of GDP, France vs. peers |

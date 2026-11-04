@@ -21,6 +21,28 @@ export function fmtRatio(v: number): string {
 export function fmtNumber(v: number): string {
   return num(v, 0, 0);
 }
+// Chart tooltip value for a KPI unit. "eur" series are raw euros → shown in Md€.
+export function fmtValue(v: number, unit: string): string {
+  switch (unit) {
+    case "percent": return fmtPercent(v);
+    case "eur_bn": return fmtEurBn(v);
+    case "eur": return fmtEurBn(v / 1e9);
+    case "years": return fmtYears(v);
+    case "ratio": return fmtRatio(v);
+    default: return num(v, 0, 2);
+  }
+}
+// Shorter variant for chart axis ticks.
+export function fmtAxis(v: number, unit: string): string {
+  switch (unit) {
+    case "percent": return `${num(v, 0, 1)} %`;
+    case "eur_bn": return `${num(v, 0, 0)} Md€`;
+    case "eur": return `${num(v / 1e9, 0, 0)} Md€`;
+    case "years": return `${num(v, 0, 0)} ans`;
+    case "ratio": return `${num(v, 0, 1)}×`;
+    default: return num(v, 0, 1);
+  }
+}
 export function fmtDateFr(iso: string): string {
   return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" })
     .format(new Date(iso));
@@ -35,7 +57,7 @@ export function fmtYoy(v: number, unit?: string): { text: string; dir: YoyDir } 
 }
 
 // Per-KPI direction of "better": for most ratios a rise is bad (overhead, debt
-// service, niches…); for a few a rise is good (productive spend, public balance);
+// service, niches…); for a few a rise is good (public balance);
 // some are informational with no good/bad reading (outcomes, monthly tracking).
 export type Polarity = "higher_good" | "higher_bad" | "neutral";
 export type Sentiment = "good" | "bad" | "neutral";

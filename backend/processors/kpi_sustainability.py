@@ -75,8 +75,9 @@ def compute_fiscal_sustainability() -> dict:
             "relevé au dernier trimestre de l'année (T4) puisque la dette est un "
             "stock. Pays comparés : OCDE GIP 2025, capacité/besoin de financement "
             "(GNLB) et dette brute de Maastricht (GGDM), en % du PIB de part et "
-            "d'autre — OECD_AVG est la moyenne non pondérée de "
-            "DEU/GBR/ITA/ESP/NLD/SWE ; les séries des pays comparés débutent en 2007."
+            "d'autre — la « moyenne des 6 pays » (clé OECD_AVG) est la moyenne non "
+            "pondérée de DEU/GBR/ITA/ESP/NLD/SWE, et non la moyenne de l'OCDE ; "
+            "les séries des pays comparés débutent en 2007."
         ),
         "last_updated": now_iso(),
         "france": france,

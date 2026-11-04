@@ -19,8 +19,9 @@ export function KpiDetail() {
       {view.secondary && (
         <section className="kpi-detail__secondary">
           <h2>{view.secondary.title}</h2>
-          <TimeSeriesChart view={{ ...view, series: view.secondary.series,
-            comparison: view.secondary.comparison, secondary: undefined, hasBreak2020: false }} />
+          <TimeSeriesChart view={{ ...view, unit: view.secondary.unit, series: view.secondary.series,
+            comparison: view.secondary.comparison, peers: view.secondary.peers,
+            secondary: undefined, hasBreak2020: false }} />
         </section>
       )}
       <MethodologyDisclosure source={view.source} methodology={view.methodology} />

@@ -13,7 +13,7 @@ describe("KpiCard", () => {
   it("shows the French title, formatted latest value, and links to detail", () => {
     renderCard(overhead, "overhead_rate");
     expect(screen.getByRole("link")).toHaveAttribute("href", "/kpi/overhead_rate");
-    expect(screen.getByText(/Coût administratif/)).toBeInTheDocument();
+    expect(screen.getByText(/Part de la masse salariale publique/)).toBeInTheDocument();
     // latest overhead value 2025 formatted as fr percent
     expect(screen.getByTestId("kpi-latest").textContent).toMatch(/%/);
   });

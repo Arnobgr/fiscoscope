@@ -7,6 +7,10 @@ import type { Polarity } from "./format";
 export interface AdaptBase { slug: string; title: string; explainer: string; unit: Unit; polarity: Polarity }
 
 const OECD = "OECD_AVG";
+const PEERS: [string, string][] = [
+  ["DEU", "Allemagne"], ["ESP", "Espagne"], ["ITA", "Italie"],
+  ["NLD", "Pays-Bas"], ["GBR", "Royaume-Uni"], ["SWE", "Suède"],
+];
 
 function yearPoints(rows: RawPoint[]): { x: number; y: number }[] {
   return rows.map((r) => ({ x: r.year, y: r.value }));
@@ -21,7 +25,11 @@ function franceSeries(rows: RawPoint[]): ViewSeries {
 function oecdSeries(peers?: Record<string, RawPoint[]>): ViewSeries | undefined {
   const rows = peers?.[OECD];
   if (!rows || rows.length === 0) return undefined;
-  return { id: "oecd", label: "Moyenne OCDE", role: "oecd", points: yearPoints(rows) };
+  return { id: "oecd", label: "Moyenne des 6 pays", role: "oecd", points: yearPoints(rows) };
+}
+function peerSeries(peers?: Record<string, RawPoint[]>): ViewSeries[] {
+  return PEERS.filter(([iso]) => peers?.[iso]?.length)
+    .map(([iso, label]) => ({ id: iso, label, role: "peer" as const, points: yearPoints(peers![iso]) }));
 }
 function latestFrom(rows: RawPoint[], unit: Unit, given?: StdSeriesKpi["latest"]) {
   if (given) return { year: given.year, value: given.value, unit, yoy: given.yoy_change };
@@ -42,6 +50,7 @@ export function adaptStandard(raw: StdSeriesKpi, b: AdaptBase): KpiView {
     unit: b.unit, xKind: "year",
     series: [franceSeries(raw.france)],
     comparison: oecdSeries(raw.peers),
+    peers: peerSeries(raw.peers),
     latest: latestFrom(raw.france, b.unit, raw.latest),
     hasBreak2020: detectBreak(raw.france),
     ...meta(raw),
@@ -56,10 +65,12 @@ export function adaptSustainability(raw: SustainabilityKpi, b: AdaptBase): KpiVi
     unit: "percent", xKind: "year",
     series: [franceSeries(raw.france)],
     comparison: oecdSeries(deficitPeers),
+    peers: peerSeries(deficitPeers),
     secondary: {
       title: "Dette publique (Maastricht, % du PIB)", unit: "percent",
       series: [franceSeries(raw.debt.france)],
       comparison: oecdSeries(debtPeers),
+      peers: peerSeries(debtPeers),
     },
     latest: latestFrom(raw.france, "percent", raw.latest),
     hasBreak2020: false,

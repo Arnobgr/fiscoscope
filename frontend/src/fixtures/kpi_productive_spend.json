@@ -1,10 +1,10 @@
 {
   "kpi_id": "productive_spend",
-  "kpi_name": "Productive Spend Ratio",
-  "description": "Share of total public expenditure going to productive functions (infrastructure, economic affairs, environment, housing) rather than transfers or administration.",
+  "kpi_name": "Economic Affairs, Environment & Housing Share",
+  "description": "Share of total public expenditure going to three COFOG functions: economic affairs (GF04), environmental protection (GF05) and housing and community amenities (GF06). Education and health are not included.",
   "unit": "percent",
   "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
-  "methodology": "Bloc productif COFOG (GF04 + GF05 + GF06) / dépenses COFOG totales × 100. Les fonctions COFOG sont regroupées en blocs productif / redistributif / administratif selon la classification propre au tableau de bord (PRD §4). L'éducation (GF09) et la santé (GF07) mêlent des composantes d'investissement et de transfert et sont classées selon leur composante dominante — il s'agit d'une approximation. La famille COFOG CNA-2014-DEP-APU de l'INSEE s'arrête en 2020 ; les valeurs postérieures à 2020 proviennent de l'OCDE (Government at a Glance 2025, France uniquement), converties de % du PIB en euros via le PIB nominal INSEE. Chaque point de données est associé à sa source. L'INSEE et l'OCDE concordent à ±0,4 point de pourcentage du PIB au raccord de 2020. Pays comparés : OCDE GIP 2025, bloc productif / COFOG total (en % du PIB de part et d'autre) ; OECD_AVG = moyenne non pondérée des 6 pays comparés ; les séries des pays comparés débutent en 2007.",
+  "methodology": "Fonctions COFOG GF04 (affaires économiques) + GF05 (protection de l'environnement) + GF06 (logement et équipements collectifs) / dépenses COFOG totales (GF01 à GF10) × 100. L'éducation (GF09) et la santé (GF07) n'en font pas partie. La famille COFOG CNA-2014-DEP-APU de l'INSEE s'arrête en 2020 ; les valeurs postérieures à 2020 proviennent de l'OCDE (Government at a Glance 2025, France uniquement), converties de % du PIB en euros via le PIB nominal INSEE. Chaque point de données est associé à sa source. L'INSEE et l'OCDE concordent à ±0,4 point de pourcentage du PIB au raccord de 2020. Pays comparés : OCDE GIP 2025, GF04 + GF05 + GF06 / COFOG total (en % du PIB de part et d'autre) ; la « moyenne des 6 pays » (clé OECD_AVG) est la moyenne non pondérée des 6 pays comparés, et non la moyenne de l'OCDE ; les séries des pays comparés débutent en 2007.",
   "last_updated": "2026-05-21T10:03:35Z",
   "france": [
     {

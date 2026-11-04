@@ -1,5 +1,7 @@
 """
-KPI: Administrative Overhead Rate — see PRD §5.2.
+KPI: Public Wage Bill Share (formerly "Administrative Overhead Rate") — see
+PRD §5.2. Renamed in roadmap Phase 0.1: total D1 includes teachers, health
+staff and police, so it is not an administrative-overhead measure.
 
 Formula: public sector wage bill (D1_S13) / total APU expenditure × 100.
 France series from INSEE BDM's CNT-2020-CSI quarterly accounts, summed to
@@ -23,7 +25,7 @@ log = logging.getLogger(__name__)
 
 
 def compute_overhead_rate() -> dict:
-    """Compute the Administrative Overhead Rate and write kpi_overhead_rate.json."""
+    """Compute the Public Wage Bill Share and write kpi_overhead_rate.json."""
     series = load_insee_series()
     wage = annual_values(series["wage_bill_apu"])
     total = annual_values(series["total_apu_expenditure"])
@@ -47,11 +49,11 @@ def compute_overhead_rate() -> dict:
 
     payload = {
         "kpi_id": "overhead_rate",
-        "kpi_name": "Administrative Overhead Rate",
+        "kpi_name": "Public Wage Bill Share",
         "description": (
-            "Public sector wage bill as % of total public expenditure. Measures "
-            "how much of every euro spent goes to running the administrative "
-            "apparatus rather than delivering services or transfers."
+            "Public sector wage bill as % of total public expenditure. Covers "
+            "all public employees — teachers, health staff, police, soldiers — "
+            "not only administrative functions, so it is not an overhead rate."
         ),
         "unit": "percent",
         "source": "INSEE BDM — CNT-2020-CSI (quarterly, base 2020)",
@@ -59,10 +61,15 @@ def compute_overhead_rate() -> dict:
             "D1_S13 (rémunération des salariés, ensemble des APU) / OTE_S13 "
             "(dépense totale des APU) × 100. Séries trimestrielles cumulées sur "
             "l'année ; les années incomplètes sont écartées."
+            " La rémunération des salariés (D1) couvre l'ensemble des agents "
+            "publics — enseignants, personnels de santé, forces de l'ordre, "
+            "militaires — et pas seulement les fonctions administratives : ce "
+            "ratio n'est donc pas un taux de frais administratifs."
             " Pays comparés : OCDE GIP 2025, D1 / dépense totale (en % du PIB de "
-            "part et d'autre) — comparable au ratio français ; OECD_AVG est la "
-            "moyenne non pondérée de DEU/GBR/ITA/ESP/NLD/SWE ; les séries des "
-            "pays comparés débutent en 2007."
+            "part et d'autre) — comparable au ratio français ; la « moyenne des "
+            "6 pays » (clé OECD_AVG) est la moyenne non pondérée de "
+            "DEU/GBR/ITA/ESP/NLD/SWE, et non la moyenne de l'OCDE ; les séries "
+            "des pays comparés débutent en 2007."
         ),
         "last_updated": now_iso(),
         "france": france,

@@ -1,5 +1,6 @@
 """
-KPI: Productive Spend Ratio (PRD §5.4) and Pension/Investment Ratio (PRD §5.5).
+KPI: Economic Affairs, Environment & Housing Share (formerly "Productive Spend
+Ratio", PRD §5.4) and Pension/Investment Ratio (PRD §5.5).
 
 Both are France-only series; the PRD names no peer source, so the `peers`
 block is empty. COFOG inputs are stitched INSEE 1995–2020 + OECD 2021+
@@ -19,7 +20,6 @@ from processors import (
     write_output,
 )
 from processors.cofog import (
-    CLASSIFICATION_CAVEAT,
     STITCH_NOTE,
     bucket_cofog,
     function_eur_stitched,
@@ -52,7 +52,7 @@ def _cofog_bucket_peers(bucket_codes: list[str]) -> dict:
 
 
 def compute_productive_spend() -> dict:
-    """Compute the Productive Spend Ratio and write kpi_productive_spend.json."""
+    """Compute the Economic Affairs, Environment & Housing Share (kpi_productive_spend.json)."""
     series = load_insee_series()
     gdp = annual_values(series["gdp_nominal"])
     buckets = bucket_cofog(series, gdp)
@@ -69,20 +69,25 @@ def compute_productive_spend() -> dict:
 
     payload = {
         "kpi_id": "productive_spend",
-        "kpi_name": "Productive Spend Ratio",
+        "kpi_name": "Economic Affairs, Environment & Housing Share",
         "description": (
-            "Share of total public expenditure going to productive functions "
-            "(infrastructure, economic affairs, environment, housing) rather "
-            "than transfers or administration."
+            "Share of total public expenditure going to three COFOG functions: "
+            "economic affairs (GF04), environmental protection (GF05) and "
+            "housing and community amenities (GF06). Education and health are "
+            "not included."
         ),
         "unit": "percent",
         "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
         "methodology": (
-            "Bloc productif COFOG (GF04 + GF05 + GF06) / dépenses COFOG totales "
-            "× 100. " + CLASSIFICATION_CAVEAT + " " + STITCH_NOTE
-            + " Pays comparés : OCDE GIP 2025, bloc productif / COFOG total (en % "
-            "du PIB de part et d'autre) ; OECD_AVG = moyenne non pondérée des 6 "
-            "pays comparés ; les séries des pays comparés débutent en 2007."
+            "Fonctions COFOG GF04 (affaires économiques) + GF05 (protection de "
+            "l'environnement) + GF06 (logement et équipements collectifs) / "
+            "dépenses COFOG totales (GF01 à GF10) × 100. L'éducation (GF09) et "
+            "la santé (GF07) n'en font pas partie. " + STITCH_NOTE
+            + " Pays comparés : OCDE GIP 2025, GF04 + GF05 + GF06 / COFOG total "
+            "(en % du PIB de part et d'autre) ; la « moyenne des 6 pays » "
+            "(clé OECD_AVG) est la moyenne non pondérée des 6 pays comparés, et "
+            "non la moyenne de l'OCDE ; les séries des pays comparés débutent en "
+            "2007."
         ),
         "last_updated": now_iso(),
         "france": france,

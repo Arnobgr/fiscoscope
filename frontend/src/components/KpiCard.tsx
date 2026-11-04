@@ -44,7 +44,7 @@ export function KpiCard({ view, index = 0 }: { view: KpiView; index?: number }) 
       {view.latest && (
         <span className="kpi-card__asof">données jusqu’à {view.latest.year}</span>
       )}
-      {hasOecd && <span className="kpi-card__badge">vs moyenne OCDE</span>}
+      {hasOecd && <span className="kpi-card__badge">vs 6 pays</span>}
     </Link>
   );
 }
