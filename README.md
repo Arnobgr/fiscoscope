@@ -16,9 +16,9 @@ It reports ratios, not totals. Total spending tells you almost nothing on its ow
 
 Wherever the data goes back that far, series start in 1995, not just the last election cycle. A lot of trends only show up over decades.
 
-Peers are Germany, the UK, Italy, Spain, the Netherlands, Sweden, and their unweighted average. France-only numbers are usually misleading.
+Peers are Germany, the UK, Italy, Spain, the Netherlands and Sweden, next to an average labelled for what it is: the EU27 aggregate (Eurostat), the OECD average, or the six countries' unweighted mean. France-only numbers are usually misleading.
 
-The whole pipeline runs on a cron schedule. Nobody is editing spreadsheets by hand, which means the numbers can't drift from whatever INSEE and the OECD publish.
+The whole pipeline runs on a cron schedule. Nobody is editing spreadsheets by hand, which means the numbers can't drift from whatever INSEE, Eurostat and the OECD publish.
 
 No institutional backing. The code and the methodology are in this repo.
 
@@ -29,15 +29,22 @@ No institutional backing. The code and the methodology are in this repo.
 | KPI | What it measures |
 |---|---|
 | Public Wage Bill Share | Public sector wage bill as % of total public expenditure — all public employees (teachers, health staff, police…), not an administrative-overhead measure |
-| Friction Ratio | Share of revenue absorbed by the State's core support and sovereign functions (general services, defence, public order) — the running cost of the apparatus, not a measure of waste (France-only) |
-| Economic Affairs, Environment & Housing Share | Share of expenditure on COFOG GF04–GF06 (economic affairs, environmental protection, housing & community amenities) |
+| General Public Services Wage Share | Compensation of staff in general public services (COFOG GF01: executive and legislative bodies, tax and financial administration, foreign affairs, general services) as % of total expenditure — the closest COFOG gets to administrative overhead |
+| Friction Ratio | Share of revenue absorbed by the State's core support and sovereign functions (general services, defence, public order) — the running cost of the apparatus, not a measure of waste |
+| Public Employment | General-government employment as % of total employment (OECD) |
+| Public / Private Wage Bill | Public wage bill relative to the private-sector wage bill (France-only) |
+| Fiscal Deficit Trend | Balance and debt as % of GDP, France vs. peers, plus who holds the debt (non-residents, Banque de France, other residents) |
+| Deficit by Sub-sector | Balance of central government, local government and social security, in % of GDP and € bn |
+| Tax Burden | Taxes and social contributions as % of GDP since 1965 (OECD definition), vs. peers and the OECD average |
+| Debt Service Burden | Interest paid on public debt as % of government revenue |
 | Social Protection / Investment Ratio | Total social protection spending (COFOG GF10 — pensions, unemployment, family, etc.) vs. gross fixed capital formation, as a multiple |
-| Monthly Budget Execution | Live cumulative revenues, spending, and balance for the current year |
-| Fiscal Deficit Trend | Balance and debt as % of GDP, France vs. peers |
-| Tax Expenditure Cost | Cost of *niches fiscales* (GTED estimate; lower than the official PLF figure) as % of revenue |
+| Economic Affairs, Environment & Housing Share | Share of expenditure on COFOG GF04–GF06 (economic affairs, environmental protection, housing & community amenities) |
+| Old-Age Expenditure | Pensions and old-age care (COFOG GF1002) as % of public spending and of GDP |
 | Spend vs. Outcome (health) | Public health spend (% of GDP) and life expectancy at birth, shown as two parallel series (education/PISA not yet available) |
+| Tax Expenditure Cost | Cost of *niches fiscales* (GTED estimate; lower than the official PLF figure) as % of revenue |
+| Monthly Budget Execution | Live cumulative revenues, spending, and balance for the current year |
 
-Full KPI specifications and methodology are in [`docs/PRD.md`](docs/PRD.md) §5.
+The original KPI specifications are in [`docs/PRD.md`](docs/PRD.md) §5; the indicators added since are specified in [`docs/roadmap.md`](docs/roadmap.md).
 
 ---
 
@@ -47,7 +54,7 @@ Full KPI specifications and methodology are in [`docs/PRD.md`](docs/PRD.md) §5.
 ┌────────────────────────────────────────────────────┐
 │                  VPS (Hetzner)                     │
 │  ┌──────────────────────────────────────────────┐  │
-│  │  Python pipeline (systemd timer)             │  │
+│  │  Python pipeline (cron, Docker Compose)      │  │
 │  │  fetch → cache → compute KPIs → write JSON   │  │
 │  └──────────────────────────────────────────────┘  │
 │  ┌──────────────────────────────────────────────┐  │
@@ -62,7 +69,7 @@ Full KPI specifications and methodology are in [`docs/PRD.md`](docs/PRD.md) §5.
 └────────────────────────────────────────────────────┘
 ```
 
-Two systemd timers drive the pipeline: a monthly one for budget execution, Urssaf, and France Travail, and an annual one for INSEE COFOG, OECD, and the GTED tax-expenditure data.
+Two cron jobs drive the pipeline: a monthly one for budget execution, Urssaf, and France Travail, and an annual one for INSEE, Eurostat, the OECD, and the GTED tax-expenditure data.
 
 The FastAPI app serves `data/output/*.json` over read-only HTTP. No auth, because the data is public anyway. Abuse is bounded by `slowapi` rate limiting and a CORS allowlist, which is enough for a small read-only API.
 
@@ -74,9 +81,10 @@ The frontend is a static site on Cloudflare Pages that fetches from the VPS API 
 
 All sources are public. None require an API key.
 
-- **INSEE BDM** for national accounts time series (COFOG, wage bill, GDP, CPI), via the SDMX API. idBanks are resolved at runtime from INSEE's official mapping file.
+- **INSEE BDM** for France's quarterly national accounts (wage bill, expenditure, balance, interest), GDP and Maastricht debt, via the SDMX API. idBanks are resolved at runtime from INSEE's official mapping file.
+- **Eurostat** for government accounts on one basis from 1995, for France and its EU peers: spending by COFOG function and transaction, balances by sub-sector, interest and revenue, and who holds the debt. Eurostat no longer covers the UK, so the UK appears only on OECD-sourced charts.
 - **data.economie.gouv.fr** for monthly budget execution (`situations mensuelles budgétaires`) and annual final execution (PLRG).
-- **OECD Data Explorer** for COFOG and fiscal indicators on peer countries.
+- **OECD Data Explorer**: Government at a Glance (peer deficit, debt and wage bill; public employment), Revenue Statistics (tax-to-GDP since 1965), and Health Statistics (life expectancy).
 - **open.urssaf.fr** for the private sector wage bill, used in the public/private ratio.
 - **data.gouv.fr / France Travail** for monthly unemployment-insurance allocataires.
 - **GTED (Global Tax Expenditures Database)** for the annual cost of tax expenditures — a CC-BY academic compilation of France's PLF *Voies et Moyens* tome II (not the official annex directly, and narrower in scope than it).
@@ -86,8 +94,8 @@ All sources are public. None require an API key.
 ## Quick start
 
 ```bash
-git clone https://github.com/Arnobgr/french-efficiency-dashboard.git
-cd french-efficiency-dashboard/backend
+git clone https://github.com/Arnobgr/fiscoscope.git
+cd fiscoscope/backend
 
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -110,7 +118,7 @@ Requirements: Python 3.11+. No secrets needed because all data sources are publi
 | Mode | What it runs | Cadence |
 |---|---|---|
 | `--mode monthly` | Budget execution, Urssaf, France Travail | 1st of each month |
-| `--mode annual` | INSEE COFOG, OECD, PLRG, structural KPIs | 1st February (and June, after PLF) |
+| `--mode annual` | INSEE, Eurostat, OECD, GTED, PLRG, structural KPIs | 1st February, June and November (June and November follow Eurostat's April and October updates) |
 | `--mode full` | Both | Initial setup or manual refresh |
 
 ### API endpoints
@@ -125,19 +133,20 @@ Requirements: Python 3.11+. No secrets needed because all data sources are publi
 ## Repository layout
 
 ```
-french-efficiency-dashboard/
+fiscoscope/
 ├── backend/
 │   ├── fetchers/        # One module per data source
-│   ├── processors/      # One module per KPI
+│   ├── processors/      # KPI computations (one module per KPI family)
 │   ├── data/
 │   │   ├── raw/         # Cached API responses (not committed)
 │   │   └── output/      # Final JSON served by api.py
 │   ├── api.py           # FastAPI read-only server
 │   ├── config.py        # Constants and env-var loading
 │   └── run_pipeline.py  # Entry point
-├── frontend/            # Phase 2 — Vite + React + Recharts
+├── frontend/            # Vite + React + Recharts (Cloudflare Pages)
 ├── docs/
 │   ├── PRD.md                  # Full specification
+│   ├── roadmap.md              # Forward plan and vetted data sources
 │   ├── runtime-discoveries.md  # Methodology decisions per KPI
 │   └── known-gaps.md           # Documented limitations
 ├── CLAUDE.md
@@ -148,9 +157,9 @@ french-efficiency-dashboard/
 
 ## Methodology notes
 
-The one place where this project actually editorializes is COFOG bucketing: sorting the 10 COFOG functions into productive, redistributive, and administrative. No official source does this for you, and the choice is debatable. The bucketing lives in `backend/processors/cofog.py` and is repeated in each KPI's output `methodology` field so anyone reading the JSON sees what was assumed.
+The project tries not to tell you whether a number is good or bad. Each KPI is named after what it measures — usually a COFOG function or a national-accounts aggregate — rather than a judgement like "productive" or "administrative", and the year-on-year arrow is coloured only where a rise is uncontroversially better or worse.
 
-Education (GF09) and Health (GF07) both mix investment and transfers, so any bucketing of them is approximate. The output flags it. INSEE rebased the national accounts in 2020, which can create a structural break in long series; the processors detect and flag that too.
+Functional breakdowns (COFOG) come from Eurostat on a single basis from 1995, for France and its peers alike, so long series have no change of source. Each KPI's sources and methodology are shown on its page and repeated in its JSON output (`source`, `methodology`), so anyone reading the data sees what was assumed.
 
 For per-KPI methodology decisions and the reasoning behind them, see [`docs/runtime-discoveries.md`](docs/runtime-discoveries.md). For things we tried and couldn't make work, see [`docs/known-gaps.md`](docs/known-gaps.md).
 
@@ -176,4 +185,4 @@ PRs and issues welcome. A few things that make review easier:
 
 ## Acknowledgements
 
-Built on top of the open data published by INSEE, the Direction du Budget, the OECD, the Urssaf, France Travail, and data.gouv.fr.
+Built on top of the open data published by INSEE, Eurostat, the Direction du Budget, the OECD, the Urssaf, France Travail, and data.gouv.fr.
