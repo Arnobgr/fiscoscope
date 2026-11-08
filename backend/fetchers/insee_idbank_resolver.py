@@ -26,17 +26,15 @@ ZIP_FILENAME_RE = re.compile(
 #   PERIODICITE: A=annual, M=monthly, T=quarterly
 #   SECT-INST: S13=all APU, S0=economy-wide, etc.
 #   OPERATION (CNT-2020-CSI): D1=compensation of employees, OTE=total expenditure,
-#                             P5K2=gross capital formation, D62=cash social benefits,
-#                             B9NF=net lending/borrowing, D41=interest paid
-#   FONCTION (CNA-2014-DEP-APU only): FON01..FON10=COFOG functions
+#                             D62=cash social benefits, B9NF=net lending/borrowing,
+#                             D41=interest paid
 #   COMPTE (CNT-2020-CSI): E=emplois (uses), R=ressources, SO=neither (balance lines)
 #
 # APU aggregates use CNT-2020-CSI (quarterly, base 2020, freshness through current
 # quarter); annual_values() aggregates 4 quarters and drops incomplete years.
-# CNA-2020-DEP-APU does not exist in the INSEE mapping (only CNA-2020-PIB and
-# CNA-2020-CSI as ratios), so the COFOG functional breakdown (FON01..FON10)
-# stays on CNA-2014-DEP-APU (frozen at 2020). Post-2020 COFOG is stitched in
-# from OECD GIP 2025 at the processor layer — see processors/cofog.py.
+# The COFOG functional breakdown is not resolved here: INSEE's only functional
+# family (CNA-2014-DEP-APU) is frozen at 2020, so COFOG comes from Eurostat
+# gov_10a_exp (roadmap 1.9 — see fetchers/eurostat.py).
 SERIES_SEARCH_RULES = {
     # --- APU aggregate accounts (CNT-2020-CSI, quarterly, base 2020) ---
     "wage_bill_apu": [
@@ -44,13 +42,6 @@ SERIES_SEARCH_RULES = {
         ("PERIODICITE", "T"),
         ("SECT-INST", "S13"),
         ("OPERATION", "D1"),
-        ("COMPTE", "E"),
-    ],
-    "public_investment": [
-        ("famille", "CNT-2020-CSI"),
-        ("PERIODICITE", "T"),
-        ("SECT-INST", "S13"),
-        ("OPERATION", "P5K2"),
         ("COMPTE", "E"),
     ],
     "social_benefits": [
@@ -116,17 +107,6 @@ SERIES_SEARCH_RULES = {
         ("NATURE", "PROPORTION"),
         ("UNITE", "POURCENT"),
     ],
-    # --- COFOG functions: OTE (total expenditure) per FON01..FON10, S13, CNA-2014 ---
-    "cofog_gf01": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON01")],
-    "cofog_gf02": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON02")],
-    "cofog_gf03": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON03")],
-    "cofog_gf04": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON04")],
-    "cofog_gf05": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON05")],
-    "cofog_gf06": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON06")],
-    "cofog_gf07": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON07")],
-    "cofog_gf08": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON08")],
-    "cofog_gf09": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON09")],
-    "cofog_gf10": [("famille", "CNA-2014-DEP-APU"), ("PERIODICITE", "A"), ("SECT-INST", "S13"), ("OPERATION", "OTE"), ("FONCTION", "FON10")],
 }
 
 

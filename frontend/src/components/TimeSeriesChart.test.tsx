@@ -10,7 +10,7 @@ const view: KpiView = {
     points: [{ x: 2018, y: 1 }, { x: 2019, y: 2 }] }],
   comparison: { id: "oecd", label: "Moyenne des 6 pays", role: "oecd",
     points: [{ x: 2018, y: 1.5 }, { x: 2019, y: 1.6 }] },
-  hasBreak2020: false, source: "s", methodology: "m",
+  source: "s", methodology: "m",
 };
 
 describe("TimeSeriesChart", () => {

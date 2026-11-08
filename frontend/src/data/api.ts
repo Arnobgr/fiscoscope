@@ -2,9 +2,9 @@ import type { Meta } from "./types";
 
 const BASE = import.meta.env.VITE_API_BASE ?? "";
 const ALL_APP_IDS = [
-  "kpi_overhead_rate", "kpi_friction_ratio", "kpi_productive_spend", "kpi_wage_ratio",
-  "kpi_sustainability", "kpi_debt_service", "kpi_pension_investment",
-  "kpi_outcomes", "kpi_tax_expenditure", "kpi_monthly_execution",
+  "kpi_overhead_rate", "kpi_admin_overhead", "kpi_friction_ratio", "kpi_productive_spend", "kpi_wage_ratio",
+  "kpi_sustainability", "kpi_deficit_subsector", "kpi_debt_service", "kpi_pension_investment",
+  "kpi_pensions", "kpi_outcomes", "kpi_tax_expenditure", "kpi_monthly_execution",
 ];
 
 // Eagerly import fixtures so they bundle for dev/test (used when BASE is empty).

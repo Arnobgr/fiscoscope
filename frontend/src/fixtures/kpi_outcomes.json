@@ -3,155 +3,130 @@
   "kpi_name": "Spend vs. Outcome — Health",
   "description": "France public health spend (COFOG GF07) as % of GDP set against life expectancy at birth, as two parallel time series for the reader to judge. Life expectancy reflects the whole health system (public and private) and non-health factors, not public spend alone, so the two series are shown side by side rather than as a causal efficiency verdict.",
   "unit": "mixed",
-  "source": "INSEE BDM + OECD GIP 2025 (health spend, % of GDP); OECD Health Statistics (life expectancy at birth)",
-  "methodology": "Bloc santé : dépense COFOG GF07 (santé) / PIB nominal × 100, raccordée INSEE 1995–2020 + OCDE à partir de 2021 (chaque point associé à sa source). Espérance de vie à la naissance, population totale, issue des statistiques de santé de l'OCDE (DF_LE). L'espérance de vie dépend de l'ensemble du système de santé (public et privé) et de facteurs hors santé, et non de la seule dépense publique GF07 : les deux séries sont présentées en parallèle, sans en déduire un lien de causalité. L'éducation (dépense vs. PISA) est omise — PISA n'est pas disponible via l'API SDMX de l'OCDE. Comparaison entre pays reportée. La famille COFOG CNA-2014-DEP-APU de l'INSEE s'arrête en 2020 ; les valeurs postérieures à 2020 proviennent de l'OCDE (Government at a Glance 2025, France uniquement), converties de % du PIB en euros via le PIB nominal INSEE. Chaque point de données est associé à sa source. L'INSEE et l'OCDE concordent à ±0,4 point de pourcentage du PIB au raccord de 2020.",
-  "last_updated": "2026-05-21T10:03:35Z",
+  "source": "Eurostat — gov_10a_exp (dépense publique de santé, % du PIB) ; OCDE — statistiques de santé (espérance de vie à la naissance)",
+  "methodology": "Bloc santé : dépense COFOG GF07 (santé) de l'ensemble des APU en % du PIB, valeur publiée par Eurostat (arrondie au dixième). Espérance de vie à la naissance, population totale, issue des statistiques de santé de l'OCDE (DF_LE). L'espérance de vie dépend de l'ensemble du système de santé (public et privé) et de facteurs hors santé, et non de la seule dépense publique GF07 : les deux séries sont présentées en parallèle, sans en déduire un lien de causalité. L'éducation (dépense vs. PISA) est omise — PISA n'est pas disponible via l'API SDMX de l'OCDE. Comparaison entre pays reportée.",
+  "last_updated": "2026-11-08T17:27:56Z",
   "health": {
     "spend_pct_gdp": [
       {
         "year": 1995,
-        "value": 7.13,
-        "source": "INSEE"
+        "value": 6.9
       },
       {
         "year": 1996,
-        "value": 7.26,
-        "source": "INSEE"
+        "value": 7.0
       },
       {
         "year": 1997,
-        "value": 7.1,
-        "source": "INSEE"
+        "value": 6.9
       },
       {
         "year": 1998,
-        "value": 7.01,
-        "source": "INSEE"
+        "value": 6.9
       },
       {
         "year": 1999,
-        "value": 6.93,
-        "source": "INSEE"
+        "value": 6.8
       },
       {
         "year": 2000,
-        "value": 7.01,
-        "source": "INSEE"
+        "value": 6.9
       },
       {
         "year": 2001,
-        "value": 7.06,
-        "source": "INSEE"
+        "value": 7.0
       },
       {
         "year": 2002,
-        "value": 7.33,
-        "source": "INSEE"
+        "value": 7.3
       },
       {
         "year": 2003,
-        "value": 7.58,
-        "source": "INSEE"
+        "value": 7.6
       },
       {
         "year": 2004,
-        "value": 7.62,
-        "source": "INSEE"
+        "value": 7.6
       },
       {
         "year": 2005,
-        "value": 7.69,
-        "source": "INSEE"
+        "value": 7.8
       },
       {
         "year": 2006,
-        "value": 7.59,
-        "source": "INSEE"
+        "value": 7.7
       },
       {
         "year": 2007,
-        "value": 7.48,
-        "source": "INSEE"
+        "value": 7.6
       },
       {
         "year": 2008,
-        "value": 7.46,
-        "source": "INSEE"
+        "value": 7.6
       },
       {
         "year": 2009,
-        "value": 7.96,
-        "source": "INSEE"
+        "value": 8.1
       },
       {
         "year": 2010,
-        "value": 7.98,
-        "source": "INSEE"
+        "value": 8.1
       },
       {
         "year": 2011,
-        "value": 7.92,
-        "source": "INSEE"
+        "value": 8.1
       },
       {
         "year": 2012,
-        "value": 8.01,
-        "source": "INSEE"
+        "value": 8.2
       },
       {
         "year": 2013,
-        "value": 8.05,
-        "source": "INSEE"
+        "value": 8.2
       },
       {
         "year": 2014,
-        "value": 8.17,
-        "source": "INSEE"
+        "value": 8.3
       },
       {
         "year": 2015,
-        "value": 8.07,
-        "source": "INSEE"
+        "value": 8.2
       },
       {
         "year": 2016,
-        "value": 8.13,
-        "source": "INSEE"
+        "value": 8.3
       },
       {
         "year": 2017,
-        "value": 8.13,
-        "source": "INSEE"
+        "value": 8.3
       },
       {
         "year": 2018,
-        "value": 8.05,
-        "source": "INSEE"
+        "value": 8.2
       },
       {
         "year": 2019,
-        "value": 7.98,
-        "source": "INSEE"
+        "value": 8.1
       },
       {
         "year": 2020,
-        "value": 8.93,
-        "source": "INSEE"
+        "value": 9.0
       },
       {
         "year": 2021,
-        "value": 9.36,
-        "source": "OECD"
+        "value": 9.4
       },
       {
         "year": 2022,
-        "value": 9.09,
-        "source": "OECD"
+        "value": 9.1
       },
       {
         "year": 2023,
-        "value": 8.87,
-        "source": "OECD"
+        "value": 8.8
+      },
+      {
+        "year": 2024,
+        "value": 8.9
       }
     ],
     "life_expectancy_years": [
@@ -276,8 +251,8 @@
   "education": null,
   "peers": {},
   "latest": {
-    "spend_year": 2023,
-    "spend_pct_gdp": 8.87,
+    "spend_year": 2024,
+    "spend_pct_gdp": 8.9,
     "life_expectancy_year": 2023,
     "life_expectancy_years": 83.0
   }

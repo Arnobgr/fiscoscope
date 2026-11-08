@@ -170,3 +170,78 @@ def peer_series(df: pd.DataFrame) -> dict:
     avg = sub.groupby("year")["value"].mean().sort_index()
     out[OECD_AVG_KEY] = [{"year": int(y), "value": round(float(v), 2)} for y, v in avg.items()]
     return out
+
+
+# --- Eurostat (roadmap Phase 1) ----------------------------------------------
+# Eurostat has no UK: peers are 5 countries plus EU27_AVG, a true EU27
+# aggregate published by Eurostat (not a mean computed here). A 5-country mean
+# must never be stored under OECD_AVG ("Moyenne des 6 pays").
+EUROSTAT_PEERS = ["DEU", "ITA", "ESP", "NLD", "SWE"]
+EU27_AVG_KEY = "EU27_AVG"
+_EUROSTAT_GEO = {
+    "FR": "FRA", "DE": "DEU", "IT": "ITA", "ES": "ESP", "NL": "NLD", "SE": "SWE",
+    "EU27_2020": EU27_AVG_KEY,
+}
+
+
+def load_eurostat_long(source: str) -> pd.DataFrame:
+    """
+    Decode the most recent data/raw/{source}_*.json (Eurostat JSON-stat) into a
+    long DataFrame: one column per dimension (minus freq/geo/time), plus
+    country (ISO3, or EU27_AVG), year (int) and value (float).
+    """
+    from fetchers.eurostat import decode_jsonstat
+
+    path = latest_raw(source)
+    if path is None:
+        raise FileNotFoundError(f"No data/raw/{source}_*.json found — run its fetcher first.")
+    d = json.loads(path.read_text())
+    df = pd.DataFrame(
+        [(*key, value) for key, value in decode_jsonstat(d).items()],
+        columns=[*d["id"], "value"],
+    )
+    df["country"] = df["geo"].map(_EUROSTAT_GEO)
+    df["year"] = df["time"].astype(int)
+    df["value"] = df["value"].astype(float)
+    return df.drop(columns=["freq", "geo", "time"]).dropna(subset=["country"])
+
+
+def pick(df: pd.DataFrame, **filters) -> pd.DataFrame:
+    """Rows matching every column=value filter, reduced to country/year/value."""
+    mask = pd.Series(True, index=df.index)
+    for col, val in filters.items():
+        mask &= df[col] == val
+    return df.loc[mask, ["country", "year", "value"]]
+
+
+def ratio(num: pd.DataFrame, den: pd.DataFrame, scale: float = 100) -> pd.DataFrame:
+    """num / den × scale per (country, year); pairs with a zero denominator are dropped."""
+    m = num.merge(den, on=["country", "year"], suffixes=("_n", "_d"))
+    m = m[m["value_d"] != 0]
+    return m.assign(value=m["value_n"] / m["value_d"] * scale)[["country", "year", "value"]]
+
+
+def series_by_country(df: pd.DataFrame, codes: list[str]) -> dict:
+    """{code: [{year, value}, ...]} for each code present in a long country/year/value frame."""
+    out = {}
+    for code in codes:
+        rows = df[df["country"] == code].sort_values("year")
+        if len(rows):
+            out[code] = [
+                {"year": int(r.year), "value": round(float(r.value), 2)} for r in rows.itertuples()
+            ]
+    return out
+
+
+def france_and_peers(df: pd.DataFrame, peers: list[str]) -> tuple[list, dict]:
+    """Split a long country/year/value frame into the France series and the peers block."""
+    return series_by_country(df, ["FRA"]).get("FRA", []), series_by_country(df, peers)
+
+
+EUROSTAT_PEER_NOTE = (
+    "Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source "
+    "et même définition que la France ; le Royaume-Uni n'est plus couvert par "
+    "Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est "
+    "l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 "
+    "pour les dépenses par fonction)."
+)

@@ -6,15 +6,15 @@ import os
 # data/raw/insee_idbanks.json. All INSEE fetchers load from that file.
 #
 # Logical series names used throughout the pipeline:
-#   wage_bill_apu, public_investment, social_benefits, fiscal_balance,
-#   debt_interest, total_apu_expenditure, gdp_nominal, cpi,
-#   cofog_gf01 through cofog_gf10
+#   wage_bill_apu, social_benefits, fiscal_balance, debt_interest,
+#   total_apu_expenditure, gdp_nominal, cpi, public_debt_ratio
+# COFOG (functional) series come from Eurostat — see fetchers/eurostat.py.
 
 # OECD
 OECD_COUNTRIES = ["FRA", "DEU", "GBR", "ITA", "ESP", "NLD", "SWE"]
 OECD_START_YEAR = 2000
 
-# INSEE start year for COFOG (available from 1995)
+# Start year for annual national-accounts series (INSEE, Eurostat: from 1995)
 INSEE_START_YEAR = 1995
 
 # Data paths (relative to backend/)
@@ -31,11 +31,3 @@ ALLOWED_ORIGINS = [
 # RATE_LIMIT: slowapi limit string applied globally to every endpoint.
 RATE_LIMIT = os.environ.get("RATE_LIMIT", "60/minute")
 
-# COFOG bucket classification (logical names matching keys in insee_idbanks.json)
-COFOG_PRODUCTIVE = ["cofog_gf04", "cofog_gf05", "cofog_gf06"]
-COFOG_REDISTRIBUTIVE = ["cofog_gf07", "cofog_gf08", "cofog_gf09", "cofog_gf10"]
-COFOG_ADMINISTRATIVE = ["cofog_gf01", "cofog_gf02", "cofog_gf03"]
-
-# GF09 (Education) spans both productive and redistributive buckets.
-# The pipeline uses its dominant component rule: classified as redistributive,
-# but flagged in output metadata as an approximation.

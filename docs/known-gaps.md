@@ -29,13 +29,13 @@ needed series for several, and three KPIs are France-only by construction.
 
 | KPI | Peer status | Reason |
 |-----|-------------|--------|
-| overhead, productive, sustainability (deficit+debt) | ✅ DONE (Sessions A/B; each country shown on charts since roadmap 0.4) | OECD GIP raw has the series (peer floor 2007). The `OECD_AVG` key is the unweighted mean of the **6 peers**, not an OECD aggregate — shown as "Moyenne des 6 pays" since 2026-11-04. A true average (Eurostat EU27, OECD `OECD_REP`) is roadmap 1.1/1.5 |
-| friction | ❌ REMOVED by design (2026-06) | Peers were wired (Session A) but dropped: France denominator is revenue, peer denominator is total expenditure — not level-comparable, and a trends-only overlay is too easily misread on a public chart. Now France-only |
-| pension/investment | ❌ BLOCKED | OECD fiscal raw has **no P51 / gross fixed capital formation**; PRD §5.5 names no peer source |
+| overhead_rate, sustainability (deficit+debt) | ✅ DONE (Sessions A/B; each country shown on charts since roadmap 0.4) | OECD GIP raw has the series (peer floor 2007). The `OECD_AVG` key is the unweighted mean of the **6 peers**, not an OECD aggregate — shown as "Moyenne des 6 pays" since 2026-11-04 |
+| admin_overhead, productive, friction, pension/investment, pensions | ✅ DONE (Session H, roadmap 1.2/1.3/1.9) | Eurostat `gov_10a_exp` (+ `gov_10a_main` TR for friction) for France and peers alike, from 1995 (DE/IT/SE old-age from 2000–01), with the true EU27 aggregate (`EU27_AVG`, COFOG from 2010). **No UK** on these charts — Eurostat dropped it after Brexit. Friction peers are back: the old blocker (revenue vs expenditure denominators) is gone, Eurostat TR is the same aggregate for every country |
 | outcomes — education | ❌ BLOCKED | PISA not in OECD SDMX (see C) |
 | outcomes — health | ⚠️ FEASIBLE, not built | OECD life-expectancy peers exist; peers deferred (shipped France-only dual series) |
 | tax_expenditure | ⚠️ FEASIBLE, not built | GTED RevenueForgone carries all countries; PRD names no peer source, so deferred |
-| debt_service | ⚠️ UNCONFIRMED | OECD GE transactions expose D4 (property income), not isolated D41 interest — peer source not verified |
+| debt_service | ✅ DONE (Session H, roadmap 1.8) | Peers = Eurostat `gov_10a_main` D41PAY / TR (+ EU27, no UK). France stays on INSEE quarterly accounts; its Eurostat equivalent differs by ≤ 0.06 pt over 1995–2025 |
+| deficit_subsector | N/A | France's own sub-sector split (Eurostat S1311/S1313/S1314); peers not shown — sub-sector structures (federal states, social-security perimeter) are not comparable |
 | wage_ratio | ❌ no aligned source | Urssaf is a France-only private wage bill; no cross-country equivalent on the same basis. France-only |
 | monthly_execution | N/A | French budget-execution data; France-only by nature |
 
@@ -46,6 +46,6 @@ needed series for several, and three KPIs are France-only by construction.
 | `wage_bill_central` (S1311 central-state wage bill, PRD §3.1) | CNT-2020-CSI has no central-state breakdown past 2020 | **Deleted** (Session 8); no KPI used it | A base-2020 INSEE family with an S1311 breakdown appears |
 | Education / PISA half of §5.9 outcomes | **PISA not in OECD's SDMX API** | Outcomes shipped **health-only** (Session 10) | Source PISA from the OECD PISA explorer bulk download or a data.gouv mirror (non-SDMX), interpolate triennially |
 | Official tax-expenditure tabular (Voies et Moyens *Tome II*) | **PDF-only**; no costed, multi-year, full-list tabular source | Used **GTED** via Zenodo (third-party academic compilation, CC-BY; Sessions C/C2) — *not* a primary statistical feed | Bercy publishes a tabular Tome II, or if GTED definitions prove insufficient (then PDF-parse, Session 9 option 2) |
-| Pension/investment peers | no OECD GFCF (P51) in the fiscal raw | deferred (see B) | An OECD/Eurostat GFCF-by-country series is wired in |
 | §5.9 "indexed to OECD average = 100" | peers deferred | shipped as dual France-only time series | Outcomes peers are built (see B) |
-| Full historical peer depth (1995) | OECD GIP peers start **2007**; OECD COFOG caps at **2023**; INSEE functional COFOG frozen at base-2020 (no FONCTION dim post-2020) | documented upstream limits; INSEE+OECD COFOG **stitched** at 2020 seam (Session 8) | OECD extends GIP history/recency, or INSEE ships a base-2020 functional series |
+| Full historical peer depth (1995) | OECD GIP peers start **2007** | **Resolved for COFOG KPIs** (Session H): Eurostat runs 1995–2024 on one basis, the INSEE+OECD stitch is retired. Still 2007+ for the OECD-sourced peers of overhead_rate and sustainability | Move those to Eurostat too (loses the UK), or OECD extends GIP history |
+| OECD S5 / S6 re-verification (roadmap 1.5 tax burden, 1.7 public employment) | `sdmx.oecd.org` served a Cloudflare challenge to the dev machine (2026-11-08); not an upstream change — the existing OECD fetchers run on the VPS | Fetcher + processor + parser tests written; KPIs not in the frontend registry | Run `fetch_oecd_tax_revenue` / `fetch_oecd_public_employment` on the VPS, check the output, then add registry entries and fixtures |

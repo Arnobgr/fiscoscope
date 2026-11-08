@@ -11,8 +11,8 @@ describe("adaptStandard", () => {
     expect(v.series[0].role).toBe("france");
     expect(v.series[0].points[0]).toEqual({ x: 1995, y: 24.11 });
   });
-  it("exposes OECD_AVG as comparison", () => {
-    expect(v.comparison?.role).toBe("oecd");
+  it("exposes OECD_AVG as comparison, labelled as the 6-country mean", () => {
+    expect(v.comparison).toMatchObject({ id: "OECD_AVG", label: "Moyenne des 6 pays", role: "oecd" });
     expect(v.comparison?.points.length).toBeGreaterThan(0);
   });
   it("exposes the 6 peer countries in a fixed order with French labels", () => {
@@ -54,13 +54,12 @@ describe("adaptOutcomes", () => {
   const v = adaptOutcomes(outcomes as any,
     { slug: "outcomes", title: "T", explainer: "E", unit: "mixed", polarity: "neutral" });
   it("primary = health spend %GDP, secondary = life expectancy", () => {
-    expect(v.series[0].points[0]).toEqual({ x: 1995, y: 7.13 });
+    expect(v.series[0].points[0]).toEqual({ x: 1995, y: 6.9 });
     expect(v.secondary?.unit).toBe("years");
     expect(v.secondary?.series[0].points.length).toBeGreaterThan(0);
   });
   it("no OECD comparison", () => expect(v.comparison).toBeUndefined());
   it("no peers", () => expect(v.peers).toBeUndefined());
-  it("flags the 2020 source break", () => expect(v.hasBreak2020).toBe(true));
 });
 
 describe("adaptTaxExpenditure", () => {
@@ -81,5 +80,45 @@ describe("adaptMonthly", () => {
     expect(ids).toContain("revenues");
     expect(ids).toContain("spending");
     expect(v.series[0].points[0].x).toBe("2026-01");
+  });
+});
+
+import { adaptPensions, adaptDeficitSubsector } from "./adapters";
+import adminOverhead from "../fixtures/kpi_admin_overhead.json";
+import pensions from "../fixtures/kpi_pensions.json";
+import deficitSubsector from "../fixtures/kpi_deficit_subsector.json";
+import type { StdSeriesKpi, PensionsKpi, DeficitSubsectorKpi, SustainabilityKpi } from "./types";
+
+const deficitRaw = deficitSubsector as unknown as DeficitSubsectorKpi;
+
+describe("Eurostat-based KPIs", () => {
+  it("label the EU27 aggregate, and have 5 peers (no UK)", () => {
+    const v = adaptStandard(adminOverhead as unknown as StdSeriesKpi, { ...base, slug: "admin_overhead" });
+    expect(v.comparison).toMatchObject({ id: "EU27_AVG", label: "Moyenne UE à 27", role: "oecd" });
+    expect(v.peers?.map((p) => p.id)).toEqual(["DEU", "ESP", "ITA", "NLD", "SWE"]);
+  });
+  it("pensions: share of spending first, % of GDP as secondary with its own peers", () => {
+    const v = adaptPensions(pensions as unknown as PensionsKpi,
+      { slug: "pensions", title: "T", explainer: "E", unit: "percent", polarity: "neutral" });
+    expect(v.series[0].role).toBe("france");
+    expect(v.secondary?.title).toMatch(/PIB/);
+    expect(v.secondary?.comparison?.id).toBe("EU27_AVG");
+    expect(v.secondary?.peers).toHaveLength(5);
+  });
+  it("deficit by sub-sector: State first, then local, social security and total, in % and Md€", () => {
+    const v = adaptDeficitSubsector(deficitRaw,
+      { slug: "deficit_subsector", title: "T", explainer: "E", unit: "percent", polarity: "higher_good" });
+    expect(v.series.map((s) => s.id)).toEqual(["central", "local", "social_security", "total"]);
+    expect(v.series[0].role).toBe("france");
+    expect(v.latest?.value).toBe(deficitRaw.latest?.value);
+    expect(v.secondary?.unit).toBe("eur_bn");
+    expect(v.secondary?.series).toHaveLength(4);
+    expect(v.comparison).toBeUndefined();
+  });
+  it("sustainability: debt-holders panel with three series", () => {
+    const v = adaptSustainability(sustainability as unknown as SustainabilityKpi,
+      { slug: "sustainability", title: "T", explainer: "E", unit: "percent", polarity: "higher_good" });
+    expect(v.panels?.[0].series.map((s) => s.id)).toEqual(["non_residents", "central_bank", "other_residents"]);
+    expect(v.panels?.[0].note).toMatch(/2020/);
   });
 });

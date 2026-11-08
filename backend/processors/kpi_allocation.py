@@ -1,71 +1,49 @@
 """
 KPI: Economic Affairs, Environment & Housing Share (formerly "Productive Spend
-Ratio", PRD §5.4) and Pension/Investment Ratio (PRD §5.5).
+Ratio", PRD §5.4), Social Protection / Investment Ratio (PRD §5.5) and
+Old-Age Expenditure (roadmap 1.3).
 
-Both are France-only series; the PRD names no peer source, so the `peers`
-block is empty. COFOG inputs are stitched INSEE 1995–2020 + OECD 2021+
-(see processors/cofog.py).
+All three read Eurostat gov_10a_exp (COFOG × transaction, 1995–2024 on one
+basis), for France and peers alike — this replaced the INSEE 1995–2020 + OECD
+2021+ stitch (roadmap 1.9).
 """
 
 import logging
-import re
 
 from processors import (
-    annual_values,
+    EU27_AVG_KEY,
+    EUROSTAT_PEER_NOTE,
+    EUROSTAT_PEERS,
     build_latest,
-    load_insee_series,
-    load_oecd_long,
+    france_and_peers,
+    load_eurostat_long,
     now_iso,
-    peer_series,
+    pick,
+    ratio,
     write_output,
-)
-from processors.cofog import (
-    STITCH_NOTE,
-    bucket_cofog,
-    function_eur_stitched,
 )
 
 log = logging.getLogger(__name__)
 
-_TOP_GF = re.compile(r"^GF(0[1-9]|10)$")
+PEER_CODES = [*EUROSTAT_PEERS, EU27_AVG_KEY]
 
 
-def _cofog_bucket_peers(bucket_codes: list[str]) -> dict:
-    """
-    Peer block for a COFOG bucket: sum(bucket_codes) / sum(GF01..GF10) × 100,
-    per peer country, from cached oecd_cofog (% of GDP cancels in the ratio).
-    bucket_codes are OECD GF codes, e.g. ["GF04","GF05","GF06"].
-    """
-    cofog = load_oecd_long("oecd_cofog")
-    top = cofog[(cofog["measure"] == "GE") & cofog["expenditure"].str.match(_TOP_GF)]
-    total = top.groupby(["country", "year"])["value"].sum().rename("tot").reset_index()
-    num = (
-        top[top["expenditure"].isin(bucket_codes)]
-        .groupby(["country", "year"])["value"]
-        .sum()
-        .rename("num")
-        .reset_index()
-    )
-    merged = total.merge(num, on=["country", "year"])
-    merged["value"] = merged["num"] / merged["tot"] * 100
-    return peer_series(merged[["country", "year", "value"]])
+def cofog_sum(eur, codes: list[str], na_item: str = "TE"):
+    """Sum of several COFOG functions per (country, year); rows missing any code are dropped."""
+    sub = eur[eur["cofog99"].isin(codes) & (eur["na_item"] == na_item)]
+    g = sub.groupby(["country", "year"])["value"]
+    out = g.sum().to_frame("value").assign(n=g.size()).reset_index()
+    return out[out["n"] == len(codes)][["country", "year", "value"]]
 
 
 def compute_productive_spend() -> dict:
     """Compute the Economic Affairs, Environment & Housing Share (kpi_productive_spend.json)."""
-    series = load_insee_series()
-    gdp = annual_values(series["gdp_nominal"])
-    buckets = bucket_cofog(series, gdp)
-
-    france = [
-        {
-            "year": int(row.year),
-            "value": round(row.productive / row.total * 100, 2),
-            "source": row.source,
-        }
-        for row in buckets.itertuples()
-        if row.total
-    ]
+    exp = load_eurostat_long("eurostat_exp")
+    eur = exp[exp["unit"] == "MIO_EUR"]
+    shares = ratio(
+        cofog_sum(eur, ["GF04", "GF05", "GF06"]), pick(eur, cofog99="TOTAL", na_item="TE")
+    )
+    france, peers = france_and_peers(shares, PEER_CODES)
 
     payload = {
         "kpi_id": "productive_spend",
@@ -77,21 +55,17 @@ def compute_productive_spend() -> dict:
             "not included."
         ),
         "unit": "percent",
-        "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
+        "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG)",
         "methodology": (
             "Fonctions COFOG GF04 (affaires économiques) + GF05 (protection de "
             "l'environnement) + GF06 (logement et équipements collectifs) / "
-            "dépenses COFOG totales (GF01 à GF10) × 100. L'éducation (GF09) et "
-            "la santé (GF07) n'en font pas partie. " + STITCH_NOTE
-            + " Pays comparés : OCDE GIP 2025, GF04 + GF05 + GF06 / COFOG total "
-            "(en % du PIB de part et d'autre) ; la « moyenne des 6 pays » "
-            "(clé OECD_AVG) est la moyenne non pondérée des 6 pays comparés, et "
-            "non la moyenne de l'OCDE ; les séries des pays comparés débutent en "
-            "2007."
+            "dépense publique totale (toutes fonctions) × 100, ensemble des APU, "
+            "en millions d'euros courants. L'éducation (GF09) et la santé (GF07) "
+            "n'en font pas partie. " + EUROSTAT_PEER_NOTE
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": _cofog_bucket_peers(["GF04", "GF05", "GF06"]),
+        "peers": peers,
         "latest": build_latest(france),
     }
     write_output("kpi_productive_spend.json", payload)
@@ -99,21 +73,15 @@ def compute_productive_spend() -> dict:
 
 
 def compute_pension_investment() -> dict:
-    """Compute the Pension/Investment Ratio and write kpi_pension_investment.json."""
-    series = load_insee_series()
-    gdp = annual_values(series["gdp_nominal"])
-    investment = annual_values(series["public_investment"])
-    pension_series = function_eur_stitched("GF10", series, gdp)
-
-    france = []
-    for pt in pension_series:
-        year = pt["year"]
-        inv = investment.get(year)
-        if not inv:
-            continue
-        france.append(
-            {"year": year, "value": round(pt["value"] / inv, 2), "source": pt["source"]}
-        )
+    """Compute the Social Protection / Investment Ratio and write kpi_pension_investment.json."""
+    exp = load_eurostat_long("eurostat_exp")
+    eur = exp[exp["unit"] == "MIO_EUR"]
+    ratios = ratio(
+        pick(eur, cofog99="GF10", na_item="TE"),
+        pick(eur, cofog99="TOTAL", na_item="P51G"),
+        scale=1,
+    )
+    france, peers = france_and_peers(ratios, PEER_CODES)
 
     payload = {
         "kpi_id": "pension_investment",
@@ -126,26 +94,66 @@ def compute_pension_investment() -> dict:
             "capacity rather than building it."
         ),
         "unit": "ratio",
-        "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
+        "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG et par opération)",
         "methodology": (
             "COFOG GF10 (dépenses de protection sociale dans leur ensemble — "
             "retraites, chômage, famille, maladie, etc., et non les seules "
-            "retraites — pour l'ensemble des APU) / P5K2 (formation brute de "
-            "capital fixe, ensemble des APU). Le résultat est un multiple "
-            "(sans unité). " + STITCH_NOTE
+            "retraites) / P51G (formation brute de capital fixe, toutes "
+            "fonctions), ensemble des APU, en millions d'euros courants. Le "
+            "résultat est un multiple (sans unité). " + EUROSTAT_PEER_NOTE
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": {},
+        "peers": peers,
         "latest": build_latest(france),
     }
     write_output("kpi_pension_investment.json", payload)
     return payload
 
 
+def compute_pensions() -> dict:
+    """Compute Old-Age Expenditure (share of spending and % of GDP) — kpi_pensions.json."""
+    exp = load_eurostat_long("eurostat_exp")
+    eur = exp[exp["unit"] == "MIO_EUR"]
+    shares = ratio(
+        pick(eur, cofog99="GF1002", na_item="TE"), pick(eur, cofog99="TOTAL", na_item="TE")
+    )
+    france, peers = france_and_peers(shares, PEER_CODES)
+    pct_gdp = pick(exp, unit="PC_GDP", cofog99="GF1002", na_item="TE")
+    gdp_france, gdp_peers = france_and_peers(pct_gdp, PEER_CODES)
+
+    payload = {
+        "kpi_id": "pensions",
+        "kpi_name": "Old-Age Expenditure",
+        "description": (
+            "Public expenditure on old age (COFOG GF1002: pensions and care for "
+            "the elderly) as % of total public expenditure, and as % of GDP."
+        ),
+        "unit": "percent",
+        "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG, niveau 2)",
+        "methodology": (
+            "Fonction COFOG GF1002 « vieillesse », ensemble des APU : pensions de "
+            "retraite (régimes de base et complémentaires, retraites des "
+            "fonctionnaires) et prestations liées à la perte d'autonomie des "
+            "personnes âgées (allocation personnalisée d'autonomie, aide sociale "
+            "à l'hébergement). "
+            "Les pensions de réversion relèvent de GF1003 « survivants » et ne "
+            "sont pas comprises. Part de la dépense : GF1002 / dépense publique "
+            "totale × 100, en millions d'euros courants. En % du PIB : valeur "
+            "publiée par Eurostat (arrondie au dixième). " + EUROSTAT_PEER_NOTE
+        ),
+        "last_updated": now_iso(),
+        "france": france,
+        "peers": peers,
+        "pct_gdp": {"france": gdp_france, "peers": gdp_peers},
+        "latest": build_latest(france),
+    }
+    write_output("kpi_pensions.json", payload)
+    return payload
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    ps = compute_productive_spend()
-    pi = compute_pension_investment()
-    print(f"\nProductive spend: {len(ps['france'])} France data points")
-    print(f"Pension/investment: {len(pi['france'])} France data points")
+    for fn in (compute_productive_spend, compute_pension_investment, compute_pensions):
+        r = fn()
+        print(f"{r['kpi_id']}: {len(r['france'])} France points; latest {r['latest']}")

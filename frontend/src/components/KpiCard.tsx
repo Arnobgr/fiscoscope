@@ -12,10 +12,14 @@ function fmtValue(unit: KpiView["unit"], v: number): string {
   return fmtPercent(v);
 }
 
+const BADGES: Record<string, string> = {
+  OECD_AVG: "vs 6 pays", EU27_AVG: "vs UE à 27", OECD_REP: "vs OCDE", OECD: "vs OCDE",
+};
+
 export function KpiCard({ view, index = 0 }: { view: KpiView; index?: number }) {
   const yoy = view.latest?.yoy != null ? fmtYoy(view.latest.yoy, view.latest.unit) : null;
   const sentiment = yoy ? yoySentiment(yoy.dir, view.polarity) : "neutral";
-  const hasOecd = !!view.comparison;
+  const badge = view.comparison ? BADGES[view.comparison.id] : undefined;
   const spark = view.series[0];
   return (
     <Link to={`/kpi/${view.slug}`} className="kpi-card" style={{ "--i": index } as CSSProperties}>
@@ -44,7 +48,7 @@ export function KpiCard({ view, index = 0 }: { view: KpiView; index?: number }) 
       {view.latest && (
         <span className="kpi-card__asof">données jusqu’à {view.latest.year}</span>
       )}
-      {hasOecd && <span className="kpi-card__badge">vs 6 pays</span>}
+      {badge && <span className="kpi-card__badge">{badge}</span>}
     </Link>
   );
 }

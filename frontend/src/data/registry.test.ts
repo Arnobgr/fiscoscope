@@ -3,8 +3,8 @@ import { REGISTRY, THEMES, bySlug, buildView } from "./registry";
 import overhead from "../fixtures/kpi_overhead_rate.json";
 
 describe("registry", () => {
-  it("has all 10 KPIs across 3 themes", () => {
-    expect(REGISTRY.length).toBe(10);
+  it("has all 13 KPIs across 3 themes", () => {
+    expect(REGISTRY.length).toBe(13);
     expect(THEMES.length).toBe(3);
   });
   it("every entry maps slug → apiId with kpi_ prefix and has French copy", () => {

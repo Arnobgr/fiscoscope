@@ -1,15 +1,23 @@
 // ---- Raw JSON (as served by the backend) -------------------------------
 export interface RawPoint { year: number; value: number; source?: string }
-export interface StdSeriesKpi {            // overhead, friction, productive, debt_service, pension_investment, wage_ratio
+export interface StdSeriesKpi {            // overhead, admin_overhead, friction, productive, debt_service, pension_investment, wage_ratio
   kpi_id: string; kpi_name: string; description: string; unit: string;
   source: string; methodology: string; last_updated: string;
   france: RawPoint[];
-  peers?: Record<string, RawPoint[]>;      // may include OECD_AVG + 6 countries (ISO3 keys)
+  peers?: Record<string, RawPoint[]>;      // ISO3 country keys + at most one average (OECD_AVG, EU27_AVG, OECD_REP or OECD)
   latest?: { year: number; value: number; yoy_change?: number };
 }
 export interface SustainabilityKpi extends StdSeriesKpi {
   debt: { france: RawPoint[] };
+  debt_holders?: { france: { non_residents: RawPoint[]; central_bank: RawPoint[]; other_residents: RawPoint[] } };
   peers?: { deficit?: Record<string, RawPoint[]>; debt?: Record<string, RawPoint[]> } & Record<string, never>;
+}
+export interface PensionsKpi extends StdSeriesKpi {
+  pct_gdp: { france: RawPoint[]; peers?: Record<string, RawPoint[]> };
+}
+export interface SubsectorSeries { pct_gdp: RawPoint[]; eur_bn: RawPoint[] }
+export interface DeficitSubsectorKpi extends StdSeriesKpi {
+  subsectors: { central: SubsectorSeries; local: SubsectorSeries; social_security: SubsectorSeries; total: SubsectorSeries };
 }
 export interface OutcomesKpi {
   kpi_id: string; kpi_name: string; description: string; unit: string;
@@ -45,7 +53,7 @@ export type Unit = "percent" | "eur_bn" | "years" | "eur" | "ratio" | "mixed";
 export type XKind = "year" | "month";
 export interface ViewPoint { x: number | string; y: number; projection?: boolean }
 export interface ViewSeries { id: string; label: string; role: "france" | "oecd" | "peer" | "secondary"; points: ViewPoint[] }
-export interface SecondaryBlock { title: string; unit: Unit; series: ViewSeries[]; comparison?: ViewSeries; peers?: ViewSeries[] }
+export interface SecondaryBlock { title: string; unit: Unit; series: ViewSeries[]; comparison?: ViewSeries; peers?: ViewSeries[]; note?: string }
 export interface LatestStat { year: number | string; value: number; unit: Unit; yoy?: number }
 export interface KpiView {
   slug: string;            // route slug, e.g. "overhead_rate"
@@ -56,11 +64,11 @@ export interface KpiView {
   polarity: Polarity;      // whether a rise is good/bad/neutral (drives YoY color)
   xKind: XKind;
   series: ViewSeries[];        // primary chart series (france first)
-  comparison?: ViewSeries;     // OECD average (undefined when unavailable)
+  comparison?: ViewSeries;     // an average (6-country mean, EU27 or OECD — label says which); undefined when unavailable
   peers?: ViewSeries[];        // individual peer countries (role "peer"), fixed order
   secondary?: SecondaryBlock;  // e.g. debt (sustainability), life expectancy (outcomes)
+  panels?: SecondaryBlock[];   // further detail charts below the secondary one (e.g. debt holders)
   latest?: LatestStat;
-  hasBreak2020: boolean;       // true if any france point switches source around 2020
   source: string;              // from JSON (empty for monthly)
   methodology: string;         // from JSON (empty for monthly)
 }

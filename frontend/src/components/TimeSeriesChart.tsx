@@ -8,9 +8,12 @@ import { fmtValue, fmtAxis } from "../data/format";
 const COLORS: Record<ViewSeries["role"], string> = {
   france: "#0055A4", oecd: "#8A8576", peer: "#A39E90", secondary: "#CC785C",
 };
-// Muted, mutually distinct hues for peer countries — none near France's bleu.
-const PEER_COLORS: Record<string, string> = {
+// Fixed per-series hues, none near France's bleu: muted peer countries, then the
+// lines of multi-series charts (deficit by sub-sector, debt holders).
+const SERIES_COLORS: Record<string, string> = {
   DEU: "#5F8A78", ESP: "#B8894A", ITA: "#A06A5E", NLD: "#C08A9A", GBR: "#8A6C93", SWE: "#7D8A45",
+  local: "#CC785C", social_security: "#5F8A78", total: "#4A4740",
+  central_bank: "#CC785C", other_residents: "#8A6C93",
 };
 
 function merge(seriesList: ViewSeries[]): Record<string, number | string>[] {
@@ -58,21 +61,13 @@ export function TimeSeriesChart({ view }: { view: KpiView }) {
           <Legend />
           {active.map((s) => (
             <Line key={s.id} type="monotone" dataKey={s.id} name={s.label}
-              stroke={s.role === "peer" ? PEER_COLORS[s.id] ?? COLORS.peer : COLORS[s.role]}
+              stroke={SERIES_COLORS[s.id] ?? COLORS[s.role]}
               strokeWidth={s.role === "france" ? 2.5 : s.role === "peer" ? 1.25 : 1.75}
               strokeDasharray={s.role === "oecd" ? "6 4" : undefined}
               dot={false} isAnimationActive={false} connectNulls />
           ))}
         </LineChart>
       </ResponsiveContainer>
-      {view.hasBreak2020 && (
-        <p className="chart__note">
-          <span className="chart__note-text">
-            <strong className="chart__note-label">Rupture de série 2020.</strong>{" "}
-            Changement de base méthodologique (INSEE → OCDE).
-          </span>
-        </p>
-      )}
     </div>
   );
 }

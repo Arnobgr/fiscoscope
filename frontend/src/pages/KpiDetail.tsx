@@ -3,6 +3,7 @@ import { useKpiView } from "../data/useData";
 import { TimeSeriesChart } from "../components/TimeSeriesChart";
 import { StatCallout } from "../components/StatCallout";
 import { MethodologyDisclosure } from "../components/MethodologyDisclosure";
+import type { SecondaryBlock } from "../data/types";
 
 export function KpiDetail() {
   const { slug = "" } = useParams();
@@ -16,14 +17,15 @@ export function KpiDetail() {
       <p className="kpi-detail__explainer">{view.explainer}</p>
       <StatCallout view={view} />
       <TimeSeriesChart view={view} />
-      {view.secondary && (
-        <section className="kpi-detail__secondary">
-          <h2>{view.secondary.title}</h2>
-          <TimeSeriesChart view={{ ...view, unit: view.secondary.unit, series: view.secondary.series,
-            comparison: view.secondary.comparison, peers: view.secondary.peers,
-            secondary: undefined, hasBreak2020: false }} />
+      {[view.secondary, ...(view.panels ?? [])].filter((block): block is SecondaryBlock => !!block).map((block) => (
+        <section key={block.title} className="kpi-detail__secondary">
+          <h2>{block.title}</h2>
+          {block.note && <p className="kpi-detail__note">{block.note}</p>}
+          <TimeSeriesChart view={{ ...view, unit: block.unit, series: block.series,
+            comparison: block.comparison, peers: block.peers,
+            secondary: undefined, panels: undefined }} />
         </section>
-      )}
+      ))}
       <MethodologyDisclosure source={view.source} methodology={view.methodology} />
     </article>
   );

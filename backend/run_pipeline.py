@@ -30,23 +30,38 @@ from config import OUTPUT_DATA_DIR
 from fetchers.budget_execution import fetch_monthly_execution, fetch_plrg_execution
 from fetchers.insee_bdm import fetch_all_insee_series
 from fetchers.insee_idbank_resolver import run_idbank_resolver
+from fetchers.eurostat import (
+    fetch_eurostat_debt,
+    fetch_eurostat_expenditure,
+    fetch_eurostat_main,
+)
 from fetchers.oecd import (
-    fetch_oecd_cofog,
     fetch_oecd_debt,
     fetch_oecd_deficit,
     fetch_oecd_fiscal,
     fetch_oecd_life_expectancy,
+    fetch_oecd_public_employment,
+    fetch_oecd_tax_revenue,
 )
 from fetchers.france_travail import fetch_france_travail_allocataires
 from fetchers.tax_expenditure import fetch_tax_expenditure
 from fetchers.urssaf import fetch_urssaf_wage_bill
-from processors.kpi_allocation import compute_pension_investment, compute_productive_spend
+from processors.kpi_allocation import (
+    compute_pension_investment,
+    compute_pensions,
+    compute_productive_spend,
+)
 from processors.kpi_friction import compute_friction_ratio
 from processors.kpi_monthly import compute_monthly_execution
 from processors.kpi_outcomes import compute_outcomes, compute_tax_expenditure
-from processors.kpi_overhead import compute_overhead_rate
+from processors.kpi_overhead import compute_admin_overhead, compute_overhead_rate
 from processors.kpi_debt_service import compute_debt_service
-from processors.kpi_sustainability import compute_fiscal_sustainability
+from processors.kpi_public_employment import compute_public_employment
+from processors.kpi_sustainability import (
+    compute_deficit_subsector,
+    compute_fiscal_sustainability,
+)
+from processors.kpi_tax_burden import compute_tax_burden
 from processors.kpi_wage_ratio import compute_wage_ratio
 
 PIPELINE_VERSION = "1.0.0"
@@ -129,20 +144,29 @@ def run_annual(sources: dict) -> None:
     # Step 0: resolve INSEE idBanks before any INSEE fetch (see PRD §3.1.1).
     _run_step("insee_idbanks", run_idbank_resolver, sources)
     _run_step("insee_bdm", fetch_all_insee_series, sources)
-    _run_step("oecd_cofog", fetch_oecd_cofog, sources)
     _run_step("oecd_fiscal", fetch_oecd_fiscal, sources)
     _run_step("oecd_life_expectancy", fetch_oecd_life_expectancy, sources)
     _run_step("oecd_deficit", fetch_oecd_deficit, sources)
     _run_step("oecd_debt", fetch_oecd_debt, sources)
+    _run_step("oecd_tax_revenue", fetch_oecd_tax_revenue, sources)
+    _run_step("oecd_public_employment", fetch_oecd_public_employment, sources)
+    _run_step("eurostat_exp", fetch_eurostat_expenditure, sources)
+    _run_step("eurostat_main", fetch_eurostat_main, sources)
+    _run_step("eurostat_debt", fetch_eurostat_debt, sources)
     _run_step(
         "budget_plrg", fetch_plrg_execution, sources, datetime.now().year - 1
     )
     _run_step("tax_expenditure", fetch_tax_expenditure, sources)
     _run_step("kpi_overhead_rate", compute_overhead_rate, sources)
+    _run_step("kpi_admin_overhead", compute_admin_overhead, sources)
     _run_step("kpi_friction_ratio", compute_friction_ratio, sources)
     _run_step("kpi_productive_spend", compute_productive_spend, sources)
     _run_step("kpi_pension_investment", compute_pension_investment, sources)
+    _run_step("kpi_pensions", compute_pensions, sources)
     _run_step("kpi_sustainability", compute_fiscal_sustainability, sources)
+    _run_step("kpi_deficit_subsector", compute_deficit_subsector, sources)
+    _run_step("kpi_tax_burden", compute_tax_burden, sources)
+    _run_step("kpi_public_employment", compute_public_employment, sources)
     _run_step("kpi_debt_service", compute_debt_service, sources)
     _run_step("kpi_outcomes", compute_outcomes, sources)
     _run_step("kpi_tax_expenditure", compute_tax_expenditure, sources)

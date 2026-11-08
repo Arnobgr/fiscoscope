@@ -15,7 +15,7 @@ export function AppShell({ lastUpdated, children }: { lastUpdated?: string; chil
       <main>{children}</main>
       <footer className="app-footer">
         <p>
-          Sources : INSEE, OCDE (Government at a Glance), GTED (CC-BY-4.0). Données publiques.{" "}
+          Sources : INSEE, Eurostat, OCDE (Government at a Glance), GTED (CC-BY-4.0). Données publiques.{" "}
           <Link to="/methodologie">Méthodologie</Link>
         </p>
         <nav className="footer-links" aria-label="Liens de l’auteur">

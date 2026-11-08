@@ -2,7 +2,7 @@
 KPI: Spend vs. Outcome Ratios (PRD §5.9) and Tax Expenditure Cost (PRD §5.8).
 
   - Spend vs. Outcome — HEALTH ONLY for now. France health spend (COFOG GF07,
-    % of GDP, stitched INSEE+OECD) is emitted alongside life expectancy at
+    % of GDP, Eurostat gov_10a_exp) is emitted alongside life expectancy at
     birth (OECD Health Statistics) as two parallel time series — the reader
     judges whether outcomes track spending. Peer benchmarking is deferred
     (Phase 1.5), so there is no "indexed to OECD average" transform.
@@ -27,11 +27,13 @@ import pandas as pd
 from processors import (
     annual_values,
     latest_raw,
+    load_eurostat_long,
     load_insee_series,
     now_iso,
+    pick,
+    series_by_country,
     write_output,
 )
-from processors.cofog import STITCH_NOTE, function_eur_stitched
 
 log = logging.getLogger(__name__)
 
@@ -60,18 +62,9 @@ def _life_expectancy_france() -> list[dict]:
 
 def compute_outcomes() -> dict:
     """Compute the health Spend-vs-Outcome KPI and write kpi_outcomes.json."""
-    series = load_insee_series()
-    gdp = annual_values(series["gdp_nominal"])
-
-    health_spend = [
-        {
-            "year": pt["year"],
-            "value": round(pt["value"] / gdp[pt["year"]] * 100, 2),
-            "source": pt["source"],
-        }
-        for pt in function_eur_stitched("GF07", series, gdp)
-        if pt["year"] in gdp and gdp[pt["year"]]
-    ]
+    exp = load_eurostat_long("eurostat_exp")
+    gf07 = pick(exp, unit="PC_GDP", cofog99="GF07", na_item="TE")
+    health_spend = series_by_country(gf07, ["FRA"]).get("FRA", [])
     life_expectancy = _life_expectancy_france()
 
     latest = None
@@ -96,13 +89,12 @@ def compute_outcomes() -> dict:
         ),
         "unit": "mixed",
         "source": (
-            "INSEE BDM + OECD GIP 2025 (health spend, % of GDP); "
-            "OECD Health Statistics (life expectancy at birth)"
+            "Eurostat — gov_10a_exp (dépense publique de santé, % du PIB) ; "
+            "OCDE — statistiques de santé (espérance de vie à la naissance)"
         ),
         "methodology": (
-            "Bloc santé : dépense COFOG GF07 (santé) / PIB nominal × 100, "
-            "raccordée INSEE 1995–2020 + OCDE à partir de 2021 (chaque point "
-            "associé à sa source). Espérance de vie à la naissance, population "
+            "Bloc santé : dépense COFOG GF07 (santé) de l'ensemble des APU en % "
+            "du PIB, valeur publiée par Eurostat (arrondie au dixième). Espérance de vie à la naissance, population "
             "totale, issue des statistiques de santé de l'OCDE (DF_LE). "
             "L'espérance de vie dépend de l'ensemble du système de santé "
             "(public et privé) et de facteurs hors santé, et non de la seule "
@@ -110,7 +102,7 @@ def compute_outcomes() -> dict:
             "parallèle, sans en déduire un lien de causalité. "
             "L'éducation (dépense vs. PISA) est omise — PISA n'est pas "
             "disponible via l'API SDMX de l'OCDE. Comparaison entre pays "
-            "reportée. " + STITCH_NOTE
+            "reportée."
         ),
         "last_updated": now_iso(),
         "health": {

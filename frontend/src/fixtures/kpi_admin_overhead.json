@@ -1,0 +1,810 @@
+{
+  "kpi_id": "admin_overhead",
+  "kpi_name": "General Public Services Wage Share",
+  "description": "Compensation of employees in general public services (COFOG GF01: executive and legislative bodies, financial and fiscal affairs, foreign affairs, general services) as % of total public expenditure.",
+  "unit": "percent",
+  "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG et par opération)",
+  "methodology": "Rémunération des salariés (D1) de la fonction COFOG GF01 « services publics généraux », ensemble des APU (S13), rapportée à la dépense publique totale (TE, toutes fonctions) × 100, en millions d'euros courants. GF01 regroupe les organes exécutifs et législatifs, l'administration financière et fiscale, les affaires étrangères et les services généraux de l'État, des collectivités locales et de la sécurité sociale. Les enseignants, soignants, policiers et militaires relèvent d'autres fonctions (GF09, GF07, GF03, GF02) et n'y sont pas comptés. Les intérêts de la dette (aussi rangés en GF01) ne sont pas des rémunérations et n'entrent pas dans le numérateur. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction).",
+  "last_updated": "2026-11-08T17:26:50Z",
+  "france": [
+    {
+      "year": 1995,
+      "value": 4.06
+    },
+    {
+      "year": 1996,
+      "value": 4.11
+    },
+    {
+      "year": 1997,
+      "value": 3.94
+    },
+    {
+      "year": 1998,
+      "value": 4.0
+    },
+    {
+      "year": 1999,
+      "value": 4.09
+    },
+    {
+      "year": 2000,
+      "value": 4.14
+    },
+    {
+      "year": 2001,
+      "value": 4.1
+    },
+    {
+      "year": 2002,
+      "value": 3.83
+    },
+    {
+      "year": 2003,
+      "value": 3.66
+    },
+    {
+      "year": 2004,
+      "value": 3.6
+    },
+    {
+      "year": 2005,
+      "value": 3.61
+    },
+    {
+      "year": 2006,
+      "value": 3.53
+    },
+    {
+      "year": 2007,
+      "value": 3.59
+    },
+    {
+      "year": 2008,
+      "value": 3.5
+    },
+    {
+      "year": 2009,
+      "value": 3.47
+    },
+    {
+      "year": 2010,
+      "value": 3.29
+    },
+    {
+      "year": 2011,
+      "value": 3.27
+    },
+    {
+      "year": 2012,
+      "value": 3.26
+    },
+    {
+      "year": 2013,
+      "value": 3.23
+    },
+    {
+      "year": 2014,
+      "value": 3.22
+    },
+    {
+      "year": 2015,
+      "value": 3.21
+    },
+    {
+      "year": 2016,
+      "value": 3.16
+    },
+    {
+      "year": 2017,
+      "value": 3.11
+    },
+    {
+      "year": 2018,
+      "value": 3.09
+    },
+    {
+      "year": 2019,
+      "value": 3.09
+    },
+    {
+      "year": 2020,
+      "value": 2.94
+    },
+    {
+      "year": 2021,
+      "value": 2.87
+    },
+    {
+      "year": 2022,
+      "value": 2.9
+    },
+    {
+      "year": 2023,
+      "value": 2.9
+    },
+    {
+      "year": 2024,
+      "value": 2.85
+    }
+  ],
+  "peers": {
+    "DEU": [
+      {
+        "year": 1995,
+        "value": 2.8
+      },
+      {
+        "year": 1996,
+        "value": 3.11
+      },
+      {
+        "year": 1997,
+        "value": 3.13
+      },
+      {
+        "year": 1998,
+        "value": 3.08
+      },
+      {
+        "year": 1999,
+        "value": 3.05
+      },
+      {
+        "year": 2000,
+        "value": 2.92
+      },
+      {
+        "year": 2001,
+        "value": 2.92
+      },
+      {
+        "year": 2002,
+        "value": 2.93
+      },
+      {
+        "year": 2003,
+        "value": 2.95
+      },
+      {
+        "year": 2004,
+        "value": 3.01
+      },
+      {
+        "year": 2005,
+        "value": 3.0
+      },
+      {
+        "year": 2006,
+        "value": 3.03
+      },
+      {
+        "year": 2007,
+        "value": 3.1
+      },
+      {
+        "year": 2008,
+        "value": 3.2
+      },
+      {
+        "year": 2009,
+        "value": 3.22
+      },
+      {
+        "year": 2010,
+        "value": 3.28
+      },
+      {
+        "year": 2011,
+        "value": 3.43
+      },
+      {
+        "year": 2012,
+        "value": 3.49
+      },
+      {
+        "year": 2013,
+        "value": 3.48
+      },
+      {
+        "year": 2014,
+        "value": 3.45
+      },
+      {
+        "year": 2015,
+        "value": 3.43
+      },
+      {
+        "year": 2016,
+        "value": 3.41
+      },
+      {
+        "year": 2017,
+        "value": 3.43
+      },
+      {
+        "year": 2018,
+        "value": 3.33
+      },
+      {
+        "year": 2019,
+        "value": 3.37
+      },
+      {
+        "year": 2020,
+        "value": 3.23
+      },
+      {
+        "year": 2021,
+        "value": 3.19
+      },
+      {
+        "year": 2022,
+        "value": 3.22
+      },
+      {
+        "year": 2023,
+        "value": 3.3
+      },
+      {
+        "year": 2024,
+        "value": 3.35
+      }
+    ],
+    "ITA": [
+      {
+        "year": 1995,
+        "value": 2.43
+      },
+      {
+        "year": 1996,
+        "value": 2.68
+      },
+      {
+        "year": 1997,
+        "value": 2.87
+      },
+      {
+        "year": 1998,
+        "value": 2.75
+      },
+      {
+        "year": 1999,
+        "value": 2.91
+      },
+      {
+        "year": 2000,
+        "value": 2.92
+      },
+      {
+        "year": 2001,
+        "value": 3.01
+      },
+      {
+        "year": 2002,
+        "value": 3.13
+      },
+      {
+        "year": 2003,
+        "value": 3.26
+      },
+      {
+        "year": 2004,
+        "value": 3.33
+      },
+      {
+        "year": 2005,
+        "value": 3.28
+      },
+      {
+        "year": 2006,
+        "value": 3.37
+      },
+      {
+        "year": 2007,
+        "value": 3.34
+      },
+      {
+        "year": 2008,
+        "value": 3.42
+      },
+      {
+        "year": 2009,
+        "value": 3.27
+      },
+      {
+        "year": 2010,
+        "value": 3.26
+      },
+      {
+        "year": 2011,
+        "value": 3.22
+      },
+      {
+        "year": 2012,
+        "value": 3.1
+      },
+      {
+        "year": 2013,
+        "value": 3.06
+      },
+      {
+        "year": 2014,
+        "value": 2.97
+      },
+      {
+        "year": 2015,
+        "value": 2.86
+      },
+      {
+        "year": 2016,
+        "value": 2.89
+      },
+      {
+        "year": 2017,
+        "value": 2.85
+      },
+      {
+        "year": 2018,
+        "value": 2.89
+      },
+      {
+        "year": 2019,
+        "value": 2.85
+      },
+      {
+        "year": 2020,
+        "value": 2.58
+      },
+      {
+        "year": 2021,
+        "value": 2.43
+      },
+      {
+        "year": 2022,
+        "value": 2.31
+      },
+      {
+        "year": 2023,
+        "value": 2.27
+      },
+      {
+        "year": 2024,
+        "value": 2.46
+      }
+    ],
+    "ESP": [
+      {
+        "year": 1995,
+        "value": 2.45
+      },
+      {
+        "year": 1996,
+        "value": 2.53
+      },
+      {
+        "year": 1997,
+        "value": 2.56
+      },
+      {
+        "year": 1998,
+        "value": 2.62
+      },
+      {
+        "year": 1999,
+        "value": 2.69
+      },
+      {
+        "year": 2000,
+        "value": 2.64
+      },
+      {
+        "year": 2001,
+        "value": 2.72
+      },
+      {
+        "year": 2002,
+        "value": 2.68
+      },
+      {
+        "year": 2003,
+        "value": 2.74
+      },
+      {
+        "year": 2004,
+        "value": 2.69
+      },
+      {
+        "year": 2005,
+        "value": 2.69
+      },
+      {
+        "year": 2006,
+        "value": 2.74
+      },
+      {
+        "year": 2007,
+        "value": 2.74
+      },
+      {
+        "year": 2008,
+        "value": 2.81
+      },
+      {
+        "year": 2009,
+        "value": 2.82
+      },
+      {
+        "year": 2010,
+        "value": 2.82
+      },
+      {
+        "year": 2011,
+        "value": 2.76
+      },
+      {
+        "year": 2012,
+        "value": 2.48
+      },
+      {
+        "year": 2013,
+        "value": 2.69
+      },
+      {
+        "year": 2014,
+        "value": 2.75
+      },
+      {
+        "year": 2015,
+        "value": 2.74
+      },
+      {
+        "year": 2016,
+        "value": 2.72
+      },
+      {
+        "year": 2017,
+        "value": 2.72
+      },
+      {
+        "year": 2018,
+        "value": 2.66
+      },
+      {
+        "year": 2019,
+        "value": 2.67
+      },
+      {
+        "year": 2020,
+        "value": 2.55
+      },
+      {
+        "year": 2021,
+        "value": 2.5
+      },
+      {
+        "year": 2022,
+        "value": 2.53
+      },
+      {
+        "year": 2023,
+        "value": 2.52
+      },
+      {
+        "year": 2024,
+        "value": 2.47
+      }
+    ],
+    "NLD": [
+      {
+        "year": 1995,
+        "value": 2.01
+      },
+      {
+        "year": 1996,
+        "value": 2.14
+      },
+      {
+        "year": 1997,
+        "value": 2.17
+      },
+      {
+        "year": 1998,
+        "value": 2.06
+      },
+      {
+        "year": 1999,
+        "value": 2.06
+      },
+      {
+        "year": 2000,
+        "value": 2.17
+      },
+      {
+        "year": 2001,
+        "value": 2.11
+      },
+      {
+        "year": 2002,
+        "value": 2.18
+      },
+      {
+        "year": 2003,
+        "value": 2.17
+      },
+      {
+        "year": 2004,
+        "value": 2.14
+      },
+      {
+        "year": 2005,
+        "value": 2.15
+      },
+      {
+        "year": 2006,
+        "value": 2.02
+      },
+      {
+        "year": 2007,
+        "value": 1.97
+      },
+      {
+        "year": 2008,
+        "value": 1.85
+      },
+      {
+        "year": 2009,
+        "value": 1.85
+      },
+      {
+        "year": 2010,
+        "value": 1.9
+      },
+      {
+        "year": 2011,
+        "value": 1.9
+      },
+      {
+        "year": 2012,
+        "value": 1.87
+      },
+      {
+        "year": 2013,
+        "value": 1.96
+      },
+      {
+        "year": 2014,
+        "value": 2.03
+      },
+      {
+        "year": 2015,
+        "value": 1.91
+      },
+      {
+        "year": 2016,
+        "value": 2.01
+      },
+      {
+        "year": 2017,
+        "value": 1.99
+      },
+      {
+        "year": 2018,
+        "value": 1.95
+      },
+      {
+        "year": 2019,
+        "value": 2.0
+      },
+      {
+        "year": 2020,
+        "value": 1.88
+      },
+      {
+        "year": 2021,
+        "value": 1.84
+      },
+      {
+        "year": 2022,
+        "value": 1.87
+      },
+      {
+        "year": 2023,
+        "value": 1.88
+      },
+      {
+        "year": 2024,
+        "value": 1.93
+      }
+    ],
+    "SWE": [
+      {
+        "year": 1995,
+        "value": 1.21
+      },
+      {
+        "year": 1996,
+        "value": 1.32
+      },
+      {
+        "year": 1997,
+        "value": 1.34
+      },
+      {
+        "year": 1998,
+        "value": 1.27
+      },
+      {
+        "year": 1999,
+        "value": 1.32
+      },
+      {
+        "year": 2000,
+        "value": 1.54
+      },
+      {
+        "year": 2001,
+        "value": 1.56
+      },
+      {
+        "year": 2002,
+        "value": 1.57
+      },
+      {
+        "year": 2003,
+        "value": 1.63
+      },
+      {
+        "year": 2004,
+        "value": 1.63
+      },
+      {
+        "year": 2005,
+        "value": 1.6
+      },
+      {
+        "year": 2006,
+        "value": 1.63
+      },
+      {
+        "year": 2007,
+        "value": 1.72
+      },
+      {
+        "year": 2008,
+        "value": 1.76
+      },
+      {
+        "year": 2009,
+        "value": 1.81
+      },
+      {
+        "year": 2010,
+        "value": 1.8
+      },
+      {
+        "year": 2011,
+        "value": 1.86
+      },
+      {
+        "year": 2012,
+        "value": 1.93
+      },
+      {
+        "year": 2013,
+        "value": 1.98
+      },
+      {
+        "year": 2014,
+        "value": 1.99
+      },
+      {
+        "year": 2015,
+        "value": 1.96
+      },
+      {
+        "year": 2016,
+        "value": 1.94
+      },
+      {
+        "year": 2017,
+        "value": 1.95
+      },
+      {
+        "year": 2018,
+        "value": 1.95
+      },
+      {
+        "year": 2019,
+        "value": 1.97
+      },
+      {
+        "year": 2020,
+        "value": 1.87
+      },
+      {
+        "year": 2021,
+        "value": 1.91
+      },
+      {
+        "year": 2022,
+        "value": 1.91
+      },
+      {
+        "year": 2023,
+        "value": 1.87
+      },
+      {
+        "year": 2024,
+        "value": 1.91
+      }
+    ],
+    "EU27_AVG": [
+      {
+        "year": 2010,
+        "value": 3.09
+      },
+      {
+        "year": 2011,
+        "value": 3.1
+      },
+      {
+        "year": 2012,
+        "value": 3.08
+      },
+      {
+        "year": 2013,
+        "value": 3.08
+      },
+      {
+        "year": 2014,
+        "value": 3.07
+      },
+      {
+        "year": 2015,
+        "value": 3.04
+      },
+      {
+        "year": 2016,
+        "value": 3.05
+      },
+      {
+        "year": 2017,
+        "value": 3.05
+      },
+      {
+        "year": 2018,
+        "value": 3.02
+      },
+      {
+        "year": 2019,
+        "value": 3.02
+      },
+      {
+        "year": 2020,
+        "value": 2.85
+      },
+      {
+        "year": 2021,
+        "value": 2.8
+      },
+      {
+        "year": 2022,
+        "value": 2.79
+      },
+      {
+        "year": 2023,
+        "value": 2.8
+      },
+      {
+        "year": 2024,
+        "value": 2.85
+      }
+    ]
+  },
+  "latest": {
+    "year": 2024,
+    "value": 2.85,
+    "yoy_change": -0.05
+  }
+}

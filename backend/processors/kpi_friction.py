@@ -1,59 +1,43 @@
 """
 KPI: Friction Ratio — see PRD §5.3.
 
-The administrative COFOG bucket (GF01 general public services + GF02 defence
-+ GF03 public order) is treated as friction; debt interest sits inside GF01
-and is therefore not added separately.
+The core support and sovereign COFOG functions (GF01 general public services
++ GF02 defence + GF03 public order) relative to total government revenue;
+debt interest sits inside GF01 and is therefore not added separately.
 
-No direct tax-revenue series is resolved in the INSEE idBanks, so total
-government revenue is derived as total APU expenditure + fiscal balance
-(B9_S13) and used as the denominator — an approximation, per PRD §5.3.
-France-only; the PRD names no peer source.
-
-COFOG inputs are stitched INSEE 1995–2020 + OECD 2021+ (see processors/cofog.py).
-For OECD years, revenue is approximated as the sum of GF01..GF10 (total
-expenditure) + INSEE's fiscal_balance, since OECD's fiscal raw does not
-expose B9 in the current cache.
+Eurostat gov_10a_exp (COFOG) and gov_10a_main (TR, total revenue) for France
+and peers alike. Until roadmap 1.9 the France series used the INSEE+OECD
+COFOG stitch with revenue approximated as expenditure + balance, and peers
+were removed because their denominator (expenditure) differed; Eurostat
+publishes the same revenue aggregate for every country, so peers are back.
 """
 
 import logging
 
 from processors import (
-    annual_values,
+    EU27_AVG_KEY,
+    EUROSTAT_PEER_NOTE,
+    EUROSTAT_PEERS,
     build_latest,
-    load_insee_series,
+    france_and_peers,
+    load_eurostat_long,
     now_iso,
+    pick,
+    ratio,
     write_output,
 )
-from processors.cofog import STITCH_NOTE, bucket_cofog
+from processors.kpi_allocation import cofog_sum
 
 log = logging.getLogger(__name__)
 
 
 def compute_friction_ratio() -> dict:
     """Compute the Friction Ratio and write kpi_friction_ratio.json."""
-    series = load_insee_series()
-    gdp = annual_values(series["gdp_nominal"])
-    buckets = bucket_cofog(series, gdp)
-    balance = annual_values(series["fiscal_balance"])
-
-    france = []
-    for row in buckets.itertuples():
-        year = int(row.year)
-        if year not in balance:
-            continue
-        # Total expenditure: COFOG sum (matches INSEE OTE for 1995–2020,
-        # and is the OECD-side total for post-2020).
-        revenue = row.total + balance[year]
-        if not revenue:
-            continue
-        france.append(
-            {
-                "year": year,
-                "value": round(row.administrative / revenue * 100, 2),
-                "source": row.source,
-            }
-        )
+    exp = load_eurostat_long("eurostat_exp")
+    main = load_eurostat_long("eurostat_main")
+    core = cofog_sum(exp[exp["unit"] == "MIO_EUR"], ["GF01", "GF02", "GF03"])
+    revenue = pick(main, unit="MIO_EUR", sector="S13", na_item="TR")
+    france, peers = france_and_peers(ratio(core, revenue), [*EUROSTAT_PEERS, EU27_AVG_KEY])
 
     payload = {
         "kpi_id": "friction_ratio",
@@ -65,22 +49,21 @@ def compute_friction_ratio() -> dict:
             "service delivery and transfers. Not a measure of waste."
         ),
         "unit": "percent",
-        "source": "INSEE BDM (1995–2020) + OECD GIP 2025 (2021+)",
+        "source": (
+            "Eurostat — gov_10a_exp (dépenses par fonction COFOG) et gov_10a_main "
+            "(recettes totales des APU)"
+        ),
         "methodology": (
             "Le bloc COFOG « fonctions support et régaliennes de base » (GF01 "
             "services publics généraux + GF02 défense + GF03 ordre et sécurité "
-            "publics) rapporté aux recettes publiques. Les intérêts de la dette "
-            "sont compris dans GF01 et ne sont pas ajoutés séparément. Le "
-            "dénominateur est le total des recettes publiques, calculé comme la "
-            "dépense COFOG totale + le solde public (B9_S13, INSEE), faute de "
-            "série directe de recettes fiscales — il s'agit d'une approximation "
-            "(voir PRD §5.3). Indicateur France uniquement : aucune comparaison "
-            "internationale n'est affichée, le périmètre du dénominateur "
-            "(recettes) n'étant pas comparable d'un pays à l'autre. " + STITCH_NOTE
+            "publics) rapporté aux recettes publiques totales (TR), ensemble des "
+            "APU, en millions d'euros courants. Les intérêts de la dette sont "
+            "compris dans GF01 et ne sont pas ajoutés séparément. "
+            + EUROSTAT_PEER_NOTE
         ),
         "last_updated": now_iso(),
         "france": france,
-        "peers": {},
+        "peers": peers,
         "latest": build_latest(france),
     }
     write_output("kpi_friction_ratio.json", payload)

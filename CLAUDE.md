@@ -65,7 +65,8 @@ efficiency of the French public administration using publicly available fiscal d
 ## Current status
 
 Backend is **feature-complete**: all 8 PRD KPIs (§5.2–5.9) plus 2 extra (wage
-ratio, debt service) compute `status: ok`; `budget_plrg` is the only by-design
+ratio, debt service) compute `status: ok`, and roadmap Phase 1 (Eurostat/OECD
+foundation, 2026-11-08) added 5 more — see `docs/roadmap.md`; `budget_plrg` is the only by-design
 `skipped` step. Output is served by `backend/api.py` (FastAPI; the old R2 upload
 was retired in Session E).
 
@@ -107,15 +108,17 @@ french-efficiency-dashboard/
 │   │   ├── insee_bdm.py               # INSEE BDM SDMX API
 │   │   ├── budget_execution.py        # data.economie.gouv.fr monthly execution
 │   │   ├── oecd.py                    # OECD Data Explorer SDMX API
+│   │   ├── eurostat.py                # Eurostat JSON-stat API (COFOG, sub-sectors, debt holders)
 │   │   ├── urssaf.py                  # open.urssaf.fr private wage bill
 │   │   └── france_travail.py          # data.gouv.fr France Travail unemployment
 │   ├── processors/
-│   │   ├── cofog.py                   # COFOG bucketing (productive/redis./admin.)
-│   │   ├── kpi_overhead.py            # Administrative Overhead Rate
+│   │   ├── kpi_overhead.py            # Public wage bill share + general public services wage share
 │   │   ├── kpi_friction.py            # Friction Ratio
-│   │   ├── kpi_allocation.py          # Productive Spend Ratio + Social Protection/Investment
+│   │   ├── kpi_allocation.py          # Econ. affairs/env./housing share, Social Protection/Investment, old age
 │   │   ├── kpi_outcomes.py            # Spend vs. Outcome + Tax Expenditure
-│   │   ├── kpi_sustainability.py      # Fiscal Deficit Trend
+│   │   ├── kpi_sustainability.py      # Fiscal Deficit Trend (+ debt holders) + deficit by sub-sector
+│   │   ├── kpi_tax_burden.py          # Tax-to-GDP (OECD Revenue Statistics)
+│   │   ├── kpi_public_employment.py   # Public employment share (OECD GaaG)
 │   │   └── kpi_monthly.py             # Monthly Budget Execution
 │   ├── api.py                         # FastAPI read-only server for data/output/*.json
 │   ├── data/

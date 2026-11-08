@@ -2,7 +2,7 @@ import type { KpiView, Unit } from "./types";
 import type { Polarity } from "./format";
 import {
   type AdaptBase, adaptStandard, adaptSustainability, adaptOutcomes,
-  adaptTaxExpenditure, adaptMonthly,
+  adaptTaxExpenditure, adaptMonthly, adaptPensions, adaptDeficitSubsector,
 } from "./adapters";
 
 export type ThemeId = "efficacite" | "soutenabilite" | "depenses";
@@ -24,6 +24,8 @@ const e = (slug: string, theme: ThemeId, unit: Unit, polarity: Polarity, title: 
 export const REGISTRY: Entry[] = [
   e("overhead_rate", "efficacite", "percent", "neutral", "Part de la masse salariale publique",
     "Rémunération de l’ensemble des agents publics (État, collectivités locales, hôpitaux, sécurité sociale) rapportée à la dépense publique totale. Ce n’est pas un coût administratif : la masse salariale publique comprend les enseignants, les soignants, les policiers et les militaires. En 2024, l’éducation en représente 28,7 %, la santé 19,3 % et les services généraux des administrations seulement 13,1 % (Eurostat).", adaptStandard),
+  e("admin_overhead", "efficacite", "percent", "neutral", "Masse salariale des services généraux",
+    "Rémunération des agents des services publics généraux — exécutif et assemblées, administration financière et fiscale, affaires étrangères, services généraux de l’État, des collectivités locales et de la sécurité sociale — rapportée à la dépense publique totale. C’est la mesure la plus proche d’un coût administratif dans la nomenclature internationale COFOG : les enseignants, soignants, policiers et militaires n’y sont pas comptés. Elle ne couvre ni les dépenses de fonctionnement hors salaires, ni le personnel administratif rattaché aux autres fonctions (gestion des hôpitaux, des établissements scolaires…).", adaptStandard),
   e("friction_ratio", "efficacite", "percent", "higher_bad", "Ratio de friction",
     "Poids des fonctions support et régaliennes de base (services publics généraux, défense, ordre et sécurité publics) rapporté aux recettes : la part des recettes absorbée par le socle de fonctionnement de l’État.", adaptStandard),
   e("productive_spend", "depenses", "percent", "neutral", "Affaires économiques, environnement et logement",
@@ -32,10 +34,14 @@ export const REGISTRY: Entry[] = [
     "Masse salariale publique rapportée à la masse salariale privée : mesure le poids relatif de l’emploi public dans la rémunération du pays.", adaptStandard),
   e("sustainability", "soutenabilite", "percent", "higher_good", "Déficit public & dette",
     "Solde public (déficit ou excédent) en % du PIB, accompagné de la dette publique au sens de Maastricht. Indique si les finances publiques sont soutenables dans la durée.", adaptSustainability),
+  e("deficit_subsector", "soutenabilite", "percent", "higher_good", "Déficit : État, collectivités, Sécurité sociale",
+    "Solde (déficit ou excédent) de chacune des trois composantes des administrations publiques, en % du PIB : l’État et les organismes centraux, les collectivités locales, les administrations de sécurité sociale (régimes de base et complémentaires, assurance chômage, hôpitaux). Le chiffre mis en avant est celui de l’État. Chaque solde s’entend après les transferts entre administrations : l’État finance une partie des ressources des collectivités et de la Sécurité sociale. Les collectivités ne peuvent emprunter que pour investir.", adaptDeficitSubsector),
   e("debt_service", "soutenabilite", "percent", "higher_bad", "Charge de la dette",
     "Intérêts de la dette publique rapportés aux recettes : la part des recettes absorbée par le seul service de la dette, avant toute dépense.", adaptStandard),
   e("pension_investment", "soutenabilite", "ratio", "higher_bad", "Protection sociale vs investissement",
     "Dépenses de protection sociale (retraites, chômage, famille, maladie, etc.) rapportées à l’investissement public : combien de fois l’État dépense en transferts sociaux ce qu’il investit pour l’avenir.", adaptStandard),
+  e("pensions", "depenses", "percent", "neutral", "Dépenses de vieillesse (retraites)",
+    "Dépenses publiques consacrées à la vieillesse — pensions de retraite, y compris celles des fonctionnaires, et aides à l’autonomie des personnes âgées — en part de la dépense publique totale, puis en % du PIB. Les pensions de réversion (fonction « survivants ») n’y sont pas comprises. Le niveau dépend aussi de la démographie : la part des personnes âgées dans la population diffère d’un pays à l’autre.", adaptPensions),
   e("outcomes", "depenses", "mixed", "neutral", "Dépenses de santé vs espérance de vie",
     "Dépenses publiques de santé (% du PIB) et espérance de vie à la naissance, présentées comme deux séries parallèles. L’espérance de vie dépend de l’ensemble du système de santé et de facteurs hors santé : à chacun d’apprécier comment les résultats accompagnent la dépense.", adaptOutcomes),
   e("tax_expenditure", "depenses", "eur_bn", "higher_bad", "Dépenses fiscales (niches)",

@@ -1,12 +1,19 @@
 import type {
   KpiView, ViewSeries, Unit, RawPoint, StdSeriesKpi, SustainabilityKpi,
-  OutcomesKpi, TaxExpenditureKpi, MonthlyKpi,
+  OutcomesKpi, TaxExpenditureKpi, MonthlyKpi, PensionsKpi, DeficitSubsectorKpi,
 } from "./types";
 import type { Polarity } from "./format";
 
 export interface AdaptBase { slug: string; title: string; explainer: string; unit: Unit; polarity: Polarity }
 
-const OECD = "OECD_AVG";
+// Averages a payload may carry, with their on-screen labels. OECD_AVG is the
+// unweighted mean of the 6 peers (never an OECD average); EU27_AVG, OECD_REP
+// (Revenue Statistics) and OECD (Government at a Glance) are aggregates
+// published by Eurostat / the OECD.
+export const AVERAGES: [string, string][] = [
+  ["OECD_AVG", "Moyenne des 6 pays"], ["EU27_AVG", "Moyenne UE à 27"],
+  ["OECD_REP", "Moyenne OCDE"], ["OECD", "Moyenne OCDE"],
+];
 const PEERS: [string, string][] = [
   ["DEU", "Allemagne"], ["ESP", "Espagne"], ["ITA", "Italie"],
   ["NLD", "Pays-Bas"], ["GBR", "Royaume-Uni"], ["SWE", "Suède"],
@@ -15,17 +22,14 @@ const PEERS: [string, string][] = [
 function yearPoints(rows: RawPoint[]): { x: number; y: number }[] {
   return rows.map((r) => ({ x: r.year, y: r.value }));
 }
-function detectBreak(rows: RawPoint[]): boolean {
-  const sources = new Set(rows.filter((r) => r.source).map((r) => r.source));
-  return sources.size > 1;
-}
 function franceSeries(rows: RawPoint[]): ViewSeries {
   return { id: "france", label: "France", role: "france", points: yearPoints(rows) };
 }
-function oecdSeries(peers?: Record<string, RawPoint[]>): ViewSeries | undefined {
-  const rows = peers?.[OECD];
-  if (!rows || rows.length === 0) return undefined;
-  return { id: "oecd", label: "Moyenne des 6 pays", role: "oecd", points: yearPoints(rows) };
+function averageSeries(peers?: Record<string, RawPoint[]>): ViewSeries | undefined {
+  const hit = AVERAGES.find(([key]) => peers?.[key]?.length);
+  if (!hit) return undefined;
+  const [key, label] = hit;
+  return { id: key, label, role: "oecd", points: yearPoints(peers![key]) };
 }
 function peerSeries(peers?: Record<string, RawPoint[]>): ViewSeries[] {
   return PEERS.filter(([iso]) => peers?.[iso]?.length)
@@ -49,10 +53,9 @@ export function adaptStandard(raw: StdSeriesKpi, b: AdaptBase): KpiView {
     slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
     unit: b.unit, xKind: "year",
     series: [franceSeries(raw.france)],
-    comparison: oecdSeries(raw.peers),
+    comparison: averageSeries(raw.peers),
     peers: peerSeries(raw.peers),
     latest: latestFrom(raw.france, b.unit, raw.latest),
-    hasBreak2020: detectBreak(raw.france),
     ...meta(raw),
   };
 }
@@ -64,16 +67,54 @@ export function adaptSustainability(raw: SustainabilityKpi, b: AdaptBase): KpiVi
     slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
     unit: "percent", xKind: "year",
     series: [franceSeries(raw.france)],
-    comparison: oecdSeries(deficitPeers),
+    comparison: averageSeries(deficitPeers),
     peers: peerSeries(deficitPeers),
     secondary: {
       title: "Dette publique (Maastricht, % du PIB)", unit: "percent",
       series: [franceSeries(raw.debt.france)],
-      comparison: oecdSeries(debtPeers),
+      comparison: averageSeries(debtPeers),
       peers: peerSeries(debtPeers),
     },
+    panels: raw.debt_holders ? [{
+      title: "Qui détient la dette ? (% du PIB)", unit: "percent",
+      note: "Ventilation publiée par Eurostat depuis 2020. « Autres résidents » : banques, assurances, fonds, ménages…",
+      series: [
+        { id: "non_residents", label: "Non-résidents", role: "france", points: yearPoints(raw.debt_holders.france.non_residents) },
+        { id: "central_bank", label: "Banque de France", role: "secondary", points: yearPoints(raw.debt_holders.france.central_bank) },
+        { id: "other_residents", label: "Autres résidents", role: "secondary", points: yearPoints(raw.debt_holders.france.other_residents) },
+      ],
+    }] : undefined,
     latest: latestFrom(raw.france, "percent", raw.latest),
-    hasBreak2020: false,
+    ...meta(raw),
+  };
+}
+
+export function adaptPensions(raw: PensionsKpi, b: AdaptBase): KpiView {
+  return {
+    ...adaptStandard(raw, b),
+    secondary: {
+      title: "Dépenses de vieillesse (% du PIB)", unit: "percent",
+      series: [franceSeries(raw.pct_gdp.france)],
+      comparison: averageSeries(raw.pct_gdp.peers),
+      peers: peerSeries(raw.pct_gdp.peers),
+    },
+  };
+}
+
+const SUBSECTORS: [keyof DeficitSubsectorKpi["subsectors"], string][] = [
+  ["central", "État et organismes centraux"], ["local", "Collectivités locales"],
+  ["social_security", "Sécurité sociale"], ["total", "Ensemble des administrations"],
+];
+export function adaptDeficitSubsector(raw: DeficitSubsectorKpi, b: AdaptBase): KpiView {
+  const lines = (field: "pct_gdp" | "eur_bn"): ViewSeries[] => SUBSECTORS.map(([key, label], i) => ({
+    id: key, label, role: i === 0 ? "france" : "secondary", points: yearPoints(raw.subsectors[key][field]),
+  }));
+  return {
+    slug: b.slug, apiId: `kpi_${b.slug}`, title: b.title, explainer: b.explainer, polarity: b.polarity,
+    unit: "percent", xKind: "year",
+    series: lines("pct_gdp"),
+    secondary: { title: "En milliards d’euros courants", unit: "eur_bn", series: lines("eur_bn") },
+    latest: latestFrom(raw.france, "percent", raw.latest),
     ...meta(raw),
   };
 }
@@ -90,7 +131,6 @@ export function adaptOutcomes(raw: OutcomesKpi, b: AdaptBase): KpiView {
       series: [{ id: "life_exp", label: "Espérance de vie", role: "secondary", points: yearPoints(life) }],
     },
     latest: latestFrom(spend, "percent"),
-    hasBreak2020: detectBreak(spend),
     ...meta(raw),
   };
 }
@@ -108,7 +148,6 @@ export function adaptTaxExpenditure(raw: TaxExpenditureKpi, b: AdaptBase): KpiVi
       ? { year: last.year, value: last.total_cost_eur_bn, unit: "eur_bn",
           yoy: last.yoy_change_pct ?? (prev ? ((last.total_cost_eur_bn - prev.total_cost_eur_bn) / prev.total_cost_eur_bn) * 100 : undefined) }
       : undefined,
-    hasBreak2020: false,
     ...meta(raw),
   };
 }
@@ -126,7 +165,6 @@ export function adaptMonthly(raw: MonthlyKpi, b: AdaptBase): KpiView {
     ],
     latest: { year: raw.last_month, value: (raw.balance.cumulative as number[])[lastIdx], unit: "eur",
               yoy: raw.yoy.revenue_change_pct },
-    hasBreak2020: false,
     source: "", methodology: "",
   };
 }
