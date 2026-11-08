@@ -1,15 +1,26 @@
 # Roadmap — Fiscoscope for citizens: transparency & accountability
 
-Written 2026-10-26. This is the forward plan; `known-gaps.md` stays the reference
-for what is blocked and `runtime-discoveries.md` for why existing KPIs are built
-the way they are.
+Written 2026-10-26, last updated 2026-11-08. This is the forward plan;
+`known-gaps.md` stays the reference for what is blocked and
+`runtime-discoveries.md` for why existing KPIs are built the way they are.
 
-**Start here (new session).** Read this file top to bottom, then
-`known-gaps.md`. Pick the next unchecked item from Part 3; before writing code,
-re-run that source's query from the appendix to confirm it still answers
-(dataset IDs and columns drift — see Part 4). Part 4 has everything needed about
-repo conventions; no other context is required. Figures quoted below are as of
-2026-10-26 and will have moved.
+**Status (2026-11-08).** Phase 0 and Phase 1 are done and live (15 KPIs on
+the site). **The next item is 3.1, the State performance scorecard; its
+self-contained brief is Part 5.**
+
+**Start here (new session).**
+1. Read this file top to bottom, then `known-gaps.md`. No other context is
+   needed: Part 4 holds the repo conventions, environments and shipping steps,
+   Part 5 the brief for the next item.
+2. Take the next unchecked item from Part 3 (today: 3.1 → Part 5).
+3. Before writing code, re-run that source's queries (Part 5.8 for 3.1, the
+   appendix for the others): dataset IDs and columns drift (Part 4.1).
+4. Settle the open decisions listed in the brief with the owner before
+   building (Part 5.5 for 3.1).
+5. When done, follow "After each item" at the end of Part 3.
+
+Figures quoted in Parts 1–2 are as of 2026-10-26 unless dated otherwise; Part 5
+was re-verified on 2026-11-08.
 
 **Goal.** Give French citizens the clearest possible, independently computed view
 of how public money is raised, spent and managed — surfacing what is published
@@ -160,6 +171,10 @@ objectives, indicators, a **target** and the **result**.
   the denominator is computed the same way.
 - Example row (Justice, P166): "Nombre d'affaires traitées par magistrat",
   target 1,040, result *non renseigné* — the gaps are themselves informative.
+- **Re-verified 2026-11-08 — see Part 5.2.** Corrections to the list above:
+  `performance-de-la-depense` (no year in its id) is the **RAP 2024**; the
+  summary series still stops at 2024; the denominator question is solved
+  (Part 5.3).
 
 #### S8 — Eurostat EDP notification tables ⚠️
 Twice a year (April, October) the government reports its deficit and debt to
@@ -317,7 +332,7 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 
 | # | Item | Data | Done when |
 |---|------|------|-----------|
-| 3.1 | **Tableau de bord de la performance de l'État**: share of targets met per year since 2007 (incl. "non renseigné"); drill-down by mission → programme → indicator with target vs result; filter "objectifs manqués", "non renseignés" | S7 | Fetcher discovers yearly vintages via catalog search; per-vintage column normalisation tested; consistent denominator documented |
+| 3.1 | ▶ **NEXT — brief in Part 5.** **Tableau de bord de la performance de l'État**: share of targets met per year since 2007 (incl. "non renseigné"); drill-down by mission → programme → indicator with target vs result; filter "objectifs manqués", "non renseignés" | S7 | Fetcher discovers yearly vintages via catalog search; per-vintage column normalisation tested; consistent denominator documented |
 | 3.2 | **Prévisions vs réalité**: for each year, the deficit/interest/debt the government planned (April EDP notification) vs final outturn; forecast error in pp of GDP | S8 | Auto-capture new notifications; one-time archive backfill committed with URLs; parser tests on ≥ 3 vintages |
 | 3.3 | **Factual timeline bands** on long series: crises (2008, 2020), governments and finance ministers with dates — same treatment for every government | Static, sourced list (Légifrance/gouvernement.fr dates) | Bands toggleable; no colour coding by party |
 | 3.4 | Monthly execution: add same-month-last-year line and, when the LFI credits dataset exists for the year, the voted annual total | existing + S15 | Shows "à fin mars, X % des dépenses votées" when data allows |
@@ -359,16 +374,22 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 1. ~~**Phase 0** in full (one session) — protects everything else.~~ ✅ 2026-11-04
 2. ~~**1.1–1.4** — one Eurostat fetcher closes most of `known-gaps.md` and gives
    the honest overhead KPI.~~ ✅ 2026-11-08, with the rest of Phase 1.
-3. **3.1** (performance scorecard) — highest accountability value per effort;
-   data is clean and official.
+3. ▶ **NEXT — 3.1** (performance scorecard) — highest accountability value per
+   effort; data is clean and official. **Brief: Part 5.**
 4. **2.1, 2.4** — per-capita/constant euros and auto context sentences raise
    readability of every existing KPI.
 5. **Phase 4** — largest new audience (local relevance).
 6. **3.2, 5.1**, then the rest of Phases 2, 5 and 6.
 
+Phases group work by theme; this list sets the order. Phase 2 cannot be done in
+one block yet: 2.5 needs S8 (the source of 3.2) and S15 (latest vintage PLF
+2025), and 2.3 needs OpenFisca (heavy). 2.1, 2.2 and 2.4 are self-contained.
+
 After each item: tick it in this file (append "✅ YYYY-MM-DD" to its "Done
-when" cell), update `known-gaps.md` (remove closed gaps, add new ones) and
-append a session entry to `runtime-discoveries.md`.
+when" cell), update `known-gaps.md` (remove closed gaps, add new ones), append
+a session entry to `runtime-discoveries.md` (Session I, J, … — Session H was
+Phase 1), update the README's KPI table if a KPI was added, and move the
+"▶ NEXT" marker above.
 
 ---
 
@@ -412,21 +433,32 @@ recent last period. Known drift points:
   processor with `_run_step("<name>", fn, sources)` in `run_annual` or
   `run_monthly`. `_run_step` is fail-soft; raise `NotImplementedError` to mark a
   step `skipped`.
-- **Peers naming:** existing payloads key peers by ISO3 (`DEU`, `GBR`…) plus
-  `OECD_AVG`. **`OECD_AVG` is a misnomer:** it is the unweighted mean of the 6
-  peers (`peer_series` in `processors/__init__.py`), shown on screen as
-  "Moyenne des 6 pays" — never label it as an OECD average. Eurostat uses ISO2
-  (`FR`, `DE`, `EL` for Greece) and `EU27_2020`: map to ISO3 and introduce
-  `EU27_AVG` (a true aggregate). Eurostat has **no UK**, so a peer mean computed
-  from Eurostat covers 5 countries — don't store it under `OECD_AVG` or reuse
-  the "6 pays" label. Frontend today: `adapters.ts` reads `OECD_AVG` into the
-  single `KpiView.comparison` slot and the 6 countries via its `PEERS` list
-  (order + French labels); `TimeSeriesChart.tsx` colours them via
-  `PEER_COLORS`. The first KPI with a second average (EU27, `OECD_REP`) must
-  turn `comparison` into a list of averages, each with its own label.
-- **Tests:** backend `pytest` in `backend/tests/` (only `test_api.py` today —
-  add tests for new decoders/parsers with small fixture files); frontend
-  `npm test` (vitest) in `frontend/`.
+- **Shared processor helpers** (`processors/__init__.py`): INSEE
+  `load_insee_series`, `annual_values`, `year_end_value`; OECD
+  `load_oecd_long`, `peer_series`; Eurostat `load_eurostat_long`, `pick`,
+  `ratio`, `series_by_country`, `france_and_peers`, `EUROSTAT_PEER_NOTE`;
+  output `build_latest`, `write_output`, `now_iso`. Fetchers:
+  `fetchers/__init__.py` (`DEFAULT_HEADERS`, `save_raw`, `fetch_ods_records`),
+  `fetchers/eurostat.py` (`decode_jsonstat`).
+- **Peers naming (implemented, Phase 1):** peers are keyed by ISO3 (`DEU`,
+  `GBR`…) plus **at most one average key** per series:
+  `OECD_AVG` = unweighted mean of the 6 peers computed by `peer_series`, shown
+  as "Moyenne des 6 pays" — **never** label it an OECD average; `EU27_AVG` =
+  Eurostat's EU27 aggregate ("Moyenne UE à 27"); `OECD_REP` = OECD Revenue
+  Statistics average ("Moyenne OCDE"). Eurostat-based KPIs have 5 peers (no UK)
+  and must not store a 5-country mean under `OECD_AVG`. Frontend: key → label
+  in `AVERAGES` (`frontend/src/data/adapters.ts`), key → card badge in
+  `BADGES` (`components/KpiCard.tsx`) — add both for any new average.
+  `KpiView.comparison` is still a single slot; the first KPI needing two
+  averages must turn it into a list.
+- **Tests:** backend — `cd backend && .venv/bin/python -m pytest -q` (files:
+  `test_api.py`, `test_phase1.py`, `test_insee_resolver.py`; pytest/httpx come
+  from `requirements-dev.txt`). For processor tests, copy the `raw_dir` fixture
+  in `test_phase1.py` (monkeypatches `processors.RAW_DATA_DIR` /
+  `OUTPUT_DATA_DIR` to a temp dir and writes small raw files). Frontend — in
+  `frontend/`: `npm test` (vitest), `npx tsc -b`, `npm run build`,
+  `npm run lint`. **Lint has 11 pre-existing errors** (`no-explicit-any` in
+  tests and adapters, `set-state-in-effect` in `Overview.tsx`): don't add any.
 - **Dependencies:** pin exact versions in `backend/requirements.txt`.
   New ones implied by this roadmap: `duckdb` (DECP, 5.1), `pdfplumber` (EDP,
   3.2), `openfisca-france` (2.3 — heavy; consider a separate script/venv).
@@ -475,17 +507,208 @@ Filters are repeated query params (`geo=FR&geo=DE`); `sinceTimePeriod=1995`.
 3. Put a real pipeline output copy in `frontend/src/fixtures/kpi_<id>.json`
    (used in dev/tests when `VITE_API_BASE` is empty).
 4. Non-standard payload → add an adapter in `adapters.ts` and types in
-   `types.ts`. New page → route in `frontend/src/App.tsx`.
+   `types.ts`. Patterns that exist: `KpiView.series` may hold several lines
+   (the first, role `france`, drives the card value and sparkline);
+   `secondary` is a second chart; `panels` are further charts; any
+   `SecondaryBlock` may carry a `note` shown under its title. Give every line
+   id of a multi-series chart a colour in `SERIES_COLORS`
+   (`components/TimeSeriesChart.tsx`). Examples: `adaptPensions`,
+   `adaptDeficitSubsector`, `adaptSustainability` (debt-holders panel).
+5. Update the KPI counts in `src/data/registry.test.ts` and
+   `src/pages/Overview.test.tsx` (15 today).
+6. New page → route in `frontend/src/App.tsx` (routes today: `/`,
+   `/kpi/:slug`, `/methodologie`) and a link to it (header nav in
+   `components/AppShell.tsx`, or from a KPI page). There is no table component
+   yet. Any new source must be named on `pages/Methodology.tsx` and in the
+   footer line of `AppShell.tsx`.
+7. Fixtures must be real pipeline output. If an input can only be fetched on
+   the production server, copy its raw file from the server's
+   `backend/data/raw/` into the local `backend/data/raw/` and run the
+   processor locally.
 
-### 4.6 Shipping
-Production runs on the VPS: a cron/systemd timer runs `run_pipeline.py`, and
-`backend/api.py` serves `backend/data/output/*.json` read fresh per request
-(`https://fisc.159-69-91-118.sslip.io`). A new KPI is live once the backend code
-is deployed on the VPS and the pipeline (or that step) has run, **and** the
-frontend is redeployed to Cloudflare Pages (`https://fiscoscope.pages.dev`).
-New sources may need their own timer: EDP notifications land in April and
-October, the RAP around spring, OFGL local accounts mid-year — check actual
-release dates per source before scheduling.
+### 4.6 Environments and shipping
+- **Development** happens on the owner's Mac: backend venv `backend/.venv`,
+  frontend `npm` in `frontend/`. Eurostat, INSEE and
+  data.economie.gouv.fr are reachable from it; **`sdmx.oecd.org` is not**
+  (Cloudflare challenge). Do not try to get around it (spoofed user agents
+  etc. are refused as bot-check circumvention): fetch or verify OECD data on
+  the VPS.
+- **Production** is a VPS. How to reach it is deliberately not written in
+  this public repo: ask the owner (Claude Code keeps it in its private local
+  memory). The commands below run from the repo root on the server.
+- **The owner runs `git pull` on the server themselves.** Ask them, then
+  continue.
+- **Backend runs in Docker Compose** (`docker-compose.yml`): service `api`
+  (uvicorn on `127.0.0.1:8077` behind nginx → `https://fisc.159-69-91-118.sslip.io`)
+  and the one-shot service `pipeline`. The code is baked into the image, so
+  after every pull: `docker compose up -d --build api` (rebuilds the image both
+  services share). Run the pipeline with
+  `docker compose run --rm pipeline --mode annual|monthly|full`, or a single
+  step with `docker compose run --rm --entrypoint python pipeline -m processors.<module>`.
+  Data lives in `backend/data/` (mounted volume). The API reads the JSON fresh
+  per request: no restart after a pipeline run. Check step statuses in
+  `backend/data/output/meta.json`.
+- **Cron** (on the server, not in the repo): monthly `0 3 5 * *`; annual
+  `0 4 1 2,6,11 *` (1 Feb, 1 Jun, 1 Nov). Check a new source's release dates
+  against this: EDP notifications late April / late October, RAP early June
+  (performance summary series updated in July in 2025), OFGL mid-year.
+- **Git flow when the owner asks to ship:** commit on `dev` → push `dev` →
+  fast-forward `main` to `dev` → push `main` → `git checkout dev`. "Commit"
+  alone means commit only. The GitHub repo is now `Arnobgr/fiscoscope` (the
+  old URL redirects).
+- **Frontend:** Cloudflare Pages **auto-deploys `main`**
+  (`https://fiscoscope.pages.dev`, built with `VITE_API_BASE` pointing at the
+  VPS). A frontend that requests a new output file must therefore reach `main`
+  only after the VPS has produced that file, or its card shows "Données
+  momentanément indisponibles". Safe order for a new KPI: push `dev` → owner
+  pulls on the VPS → rebuild, run the step, check with
+  `curl https://fisc.159-69-91-118.sslip.io/api/kpi/<name>` → push `main`.
+
+---
+
+## Part 5 — Brief for the next item: 3.1 Tableau de bord de la performance de l'État
+
+**Status:** not started. Data re-verified 2026-11-08 (5.2–5.3); re-run the
+queries in 5.8 before coding. Roadmap row: Phase 3, item 3.1.
+
+### 5.1 Goal
+Every State budget programme publishes objectives and indicators, each with a
+**target** set by the administration and a **result**. Show, per year since
+2007, the share of indicators whose target was met, missed but improved, missed
+without improvement, or not reported — and let a citizen drill down
+mission → programme → indicator to see target vs result. Principle 2 applies:
+the State's own targets next to the State's own results, no adjectives, no
+ranking of ministries.
+
+### 5.2 Data — data.economie.gouv.fr (OpenDataSoft, Licence Ouverte v2.0)
+API base: `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets`.
+The attainment category values are identical in all detail datasets:
+`cible atteinte`, `amélioration`, `absence amélioration`,
+`donnée non renseignée`, `donnée non retenue`, and blank.
+
+| Key | Dataset id | Content (checked 2026-11-08) |
+|-----|------------|------------------------------|
+| **A** — summary | `performance-atteinte-de-la-cible-generale-du-budget-de-l-etat-depuis-2007` | 18 rows, one per RAP year 2007–2024. Fields `rap` (year as float), `cible_atteinte`, `amelioration`, `absence_amelioration`, `donnees_non_renseignees` — fractions 0–1 summing to ~1. 2024: 0.38 / 0.15 / 0.27 / 0.20. Last modified 2025-07-02: **no 2025 row yet**. |
+| **B** — detail 2022–2024 | `performance-execution-et-atteinte-de-la-cible-du-budget-de-l-etat-jusqu-au-niveau-sous-indicateur` | 6,338 rows: `annee` 2022 (2,012), 2023 (2,149), 2024 (2,177). Fields `annee`, `type_de_secteur` (Mission / Programme), `mission`, `code_programme`, `programme`, `code_externe_objectif`, `libelle_objectif`, `ordre_ind`, `code_externe_indicateur`, `libelle_indicateur`, `facteur_de_performance`, `code_interne_sous_indicateur`, `libelle_sous_indicateur`, `cotation`, `unite`, `cible`, `execution`, `atteinte_de_la_cible`, `commentaire`. |
+| **C** — detail 2025 | `performance-de-la-depense-rap-2025` | 2,140 rows (Mission 320, Programme 1,820), modified 2026-06-04. Year-stamped columns: `exec_2023`, `exec_2024`, `2025_cible`, `exec_2025`, `atteinte_de_la_cible_2025`, `2026_cible`, plus `abs*` flag columns, `contexte`, `evolution`, and two unnamed `column_30`, `column_31` (inspect before use). Indicator/objective fields as in B, but `ordre_ssi` instead of `code_interne_sous_indicateur` and no `commentaire`. |
+| D — RAP 2024 | `performance-de-la-depense` | Despite the generic id, this is the **RAP 2024** (2,177 rows; `exec_2022`, `exec_2023`, `2024_cible`, `exec_2024`, `atteinte_de_la_cible_2024`, `2025_cible`). Same 2024 rows as B: use one or the other, never both. |
+
+Not needed: `performance-execution-cible-n-1-du-budget-de-l-etat-jusqu-au-niveau-sous-indicateur`
+(results + next-year targets, publication 2025 only), `plf-2025-performance`
+(PAP: targets, no attainment), and the 2015–2019 PLF/PLR performance datasets
+(different formats).
+
+**Vintage drift:** each RAP vintage is a new dataset with an unpredictable id
+(`performance-de-la-depense` = 2024, `performance-de-la-depense-rap-2025`) and
+year-stamped columns. Discover vintages with the catalog search (5.8, query 1)
+and identify the year from the `atteinte_de_la_cible_YYYY` field name, not from
+the id.
+
+### 5.3 The denominator (solved — reuse this rule)
+Count **rows at sub-indicator level, Mission and Programme rows together**,
+exclude `donnée non retenue` and blank, and take the share of each of the four
+remaining categories. This reproduces the published summary (A) within ~1 pt:
+
+| Year | Computed (met / improved / no improvement / not reported, %) | Published in A (%) |
+|------|-------------------------------------------------------------|--------------------|
+| 2022 (B) | 38.6 / 12.2 / 27.4 / 21.8 | 39 / 12 / 26.5 / 22 |
+| 2023 (B) | 39.3 / 13.5 / 27.0 / 20.3 | 39 / 13 / 27 / 21 |
+| 2024 (B) | 37.8 / 14.6 / 27.7 / 19.9 | 38 / 15 / 27 / 20 |
+| 2025 (C) | 35.3 / 17.4 / 32.2 / 15.1 (n = 1,937) | not published yet |
+
+Programme rows alone give 38.8 / 15.4 / 27.7 / 18.1 for 2024, a worse match, so
+keep Mission rows in. Recommended headline series: A for 2007–2024, plus the
+2025 value computed from C under this rule, flagged as computed by Fiscoscope;
+prefer A's figure for a year once A publishes it. Add a test asserting the
+computed 2022–2024 shares stay within 1.5 pt of A (guards against drift).
+
+### 5.4 Deliverables
+**Backend**
+- `fetchers/performance.py`: fetch A by fixed id (`fetch_ods_records`, 18
+  rows); B and the discovered RAP vintages (C, and future ones) via
+  `/exports/json` (one request each instead of 20–60 pages of 100). Save raw
+  before processing, one source per dataset (e.g. `performance_summary`,
+  `performance_detail_2022_2024`, `performance_rap_2025`). Fail loudly if
+  discovery finds no RAP vintage.
+- `processors/kpi_performance.py`: normalise each vintage to one schema
+  (`year, sector, mission, programme_code, programme, objective, indicator_code,
+  indicator, sub_indicator, unit, target, result, status, comment`). Outputs:
+  - `kpi_performance.json` — standard payload (`france` = share of targets met
+    per year 2007–2025, `source` per point: published vs computed) plus a
+    `breakdown` block with the four shares and `n` per year;
+  - a drill-down file (e.g. `performance_detail.json`). `api.py` serves any
+    `[a-z0-9_]+` name at `/api/kpi/<name>`, so no API change is needed.
+    Measure the size: ~2,000 rows × ~14 fields per year is around 1 MB
+    uncompressed; latest year only, or one file per year, may be needed.
+- Register fetch and processor steps in `run_annual` (`run_pipeline.py`). The
+  RAP lands in early June and the summary updated in July last time, so the
+  1 June run may be early; the 1 November run will catch it.
+- Tests: per-vintage normalisation with small fixtures, the denominator rule,
+  and the 1.5-pt guard above.
+
+**Frontend**
+- Registry entry (suggested theme "Dépenses & résultats") and an adapter:
+  headline line = share of targets met; a `secondary` block with the four
+  categories as lines.
+- New drill-down page (route in `App.tsx`, link from the KPI page): mission →
+  programme → indicator rows showing target, result, unit, status and comment,
+  with filters "objectifs manqués" and "non renseignés". First table in the
+  app: make it accessible (roadmap 6.6).
+- Name the source on `Methodology.tsx`; data.economie.gouv.fr is already
+  listed there and in the footer.
+- Fixtures from real output (Part 4.5, step 7).
+
+### 5.5 Decisions to settle with the owner before building
+1. **Page shape:** KPI card plus dedicated drill-down page (recommended) or
+   card only.
+2. **Drill-down years:** latest year only, or 2022–2025 with a year selector
+   (file size trade-off).
+3. **Per-mission view:** showing each mission's four category counts is
+   useful but invites ranking ministries. Recommended: counts per mission,
+   sorted alphabetically, never ranked or coloured.
+4. **Polarity of the headline:** recommended `neutral` — the administration
+   sets and revises its own targets, so a higher share met is not
+   self-evidently better performance.
+5. **2025 value:** confirm showing the computed 2025 share next to the
+   published 2007–2024 series, flagged "calculé par Fiscoscope".
+
+### 5.6 Caveats for the explainer and methodology
+- Targets are set by the administration itself and can be revised; the
+  indicator set changes every year (~2,000 sub-indicators), so the share is
+  not a like-for-like series.
+- `donnée non renseignée` means no result was reported: show it, it is
+  information.
+- Check the official definition of `amélioration` (presumably target missed
+  but result better than the previous year) on the dataset page before
+  writing copy — not verified.
+- Check whether Mission-level indicators repeat Programme-level ones before
+  showing both in the drill-down (counting both is what reproduces A).
+
+### 5.7 Done when
+The roadmap row's criterion ("Fetcher discovers yearly vintages via catalog
+search; per-vintage column normalisation tested; consistent denominator
+documented"), plus: KPI card and drill-down page live, tests and lint clean
+(no new lint errors), docs updated per "After each item" (Part 3).
+
+### 5.8 Re-verification queries (run before coding)
+URL-encode the parameters (`curl -G --data-urlencode` does it).
+```text
+# 1. Vintage discovery: list performance datasets with modified date and row count
+GET {base}?where=search("performance")&limit=100
+    → results[].dataset_id, results[].metas.default.modified, .records_count
+
+# 2. Fields of a dataset (look for atteinte_de_la_cible_YYYY)
+GET {base}/performance-de-la-depense-rap-2025
+
+# 3. Summary series (does it have a 2025 row yet?)
+GET {base}/performance-atteinte-de-la-cible-generale-du-budget-de-l-etat-depuis-2007/records?limit=30&order_by=rap
+
+# 4. Category counts for the denominator check (repeat per year / dataset)
+GET {base}/performance-execution-et-atteinte-de-la-cible-du-budget-de-l-etat-jusqu-au-niveau-sous-indicateur/records
+    ?select=atteinte_de_la_cible as k, count(*) as n&group_by=atteinte_de_la_cible&where=annee=2024
+GET {base}/performance-de-la-depense-rap-2025/records
+    ?select=atteinte_de_la_cible_2025 as k, count(*) as n&group_by=atteinte_de_la_cible_2025
+```
 
 ---
 

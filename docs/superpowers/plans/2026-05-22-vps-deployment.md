@@ -8,7 +8,7 @@
 
 **Tech stack:** Docker + Docker Compose v2, Caddy 2, uvicorn/FastAPI (already built), sslip.io (free wildcard DNS), Let's Encrypt, ufw, cron, Cloudflare Pages (free).
 
-**Confirmed environment (checked 2026-05-22):** repo at `<repo-dir>`, a non-root deploy user, Docker at `/usr/bin/docker`, `docker compose` works without sudo (you're in the docker group). The VPS already runs *other* FastAPI services on host port **8000** (`uvicorn app.main:app` as root, `uvicorn main:app` as <other-user>) — these are NOT part of this project; this stack must not disturb them, and the API container is deliberately **not** published to the host so it won't collide with anything.
+**Confirmed environment (checked 2026-05-22):** repo at `<repo-dir>`, a non-root deploy user, Docker at `/usr/bin/docker`, `docker compose` works without sudo (the user is in the docker group). The VPS already runs *other* services on host port **8000** — these are NOT part of this project; this stack must not disturb them, and the API container is deliberately **not** published to the host so it won't collide with anything.
 
 ---
 

@@ -70,12 +70,14 @@ foundation, 2026-11-08) added 5 more — see `docs/roadmap.md`; `budget_plrg` is
 `skipped` step. Output is served by `backend/api.py` (FastAPI; the old R2 upload
 was retired in Session E).
 
-**Both tiers are LIVE in production** (this repo's Claude Code sessions run *on*
-the VPS):
-- **Backend** — the FastAPI app is deployed on the VPS and served publicly at
-  `https://fisc.159-69-91-118.sslip.io` (read-only `/api/meta`, `/api/kpi/<id>`).
-  It serves the files in `backend/data/output/`, which a **cron job** refreshes by
-  running the pipeline. Re-running the pipeline / a processor on the VPS updates
+**Both tiers are LIVE in production.** Claude Code sessions run on the owner's
+Mac, not on the VPS. How to reach the VPS is kept out of this public repo (ask
+the owner); environments, Docker commands and the shipping flow are in
+`docs/roadmap.md` Part 4.6.
+- **Backend** — the FastAPI app runs in Docker Compose on the VPS and is served
+  publicly at `https://fisc.159-69-91-118.sslip.io` (read-only `/api/meta`,
+  `/api/kpi/<id>`). It serves the files in `backend/data/output/`, which a
+  **cron job** refreshes by running the pipeline. Re-running the pipeline / a processor on the VPS updates
   the live API immediately — the app reads the JSON fresh per request, no restart.
 - **Frontend** — deployed on Cloudflare Pages at `https://fiscoscope.pages.dev`,
   built with `VITE_API_BASE=https://fisc.159-69-91-118.sslip.io`, so in production

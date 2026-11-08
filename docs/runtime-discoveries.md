@@ -757,8 +757,8 @@ section below, then commit.
       annual pipeline on 1 Feb and 1 Jun only, so Eurostat's late-October
       refresh of the government accounts (after the October EDP notification)
       waited until February. Changed `0 4 1 2,6 *` → `0 4 1 2,6,11 *` on the
-      server (previous crontab backed up there).
-      The crontab is not in the repo. README brought up to date: all 15 KPIs,
+      server (previous crontab backed up there). The crontab is not in the
+      repo. README brought up to date: all 15 KPIs,
       Eurostat and OECD sources, cron schedule, no more references to the
       retired COFOG bucketing or `cofog.py`, and the clone URL now uses the
       repo's new name (`Arnobgr/fiscoscope`).

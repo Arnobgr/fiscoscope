@@ -1,12 +1,12 @@
-# VPS Deployment Plan — adapted to existing nginx + docker (2026-05-24)
+# VPS Deployment Plan — adapted to an existing nginx + docker host (2026-05-24)
 
 > **Supersedes** `2026-05-22-vps-deployment.md` for your VPS. That original plan assumed an empty box with no reverse proxy. Your VPS already has:
-> - System **nginx** on 80/443, certbot-managed, with two vhosts (<other-project> on `159.69.91.118.sslip.io` → 127.0.0.1:8000, <other-project> on `<other-project>.159-69-91-118.sslip.io` → 127.0.0.1:8001).
-> - Docker with three running projects (<other-project>, <other-project>, <other-project>).
-> - A firewall already allowing 80/443.
+> - System **nginx** on 80/443, certbot-managed, already serving other sites.
+> - Docker, already running other projects.
+> - A firewall already allowing 80/443 (server access details are kept out of this public repo).
 > - certbot.timer running (auto-renewals).
 >
-> So: **no Caddy**, **no firewall changes**, **nginx becomes the reverse proxy** with a third vhost, and the api container binds to `127.0.0.1:8077` (since `0.0.0.0:8000` is already taken by <other-project>).
+> So: **no Caddy**, **no firewall changes**, **nginx becomes the reverse proxy** with one more vhost, and the api container binds to `127.0.0.1:8077` (port 8000 is already in use on the host).
 >
 > This is a manual operator runbook. Run each step yourself on the VPS.
 
@@ -38,14 +38,14 @@ docker --version
 docker compose version
 docker ps
 ```
-Expected: versions print and `docker ps` lists the three existing containers (<other-container>, <other-container>, <other-container>) — no permission error.
+Expected: versions print and `docker ps` lists the existing containers — no permission error.
 
 - [x] **Step 0.2: Confirm host port 8077 is free**
 
 ```bash
 sudo ss -ltnp 'sport = :8077'
 ```
-Expected: **no output**. (8077 is what the api container will bind to on localhost. `:8000` is held by <other-project>; don't reuse it.)
+Expected: **no output**. (8077 is what the api container will bind to on localhost. `:8000` is already in use; don't reuse it.)
 
 - [x] **Step 0.3: Confirm the new sslip.io hostname resolves**
 
@@ -168,7 +168,7 @@ git commit -m "deploy: docker stack (api + pipeline) for host-nginx reverse prox
 
 ## Phase 2: nginx vhost + Let's Encrypt cert
 
-This replaces the original plan's Caddy phases. Pattern matches your existing `<other-project>` vhost exactly.
+This replaces the original plan's Caddy phases. Pattern matches the server's existing vhosts.
 
 - [x] **Step 2.1: Create the HTTP-only vhost** (certbot will rewrite it to add TLS in step 2.3)
 
@@ -378,11 +378,7 @@ Expected: container comes back `running`; healthz returns ok. (nginx and the cer
 
 - [ ] **Step 6.3: Confirm nothing else broke**
 
-```bash
-curl -sI https://159.69.91.118.sslip.io | head -1                  # <other-project>
-curl -sI https://<other-project>.159-69-91-118.sslip.io | head -1   # <other-project>
-```
-Expected: both still respond (`HTTP/2 200` or whatever each app normally returns).
+Check that the server's other sites still respond as they normally do.
 
 ### Operations cheat-sheet
 
@@ -402,7 +398,7 @@ Expected: both still respond (`HTTP/2 200` or whatever each app normally returns
 |---|---|---|
 | Reverse proxy | Caddy in docker, owning 80/443 | Existing host nginx, third vhost |
 | TLS issuance | Caddy auto-ACME | `certbot --nginx` (matches your existing vhosts) |
-| Hostname | `<dashed-ip>.sslip.io` | `fisc.159-69-91-118.sslip.io` (bare form is taken by <other-project>) |
+| Hostname | `<dashed-ip>.sslip.io` | `fisc.159-69-91-118.sslip.io` (bare form already in use) |
 | api container exposure | `expose: 8000` (compose network only) | `ports: "127.0.0.1:8077:8000"` (host-loopback only) |
 | Caddyfile | yes | none |
 | `.env` `SITE_ADDRESS` | yes | dropped (nginx owns hostname routing) |
@@ -418,6 +414,3 @@ Expected: both still respond (`HTTP/2 200` or whatever each app normally returns
 - Phase 5 (Cloudflare Pages + CORS).
 - Operational patterns (logs, deploy, refresh).
 
-## Known side observations (not blocking, worth knowing)
-
-- `<other-container>` publishes on `0.0.0.0:8000` (publicly reachable, bypassing nginx + TLS — Docker's port publishing skirts UFW on Ubuntu by default). Not our problem today, but you may want to change that container's mapping to `127.0.0.1:8000:8000` eventually.
