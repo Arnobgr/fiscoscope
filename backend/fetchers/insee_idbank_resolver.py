@@ -14,8 +14,11 @@ from fetchers import DEFAULT_HEADERS
 log = logging.getLogger(__name__)
 
 METADATA_URL = "https://www.insee.fr/fr/information/2862759"
+# The page links the ZIP under varying language prefixes and file ids (2026-10:
+# /en/statistiques/fichier/2868055/202610_…), so match any of them; group 1 is
+# the YYYYMM vintage used to pick the newest.
 ZIP_FILENAME_RE = re.compile(
-    r"(/fr/statistiques/fichier/2862759/\d{6}_correspondance_idbank_dimension\.zip)"
+    r"/(?:fr|en)/statistiques/fichier/\d+/(\d{6})_correspondance_idbank_dimension\.zip"
 )
 
 # Each entry: logical_name -> list of (dimension, value) filters that must ALL match.
@@ -110,6 +113,17 @@ SERIES_SEARCH_RULES = {
 }
 
 
+def latest_mapping_zip_url(html: str) -> str:
+    """Absolute URL of the newest (by YYYYMM vintage) mapping ZIP linked from the page."""
+    matches = list(ZIP_FILENAME_RE.finditer(html))
+    if not matches:
+        raise RuntimeError(
+            f"No mapping ZIP link found on {METADATA_URL}. "
+            "INSEE may have restructured the page; inspect the HTML manually."
+        )
+    return "https://www.insee.fr" + max(matches, key=lambda m: m.group(1)).group(0)
+
+
 def download_mapping(force_refresh: bool = False) -> pd.DataFrame:
     """
     Resolve the latest mapping ZIP from INSEE's metadata page, download it,
@@ -129,13 +143,7 @@ def download_mapping(force_refresh: bool = False) -> pd.DataFrame:
     headers = {**DEFAULT_HEADERS, "Referer": METADATA_URL}
     meta = requests.get(METADATA_URL, headers=headers, timeout=60)
     meta.raise_for_status()
-    matches = sorted(set(ZIP_FILENAME_RE.findall(meta.text)))
-    if not matches:
-        raise RuntimeError(
-            f"No mapping ZIP link found on {METADATA_URL}. "
-            "INSEE may have restructured the page; inspect the HTML manually."
-        )
-    zip_path_url = "https://www.insee.fr" + matches[-1]
+    zip_path_url = latest_mapping_zip_url(meta.text)
     log.info(f"Downloading {zip_path_url}")
 
     cache_zip.parent.mkdir(parents=True, exist_ok=True)

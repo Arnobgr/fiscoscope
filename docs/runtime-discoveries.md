@@ -745,3 +745,11 @@ section below, then commit.
       from the VPS raw files. Unrelated breakage found on the same run:
       `insee_idbanks` errors because INSEE changed its mapping page (known-gaps
       §C); the pipeline carries on with the cached idBanks.
+    - **INSEE idBank resolver fixed (same day).** INSEE now links the mapping
+      ZIP as `/en/statistiques/fichier/2868055/202610_correspondance_idbank_dimension.zip`
+      (language prefix and file id both changed from `/fr/…/2862759/`).
+      `ZIP_FILENAME_RE` accepts either language and any file id; the newest
+      file is picked by its YYYYMM vintage (`latest_mapping_zip_url`, tested)
+      instead of sorting whole paths. Verified with a forced refresh: all 8
+      series resolve, with idBanks identical to the VPS cache; the retired
+      COFOG/P5K2 entries drop out of `insee_idbanks.json`.
