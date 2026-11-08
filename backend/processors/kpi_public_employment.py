@@ -1,7 +1,7 @@
 """
 KPI: Public Employment (roadmap 1.7) — general-government employment as a
 share of total employment, OECD Government at a Glance 2025 (2007 onwards).
-France, the 6 peers and the OECD aggregate published by GaaG (code `OECD`).
+France and the 6 peers; the dataflow publishes no OECD aggregate.
 """
 
 import logging
@@ -18,14 +18,12 @@ from processors.kpi_tax_burden import one_per_year
 
 log = logging.getLogger(__name__)
 
-OECD_GAAG_KEY = "OECD"
-
 
 def compute_public_employment() -> dict:
     """Compute the Public Employment share and write kpi_public_employment.json."""
     df = load_oecd_long("oecd_public_employment")
     df = one_per_year(df[(df["measure"] == "EMPG") & (df["unit_measure"] == "PT_EMP")])
-    france, peers = france_and_peers(df, [*OECD_PEERS, OECD_GAAG_KEY])
+    france, peers = france_and_peers(df, OECD_PEERS)
 
     payload = {
         "kpi_id": "public_employment",
@@ -45,8 +43,7 @@ def compute_public_employment() -> dict:
             "dans un pays et par des entreprises ou associations financées sur "
             "fonds publics dans un autre, ce qui limite la comparaison des niveaux. "
             "Pays comparés : Allemagne, Espagne, Italie, Pays-Bas, Royaume-Uni et "
-            "Suède. La « moyenne OCDE » (clé OECD) est l'agrégat publié par l'OCDE "
-            "dans Government at a Glance."
+            "Suède ; l'OCDE ne publie pas de moyenne pour cette série."
         ),
         "last_updated": now_iso(),
         "france": france,

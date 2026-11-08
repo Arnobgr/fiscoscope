@@ -4,7 +4,7 @@ export interface StdSeriesKpi {            // overhead, admin_overhead, friction
   kpi_id: string; kpi_name: string; description: string; unit: string;
   source: string; methodology: string; last_updated: string;
   france: RawPoint[];
-  peers?: Record<string, RawPoint[]>;      // ISO3 country keys + at most one average (OECD_AVG, EU27_AVG, OECD_REP or OECD)
+  peers?: Record<string, RawPoint[]>;      // ISO3 country keys + at most one average (OECD_AVG, EU27_AVG or OECD_REP)
   latest?: { year: number; value: number; yoy_change?: number };
 }
 export interface SustainabilityKpi extends StdSeriesKpi {

@@ -53,8 +53,8 @@ def compute_tax_burden() -> dict:
             "versés à l'Union européenne, impôts dus mais non recouvrés) : une "
             "seule définition est utilisée ici, pour la France comme pour les pays "
             "comparés. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas, "
-            "Royaume-Uni et Suède. La « moyenne OCDE » (clé OECD_REP) est "
-            "l'agrégat de l'ensemble des pays membres publié par l'OCDE."
+            "Royaume-Uni et Suède. La « moyenne OCDE » (clé OECD_REP) est la "
+            "moyenne des pays membres publiée par l'OCDE (« OECD average »)."
         ),
         "last_updated": now_iso(),
         "france": france,

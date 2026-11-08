@@ -1,0 +1,506 @@
+{
+  "kpi_id": "public_employment",
+  "kpi_name": "Public Employment",
+  "description": "Employment in general government as % of total employment (OECD Government at a Glance 2025).",
+  "unit": "percent",
+  "source": "OCDE — Government at a Glance 2025 (DF_GOV_EMPPS_REP_2025)",
+  "methodology": "Emploi dans les administrations publiques (État, collectivités locales, hôpitaux publics, sécurité sociale) en % de l'emploi total, selon la définition harmonisée de l'OCDE (Government at a Glance 2025). Le périmètre suit les comptes nationaux : un même service (santé, éducation, transports) peut être assuré par des agents publics dans un pays et par des entreprises ou associations financées sur fonds publics dans un autre, ce qui limite la comparaison des niveaux. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas, Royaume-Uni et Suède ; l'OCDE ne publie pas de moyenne pour cette série.",
+  "last_updated": "2026-11-08T17:46:40Z",
+  "france": [
+    {
+      "year": 2007,
+      "value": 22.75
+    },
+    {
+      "year": 2008,
+      "value": 22.66
+    },
+    {
+      "year": 2009,
+      "value": 22.98
+    },
+    {
+      "year": 2010,
+      "value": 22.99
+    },
+    {
+      "year": 2011,
+      "value": 22.55
+    },
+    {
+      "year": 2012,
+      "value": 22.31
+    },
+    {
+      "year": 2013,
+      "value": 22.4
+    },
+    {
+      "year": 2014,
+      "value": 22.49
+    },
+    {
+      "year": 2015,
+      "value": 22.52
+    },
+    {
+      "year": 2016,
+      "value": 22.45
+    },
+    {
+      "year": 2017,
+      "value": 22.2
+    },
+    {
+      "year": 2018,
+      "value": 21.9
+    },
+    {
+      "year": 2019,
+      "value": 21.66
+    },
+    {
+      "year": 2020,
+      "value": 21.7
+    },
+    {
+      "year": 2021,
+      "value": 21.36
+    },
+    {
+      "year": 2022,
+      "value": 20.9
+    },
+    {
+      "year": 2023,
+      "value": 20.74
+    }
+  ],
+  "peers": {
+    "DEU": [
+      {
+        "year": 2007,
+        "value": 11.82
+      },
+      {
+        "year": 2008,
+        "value": 11.67
+      },
+      {
+        "year": 2009,
+        "value": 11.81
+      },
+      {
+        "year": 2010,
+        "value": 11.82
+      },
+      {
+        "year": 2011,
+        "value": 11.45
+      },
+      {
+        "year": 2012,
+        "value": 11.23
+      },
+      {
+        "year": 2013,
+        "value": 11.17
+      },
+      {
+        "year": 2014,
+        "value": 11.12
+      },
+      {
+        "year": 2015,
+        "value": 11.06
+      },
+      {
+        "year": 2016,
+        "value": 10.98
+      },
+      {
+        "year": 2017,
+        "value": 10.97
+      },
+      {
+        "year": 2018,
+        "value": 10.99
+      },
+      {
+        "year": 2019,
+        "value": 11.07
+      },
+      {
+        "year": 2020,
+        "value": 11.31
+      },
+      {
+        "year": 2021,
+        "value": 11.57
+      },
+      {
+        "year": 2022,
+        "value": 11.14
+      },
+      {
+        "year": 2023,
+        "value": 11.53
+      }
+    ],
+    "GBR": [
+      {
+        "year": 2007,
+        "value": 19.28
+      },
+      {
+        "year": 2008,
+        "value": 19.06
+      },
+      {
+        "year": 2009,
+        "value": 19.66
+      },
+      {
+        "year": 2010,
+        "value": 19.67
+      },
+      {
+        "year": 2011,
+        "value": 18.98
+      },
+      {
+        "year": 2012,
+        "value": 17.67
+      },
+      {
+        "year": 2013,
+        "value": 17.36
+      },
+      {
+        "year": 2014,
+        "value": 16.94
+      },
+      {
+        "year": 2015,
+        "value": 16.49
+      },
+      {
+        "year": 2016,
+        "value": 16.22
+      },
+      {
+        "year": 2017,
+        "value": 16.07
+      },
+      {
+        "year": 2018,
+        "value": 15.95
+      },
+      {
+        "year": 2019,
+        "value": 15.97
+      },
+      {
+        "year": 2020,
+        "value": 16.44
+      },
+      {
+        "year": 2021,
+        "value": 16.9
+      },
+      {
+        "year": 2022,
+        "value": 16.9
+      },
+      {
+        "year": 2023,
+        "value": 17.08
+      }
+    ],
+    "ITA": [
+      {
+        "year": 2007,
+        "value": 14.66
+      },
+      {
+        "year": 2008,
+        "value": 14.51
+      },
+      {
+        "year": 2009,
+        "value": 14.61
+      },
+      {
+        "year": 2010,
+        "value": 14.49
+      },
+      {
+        "year": 2011,
+        "value": 14.25
+      },
+      {
+        "year": 2012,
+        "value": 14.0
+      },
+      {
+        "year": 2013,
+        "value": 14.11
+      },
+      {
+        "year": 2014,
+        "value": 14.08
+      },
+      {
+        "year": 2015,
+        "value": 13.94
+      },
+      {
+        "year": 2016,
+        "value": 13.81
+      },
+      {
+        "year": 2017,
+        "value": 13.53
+      },
+      {
+        "year": 2018,
+        "value": 13.46
+      },
+      {
+        "year": 2019,
+        "value": 13.44
+      },
+      {
+        "year": 2020,
+        "value": 13.65
+      },
+      {
+        "year": 2021,
+        "value": 13.81
+      },
+      {
+        "year": 2022,
+        "value": 13.71
+      },
+      {
+        "year": 2023,
+        "value": 13.66
+      }
+    ],
+    "ESP": [
+      {
+        "year": 2007,
+        "value": 13.35
+      },
+      {
+        "year": 2008,
+        "value": 13.67
+      },
+      {
+        "year": 2009,
+        "value": 14.81
+      },
+      {
+        "year": 2010,
+        "value": 15.23
+      },
+      {
+        "year": 2011,
+        "value": 15.9
+      },
+      {
+        "year": 2012,
+        "value": 16.21
+      },
+      {
+        "year": 2013,
+        "value": 16.63
+      },
+      {
+        "year": 2014,
+        "value": 16.45
+      },
+      {
+        "year": 2015,
+        "value": 16.11
+      },
+      {
+        "year": 2016,
+        "value": 15.85
+      },
+      {
+        "year": 2017,
+        "value": 15.57
+      },
+      {
+        "year": 2018,
+        "value": 15.56
+      },
+      {
+        "year": 2019,
+        "value": 15.28
+      },
+      {
+        "year": 2020,
+        "value": 16.36
+      },
+      {
+        "year": 2021,
+        "value": 16.47
+      },
+      {
+        "year": 2022,
+        "value": 15.95
+      },
+      {
+        "year": 2023,
+        "value": 15.25
+      }
+    ],
+    "NLD": [
+      {
+        "year": 2007,
+        "value": 13.02
+      },
+      {
+        "year": 2008,
+        "value": 12.97
+      },
+      {
+        "year": 2009,
+        "value": 13.28
+      },
+      {
+        "year": 2010,
+        "value": 13.57
+      },
+      {
+        "year": 2011,
+        "value": 13.23
+      },
+      {
+        "year": 2012,
+        "value": 13.07
+      },
+      {
+        "year": 2013,
+        "value": 13.07
+      },
+      {
+        "year": 2014,
+        "value": 12.93
+      },
+      {
+        "year": 2015,
+        "value": 12.76
+      },
+      {
+        "year": 2016,
+        "value": 12.52
+      },
+      {
+        "year": 2017,
+        "value": 12.28
+      },
+      {
+        "year": 2018,
+        "value": 12.0
+      },
+      {
+        "year": 2019,
+        "value": 11.96
+      },
+      {
+        "year": 2020,
+        "value": 12.24
+      },
+      {
+        "year": 2021,
+        "value": 12.33
+      },
+      {
+        "year": 2022,
+        "value": 12.23
+      },
+      {
+        "year": 2023,
+        "value": 12.34
+      }
+    ],
+    "SWE": [
+      {
+        "year": 2007,
+        "value": 30.08
+      },
+      {
+        "year": 2008,
+        "value": 29.32
+      },
+      {
+        "year": 2009,
+        "value": 29.33
+      },
+      {
+        "year": 2010,
+        "value": 29.0
+      },
+      {
+        "year": 2011,
+        "value": 28.46
+      },
+      {
+        "year": 2012,
+        "value": 28.45
+      },
+      {
+        "year": 2013,
+        "value": 28.47
+      },
+      {
+        "year": 2014,
+        "value": 28.42
+      },
+      {
+        "year": 2015,
+        "value": 28.63
+      },
+      {
+        "year": 2016,
+        "value": 28.88
+      },
+      {
+        "year": 2017,
+        "value": 28.67
+      },
+      {
+        "year": 2018,
+        "value": 28.46
+      },
+      {
+        "year": 2019,
+        "value": 28.47
+      },
+      {
+        "year": 2020,
+        "value": 28.78
+      },
+      {
+        "year": 2021,
+        "value": 28.75
+      },
+      {
+        "year": 2022,
+        "value": 28.16
+      },
+      {
+        "year": 2023,
+        "value": 28.15
+      }
+    ]
+  },
+  "latest": {
+    "year": 2023,
+    "value": 20.74,
+    "yoy_change": -0.16
+  }
+}

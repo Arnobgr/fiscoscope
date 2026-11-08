@@ -118,12 +118,12 @@ def test_public_employment_filters_measure_and_rejects_duplicates(raw_dir):
     rows = [
         _oecd_row("FRA", 2023, 20.7, "EMPG", "PT_EMP"),
         _oecd_row("FRA", 2023, 5.6, "EMPG", "PT_POP"),  # other unit, filtered out
-        _oecd_row("OECD", 2023, 18.0, "EMPG", "PT_EMP"),
+        _oecd_row("DEU", 2023, 11.5, "EMPG", "PT_EMP"),
     ]
     raw_dir("oecd_public_employment", rows)
     out = compute_public_employment()
     assert out["france"] == [{"year": 2023, "value": 20.7}]
-    assert set(out["peers"]) == {"OECD"}
+    assert set(out["peers"]) == {"DEU"}
 
     raw_dir("oecd_public_employment", rows + [_oecd_row("FRA", 2023, 21.0, "EMPG", "PT_EMP")])
     with pytest.raises(ValueError, match="Several observations"):

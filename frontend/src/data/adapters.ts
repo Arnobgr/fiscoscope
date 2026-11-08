@@ -7,12 +7,10 @@ import type { Polarity } from "./format";
 export interface AdaptBase { slug: string; title: string; explainer: string; unit: Unit; polarity: Polarity }
 
 // Averages a payload may carry, with their on-screen labels. OECD_AVG is the
-// unweighted mean of the 6 peers (never an OECD average); EU27_AVG, OECD_REP
-// (Revenue Statistics) and OECD (Government at a Glance) are aggregates
-// published by Eurostat / the OECD.
+// unweighted mean of the 6 peers (never an OECD average); EU27_AVG and OECD_REP
+// (Revenue Statistics "OECD average") are published by Eurostat / the OECD.
 export const AVERAGES: [string, string][] = [
-  ["OECD_AVG", "Moyenne des 6 pays"], ["EU27_AVG", "Moyenne UE à 27"],
-  ["OECD_REP", "Moyenne OCDE"], ["OECD", "Moyenne OCDE"],
+  ["OECD_AVG", "Moyenne des 6 pays"], ["EU27_AVG", "Moyenne UE à 27"], ["OECD_REP", "Moyenne OCDE"],
 ];
 const PEERS: [string, string][] = [
   ["DEU", "Allemagne"], ["ESP", "Espagne"], ["ITA", "Italie"],

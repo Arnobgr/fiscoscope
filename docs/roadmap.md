@@ -297,9 +297,9 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 | 1.2 | **True overhead KPI**: compensation in GF01 (general public services) ÷ total expenditure, France vs peers, 1995–2024; optionally "wage bill by function" stacked view | S1 | New `kpi_admin_overhead.json` with peers; keep `overhead_rate` (already "Part de la masse salariale publique" since 0.1) ✅ 2026-11-08 — "Masse salariale des services généraux"; optional stacked view not built |
 | 1.3 | **Pensions isolated**: GF1002 (old age) as % of spending and % GDP vs peers; re-base "Protection sociale vs investissement" on P51G from Eurostat with peers | S1 | Closes known-gaps B "pension/investment peers ❌" ✅ 2026-11-08 — new `kpi_pensions.json`; `pension_investment` re-based on Eurostat GF10 / P51G for France and peers |
 | 1.4 | **Who runs the deficit**: balance by sub-sector (State / local / social security), € bn and % GDP, 1995–2025 | S2 | New KPI under Soutenabilité ✅ 2026-11-08 — `kpi_deficit_subsector.json` |
-| 1.5 | **Tax burden** (prélèvements obligatoires) vs peers + OECD avg (`OECD_REP` is a true OECD aggregate — the only series that may be labelled "Moyenne OCDE"; give it its own key, not `OECD_AVG`), 1965–2024 | S5 (or S3) | New KPI, one definition, named on chart ⏳ code written 2026-11-08 (fetcher, processor, parser tests); not yet in the registry — awaiting re-verification on the VPS: `sdmx.oecd.org` served a Cloudflare challenge to the dev machine |
+| 1.5 | **Tax burden** (prélèvements obligatoires) vs peers + OECD avg (`OECD_REP` is a true OECD aggregate — the only series that may be labelled "Moyenne OCDE"; give it its own key, not `OECD_AVG`), 1965–2024 | S5 (or S3) | New KPI, one definition, named on chart ✅ 2026-11-08 — verified on the VPS; `kpi_tax_burden.json`, OECD definition named in explainer and methodology |
 | 1.6 | **Who holds the debt**: non-residents / Banque de France / domestic, 2020–2025 | S4 | Detail panel on the debt KPI ✅ 2026-11-08 — `debt_holders` block in `kpi_sustainability.json`, France only |
-| 1.7 | **Public employment** share vs peers, 2007–2023 | S6 | New KPI under Efficacité ⏳ code written 2026-11-08 (fetcher, processor, parser tests); not yet in the registry — awaiting re-verification on the VPS: `sdmx.oecd.org` served a Cloudflare challenge to the dev machine |
+| 1.7 | **Public employment** share vs peers, 2007–2023 | S6 | New KPI under Efficacité ✅ 2026-11-08 — verified on the VPS; `kpi_public_employment.json`; the dataflow publishes no OECD aggregate, so no average line |
 | 1.8 | Peers for `debt_service` (interest payable, % GDP) | S2 `D41PAY` | Closes known-gaps B "debt_service ⚠️ unconfirmed" ✅ 2026-11-08 — KPI kept as interest / revenue: peers = D41PAY / TR |
 | 1.9 | Decide fate of the INSEE+OECD COFOG stitch once Eurostat is wired (Eurostat runs 1995–2024 on one basis) | S1 | `runtime-discoveries.md` entry recording the decision ✅ 2026-11-08 — stitch retired: all COFOG KPIs on Eurostat for France and peers (Session H) |
 
@@ -358,8 +358,7 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 
 1. ~~**Phase 0** in full (one session) — protects everything else.~~ ✅ 2026-11-04
 2. ~~**1.1–1.4** — one Eurostat fetcher closes most of `known-gaps.md` and gives
-   the honest overhead KPI.~~ ✅ 2026-11-08 with the rest of Phase 1, except 1.5
-   and 1.7 (OECD), which await re-verification on the VPS.
+   the honest overhead KPI.~~ ✅ 2026-11-08, with the rest of Phase 1.
 3. **3.1** (performance scorecard) — highest accountability value per effort;
    data is clean and official.
 4. **2.1, 2.4** — per-capita/constant euros and auto context sentences raise

@@ -122,3 +122,19 @@ describe("Eurostat-based KPIs", () => {
     expect(v.panels?.[0].note).toMatch(/2020/);
   });
 });
+
+import taxBurden from "../fixtures/kpi_tax_burden.json";
+import publicEmployment from "../fixtures/kpi_public_employment.json";
+
+describe("OECD-based KPIs (roadmap 1.5, 1.7)", () => {
+  it("tax burden: OECD_REP labelled as the OECD average, 6 peers incl. UK", () => {
+    const v = adaptStandard(taxBurden as unknown as StdSeriesKpi, { ...base, slug: "tax_burden" });
+    expect(v.comparison).toMatchObject({ id: "OECD_REP", label: "Moyenne OCDE" });
+    expect(v.peers).toHaveLength(6);
+  });
+  it("public employment: 6 peers, no average", () => {
+    const v = adaptStandard(publicEmployment as unknown as StdSeriesKpi, { ...base, slug: "public_employment" });
+    expect(v.comparison).toBeUndefined();
+    expect(v.peers?.map((p) => p.id)).toContain("GBR");
+  });
+});

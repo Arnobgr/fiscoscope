@@ -734,3 +734,14 @@ section below, then commit.
       The frontend asks for the three new KPI files, so it must not ship before
       the backend has produced them. Then check the two OECD raws and wire
       1.5/1.7 into the registry.
+    - **VPS run, same day (OECD verified, 1.5/1.7 shipped).** Annual pipeline on
+      the VPS: every Phase 1 step `ok`. S5 matches the roadmap (FRA 43.46 % in
+      2024, 1965–2024, `OECD_REP` = "OECD average country"). S6: the dataflow
+      also carries representation indicators (filtered out by MEASURE/UNIT) and
+      returns **no `OECD` aggregate**, so `public_employment` has 6 peers and no
+      average; the `OECD` key was dropped from the fetch key, processor and
+      frontend `AVERAGES`. Both KPIs are in the registry (tax burden under
+      Soutenabilité, public employment under Efficacité); fixtures were built
+      from the VPS raw files. Unrelated breakage found on the same run:
+      `insee_idbanks` errors because INSEE changed its mapping page (known-gaps
+      §C); the pipeline carries on with the cached idBanks.

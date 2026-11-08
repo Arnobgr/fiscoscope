@@ -54,10 +54,11 @@ TAX_REVENUE_START_YEAR = 1965
 
 # Government at a Glance 2025 — public employment (roadmap S6), DSD_GOV — 7 dims
 # (FREQ . REF_AREA . MEASURE . UNIT_MEASURE . SECTOR . EDITION . CATEGORY). Only
-# FREQ and REF_AREA are pinned, as in the roadmap's verified query; the
-# processor keeps MEASURE=EMPG, UNIT_MEASURE=PT_EMP (share of total employment).
+# FREQ and REF_AREA are pinned; the dataflow also carries representation
+# indicators, so the processor keeps MEASURE=EMPG, UNIT_MEASURE=PT_EMP (share of
+# total employment). It publishes no OECD aggregate (checked 2026-11-08).
 PUBLIC_EMPLOYMENT_DATASET = "OECD.GOV.GIP,DSD_GOV@DF_GOV_EMPPS_REP_2025"
-PUBLIC_EMPLOYMENT_KEY = f"A.{'+'.join(OECD_COUNTRIES)}+OECD......"
+PUBLIC_EMPLOYMENT_KEY = f"A.{'+'.join(OECD_COUNTRIES)}......"
 
 # OECD rate limit is 20 requests/minute — pause between calls.
 RATE_LIMIT_SLEEP = 3
@@ -116,7 +117,7 @@ def fetch_oecd_tax_revenue() -> pd.DataFrame:
 
 
 def fetch_oecd_public_employment() -> pd.DataFrame:
-    """Fetch general-government employment indicators (GaaG 2025), peers + OECD."""
+    """Fetch public employment and representation indicators (GaaG 2025) for the peer set."""
     df = _fetch_oecd_csv(PUBLIC_EMPLOYMENT_DATASET, PUBLIC_EMPLOYMENT_KEY, OECD_START_YEAR)
     save_raw("oecd_public_employment", df.to_dict(orient="records"))
     return df

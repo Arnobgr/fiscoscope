@@ -13,7 +13,7 @@ function fmtValue(unit: KpiView["unit"], v: number): string {
 }
 
 const BADGES: Record<string, string> = {
-  OECD_AVG: "vs 6 pays", EU27_AVG: "vs UE à 27", OECD_REP: "vs OCDE", OECD: "vs OCDE",
+  OECD_AVG: "vs 6 pays", EU27_AVG: "vs UE à 27", OECD_REP: "vs OCDE",
 };
 
 export function KpiCard({ view, index = 0 }: { view: KpiView; index?: number }) {
