@@ -35,6 +35,7 @@ from fetchers.eurostat import (
     fetch_eurostat_expenditure,
     fetch_eurostat_main,
 )
+from fetchers.performance import fetch_performance
 from fetchers.oecd import (
     fetch_oecd_debt,
     fetch_oecd_deficit,
@@ -56,6 +57,7 @@ from processors.kpi_monthly import compute_monthly_execution
 from processors.kpi_outcomes import compute_outcomes, compute_tax_expenditure
 from processors.kpi_overhead import compute_admin_overhead, compute_overhead_rate
 from processors.kpi_debt_service import compute_debt_service
+from processors.kpi_performance import compute_performance
 from processors.kpi_public_employment import compute_public_employment
 from processors.kpi_sustainability import (
     compute_deficit_subsector,
@@ -157,6 +159,7 @@ def run_annual(sources: dict) -> None:
         "budget_plrg", fetch_plrg_execution, sources, datetime.now().year - 1
     )
     _run_step("tax_expenditure", fetch_tax_expenditure, sources)
+    _run_step("performance", fetch_performance, sources)
     _run_step("kpi_overhead_rate", compute_overhead_rate, sources)
     _run_step("kpi_admin_overhead", compute_admin_overhead, sources)
     _run_step("kpi_friction_ratio", compute_friction_ratio, sources)
@@ -170,6 +173,7 @@ def run_annual(sources: dict) -> None:
     _run_step("kpi_debt_service", compute_debt_service, sources)
     _run_step("kpi_outcomes", compute_outcomes, sources)
     _run_step("kpi_tax_expenditure", compute_tax_expenditure, sources)
+    _run_step("kpi_performance", compute_performance, sources)
 
 
 def main() -> None:

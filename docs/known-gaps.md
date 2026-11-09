@@ -38,6 +38,7 @@ needed series for several, and three KPIs are France-only by construction.
 | deficit_subsector | N/A | France's own sub-sector split (Eurostat S1311/S1313/S1314); peers not shown — sub-sector structures (federal states, social-security perimeter) are not comparable |
 | wage_ratio | ❌ no aligned source | Urssaf is a France-only private wage bill; no cross-country equivalent on the same basis. France-only |
 | monthly_execution | N/A | French budget-execution data; France-only by nature |
+| performance | N/A | The State's own targets and results; France-only by nature |
 
 ### C. Tried but technically blocked upstream
 
@@ -47,4 +48,7 @@ needed series for several, and three KPIs are France-only by construction.
 | Education / PISA half of §5.9 outcomes | **PISA not in OECD's SDMX API** | Outcomes shipped **health-only** (Session 10) | Source PISA from the OECD PISA explorer bulk download or a data.gouv mirror (non-SDMX), interpolate triennially |
 | Official tax-expenditure tabular (Voies et Moyens *Tome II*) | **PDF-only**; no costed, multi-year, full-list tabular source | Used **GTED** via Zenodo (third-party academic compilation, CC-BY; Sessions C/C2) — *not* a primary statistical feed | Bercy publishes a tabular Tome II, or if GTED definitions prove insufficient (then PDF-parse, Session 9 option 2) |
 | §5.9 "indexed to OECD average = 100" | peers deferred | shipped as dual France-only time series | Outcomes peers are built (see B) |
+| Performance headline for the latest RAP year (roadmap 3.1) | The official summary series stopped at 2024 when checked (2026-11-09) although the RAP 2025 detail is out | Headline shows the **official series only** (owner's decision: no Fiscoscope-computed point); the 2025 detail is on the drill-down page. A recount under the same rule gives 35.3 % met for 2025 | The ministry adds the year to `performance-atteinte-de-la-cible-generale-…-depuis-2007` (picked up automatically by the annual run) |
+| Official definition of "amélioration" (performance indicators) | Not given on the dataset pages | Copy uses the ministry's wording only ("cible non atteinte, en amélioration"). Data check: 141 of 174 numerically comparable RAP 2025 rows are "missed, better than the previous year" | The ministry documents the categories |
+| Deduplicating mission vs programme performance indicators | About half of the Mission rows repeat a Programme indicator, but the link field (`(Indicateur du Pxxx)`) and the labels don't match reliably (22 tagged rows have no label match) | Drill-down shows both levels and counts both, as the official series does; the page says so | A stable indicator id linking the two levels |
 | Full historical peer depth (1995) | OECD GIP peers start **2007** | **Resolved for COFOG KPIs** (Session H): Eurostat runs 1995–2024 on one basis, the INSEE+OECD stitch is retired. Still 2007+ for the OECD-sourced peers of overhead_rate and sustainability | Move those to Eurostat too (loses the UK), or OECD extends GIP history |

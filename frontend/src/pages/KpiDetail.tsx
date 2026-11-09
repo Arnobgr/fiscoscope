@@ -17,6 +17,9 @@ export function KpiDetail() {
       <p className="kpi-detail__explainer">{view.explainer}</p>
       <StatCallout view={view} />
       <TimeSeriesChart view={view} />
+      {view.drilldown && (
+        <p className="kpi-detail__drilldown"><Link to={view.drilldown.to}>{view.drilldown.label} →</Link></p>
+      )}
       {[view.secondary, ...(view.panels ?? [])].filter((block): block is SecondaryBlock => !!block).map((block) => (
         <section key={block.title} className="kpi-detail__secondary">
           <h2>{block.title}</h2>

@@ -19,6 +19,23 @@ export interface SubsectorSeries { pct_gdp: RawPoint[]; eur_bn: RawPoint[] }
 export interface DeficitSubsectorKpi extends StdSeriesKpi {
   subsectors: { central: SubsectorSeries; local: SubsectorSeries; social_security: SubsectorSeries; total: SubsectorSeries };
 }
+export type PerfStatus = "met" | "improved" | "not_improved" | "not_reported" | "not_retained";
+export type PerfCounts = Record<PerfStatus | "unassessed", number>;
+export interface PerformanceKpi extends StdSeriesKpi {
+  categories: Record<"met" | "improved" | "not_improved" | "not_reported", RawPoint[]>;
+  detail_years: number[];
+}
+// performance_detail_YYYY.json — every sub-indicator of one RAP year, values as published.
+export interface PerfRow {
+  sub_indicator: string | null; unit: string | null;
+  target: string | number | null; result: string | number | null;
+  status: PerfStatus | null; comment: string | null;
+}
+export interface PerfIndicator { code: string | null; indicator: string; rows: PerfRow[] }
+export interface PerfObjective { objective: string | null; indicators: PerfIndicator[] }
+export interface PerfGroup { programme_code: number | null; programme: string | null; objectives: PerfObjective[] } // code null = mission-level indicators
+export interface PerfMission { mission: string; counts: PerfCounts; groups: PerfGroup[] }
+export interface PerformanceDetail { year: number; source: string; last_updated: string; counts: PerfCounts; missions: PerfMission[] }
 export interface OutcomesKpi {
   kpi_id: string; kpi_name: string; description: string; unit: string;
   source: string; methodology: string; last_updated: string;
@@ -68,6 +85,7 @@ export interface KpiView {
   peers?: ViewSeries[];        // individual peer countries (role "peer"), fixed order
   secondary?: SecondaryBlock;  // e.g. debt (sustainability), life expectancy (outcomes)
   panels?: SecondaryBlock[];   // further detail charts below the secondary one (e.g. debt holders)
+  drilldown?: { to: string; label: string }; // link to a dedicated detail page (e.g. performance indicators)
   latest?: LatestStat;
   source: string;              // from JSON (empty for monthly)
   methodology: string;         // from JSON (empty for monthly)

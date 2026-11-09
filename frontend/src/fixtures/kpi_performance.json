@@ -1,0 +1,392 @@
+{
+  "kpi_id": "performance",
+  "kpi_name": "State performance targets met",
+  "description": "Share of the State budget's performance sub-indicators whose target was met, per annual performance report (RAP), as published by the Ministry of Finance.",
+  "unit": "percent",
+  "source": "Ministère de l'Économie et des Finances (data.economie.gouv.fr) — « Performance : atteinte de la cible générale du budget de l'État depuis 2007 » ; détail par indicateur : rapports annuels de performance (RAP)",
+  "methodology": "Chaque programme du budget de l'État est assorti d'objectifs et d'indicateurs de performance : une cible est fixée dans le projet annuel de performance (PAP) et le résultat est publié dans le rapport annuel de performance (RAP) annexé à la loi relative aux résultats de la gestion. La série est celle publiée par le ministère : part des indicateurs, comptés au niveau des sous-indicateurs, mission et programme confondus, dont la cible est atteinte. Les trois autres catégories sont : cible non atteinte mais résultat en amélioration, cible non atteinte sans amélioration, et résultat non renseigné ; les indicateurs « non retenus » sont exclus du total. Une série s'arrête à la dernière année publiée par le ministère : Fiscoscope ne la complète pas. Limites : les cibles sont fixées, et parfois révisées, par l'administration elle-même ; la liste des indicateurs change chaque année (environ 2 000 sous-indicateurs), la série n'est donc pas à périmètre constant, et une hausse ne signifie pas à elle seule une meilleure performance. Le détail par indicateur (2022–2025) provient des données publiées par sous-indicateur ; recomptées selon la même règle, les parts qu'il donne s'écartent de moins de 1,5 point de la série publiée. Une partie des indicateurs de mission reprend un indicateur de programme : ils sont comptés deux fois, comme dans la série officielle.",
+  "last_updated": "2026-11-09T19:39:24Z",
+  "france": [
+    {
+      "year": 2007,
+      "value": 41.83
+    },
+    {
+      "year": 2008,
+      "value": 42.72
+    },
+    {
+      "year": 2009,
+      "value": 39.16
+    },
+    {
+      "year": 2010,
+      "value": 37.38
+    },
+    {
+      "year": 2011,
+      "value": 36.49
+    },
+    {
+      "year": 2012,
+      "value": 44.5
+    },
+    {
+      "year": 2013,
+      "value": 45.39
+    },
+    {
+      "year": 2014,
+      "value": 46.28
+    },
+    {
+      "year": 2015,
+      "value": 44.5
+    },
+    {
+      "year": 2016,
+      "value": 40.05
+    },
+    {
+      "year": 2017,
+      "value": 40.94
+    },
+    {
+      "year": 2018,
+      "value": 41.83
+    },
+    {
+      "year": 2019,
+      "value": 46.28
+    },
+    {
+      "year": 2020,
+      "value": 43.73
+    },
+    {
+      "year": 2021,
+      "value": 38.38
+    },
+    {
+      "year": 2022,
+      "value": 39.0
+    },
+    {
+      "year": 2023,
+      "value": 39.0
+    },
+    {
+      "year": 2024,
+      "value": 38.0
+    }
+  ],
+  "categories": {
+    "met": [
+      {
+        "year": 2007,
+        "value": 41.83
+      },
+      {
+        "year": 2008,
+        "value": 42.72
+      },
+      {
+        "year": 2009,
+        "value": 39.16
+      },
+      {
+        "year": 2010,
+        "value": 37.38
+      },
+      {
+        "year": 2011,
+        "value": 36.49
+      },
+      {
+        "year": 2012,
+        "value": 44.5
+      },
+      {
+        "year": 2013,
+        "value": 45.39
+      },
+      {
+        "year": 2014,
+        "value": 46.28
+      },
+      {
+        "year": 2015,
+        "value": 44.5
+      },
+      {
+        "year": 2016,
+        "value": 40.05
+      },
+      {
+        "year": 2017,
+        "value": 40.94
+      },
+      {
+        "year": 2018,
+        "value": 41.83
+      },
+      {
+        "year": 2019,
+        "value": 46.28
+      },
+      {
+        "year": 2020,
+        "value": 43.73
+      },
+      {
+        "year": 2021,
+        "value": 38.38
+      },
+      {
+        "year": 2022,
+        "value": 39.0
+      },
+      {
+        "year": 2023,
+        "value": 39.0
+      },
+      {
+        "year": 2024,
+        "value": 38.0
+      }
+    ],
+    "improved": [
+      {
+        "year": 2007,
+        "value": 13.35
+      },
+      {
+        "year": 2008,
+        "value": 13.35
+      },
+      {
+        "year": 2009,
+        "value": 22.25
+      },
+      {
+        "year": 2010,
+        "value": 24.03
+      },
+      {
+        "year": 2011,
+        "value": 24.92
+      },
+      {
+        "year": 2012,
+        "value": 17.8
+      },
+      {
+        "year": 2013,
+        "value": 9.79
+      },
+      {
+        "year": 2014,
+        "value": 10.68
+      },
+      {
+        "year": 2015,
+        "value": 11.57
+      },
+      {
+        "year": 2016,
+        "value": 14.24
+      },
+      {
+        "year": 2017,
+        "value": 11.57
+      },
+      {
+        "year": 2018,
+        "value": 9.79
+      },
+      {
+        "year": 2019,
+        "value": 8.9
+      },
+      {
+        "year": 2020,
+        "value": 6.0
+      },
+      {
+        "year": 2021,
+        "value": 13.66
+      },
+      {
+        "year": 2022,
+        "value": 12.0
+      },
+      {
+        "year": 2023,
+        "value": 13.0
+      },
+      {
+        "year": 2024,
+        "value": 15.0
+      }
+    ],
+    "not_improved": [
+      {
+        "year": 2007,
+        "value": 16.02
+      },
+      {
+        "year": 2008,
+        "value": 22.25
+      },
+      {
+        "year": 2009,
+        "value": 16.91
+      },
+      {
+        "year": 2010,
+        "value": 17.8
+      },
+      {
+        "year": 2011,
+        "value": 17.8
+      },
+      {
+        "year": 2012,
+        "value": 16.91
+      },
+      {
+        "year": 2013,
+        "value": 21.36
+      },
+      {
+        "year": 2014,
+        "value": 21.36
+      },
+      {
+        "year": 2015,
+        "value": 21.36
+      },
+      {
+        "year": 2016,
+        "value": 22.25
+      },
+      {
+        "year": 2017,
+        "value": 22.0
+      },
+      {
+        "year": 2018,
+        "value": 21.0
+      },
+      {
+        "year": 2019,
+        "value": 19.58
+      },
+      {
+        "year": 2020,
+        "value": 24.99
+      },
+      {
+        "year": 2021,
+        "value": 22.99
+      },
+      {
+        "year": 2022,
+        "value": 26.51
+      },
+      {
+        "year": 2023,
+        "value": 27.0
+      },
+      {
+        "year": 2024,
+        "value": 27.0
+      }
+    ],
+    "not_reported": [
+      {
+        "year": 2007,
+        "value": 28.8
+      },
+      {
+        "year": 2008,
+        "value": 21.68
+      },
+      {
+        "year": 2009,
+        "value": 21.68
+      },
+      {
+        "year": 2010,
+        "value": 21.0
+      },
+      {
+        "year": 2011,
+        "value": 20.79
+      },
+      {
+        "year": 2012,
+        "value": 20.79
+      },
+      {
+        "year": 2013,
+        "value": 23.46
+      },
+      {
+        "year": 2014,
+        "value": 21.68
+      },
+      {
+        "year": 2015,
+        "value": 22.57
+      },
+      {
+        "year": 2016,
+        "value": 23.46
+      },
+      {
+        "year": 2017,
+        "value": 26.0
+      },
+      {
+        "year": 2018,
+        "value": 27.02
+      },
+      {
+        "year": 2019,
+        "value": 25.0
+      },
+      {
+        "year": 2020,
+        "value": 25.04
+      },
+      {
+        "year": 2021,
+        "value": 24.87
+      },
+      {
+        "year": 2022,
+        "value": 22.0
+      },
+      {
+        "year": 2023,
+        "value": 21.0
+      },
+      {
+        "year": 2024,
+        "value": 20.0
+      }
+    ]
+  },
+  "detail_years": [
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "latest": {
+    "year": 2024,
+    "value": 38.0,
+    "yoy_change": -1.0
+  }
+}

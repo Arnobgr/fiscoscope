@@ -2,7 +2,7 @@ import type { KpiView, Unit } from "./types";
 import type { Polarity } from "./format";
 import {
   type AdaptBase, adaptStandard, adaptSustainability, adaptOutcomes,
-  adaptTaxExpenditure, adaptMonthly, adaptPensions, adaptDeficitSubsector,
+  adaptTaxExpenditure, adaptMonthly, adaptPensions, adaptDeficitSubsector, adaptPerformance,
 } from "./adapters";
 
 export type ThemeId = "efficacite" | "soutenabilite" | "depenses";
@@ -50,6 +50,8 @@ export const REGISTRY: Entry[] = [
     "Dépenses publiques de santé (% du PIB) et espérance de vie à la naissance, présentées comme deux séries parallèles. L’espérance de vie dépend de l’ensemble du système de santé et de facteurs hors santé : à chacun d’apprécier comment les résultats accompagnent la dépense.", adaptOutcomes),
   e("tax_expenditure", "depenses", "eur_bn", "higher_bad", "Dépenses fiscales (niches)",
     "Coût des dépenses fiscales (« niches ») — recettes auxquelles l’État renonce via exonérations, taux réduits et crédits d’impôt — d’après l’estimation GTED. Le chiffrage officiel (PLF, Voies et Moyens tome II) retient un périmètre plus large et un total plus élevé (de l’ordre de 80–90 Md€ ces dernières années). Les deux dernières années sont des prévisions.", adaptTaxExpenditure),
+  e("performance", "depenses", "percent", "neutral", "Part des cibles de performance atteintes",
+    "Chaque programme du budget de l’État s’engage sur des indicateurs de performance (délais de jugement, taux d’insertion, coût d’un service…), avec une cible fixée par l’administration et un résultat publié chaque année dans le rapport annuel de performance. Part des indicateurs dont la cible a été atteinte, telle que publiée par le ministère de l’Économie et des Finances. Les cibles sont fixées, et parfois révisées, par l’administration elle-même, et la liste des indicateurs change chaque année : une hausse ne signifie pas à elle seule une meilleure performance. Chaque année, entre un cinquième et plus d’un quart des indicateurs n’ont pas de résultat renseigné.", adaptPerformance),
   e("monthly_execution", "depenses", "eur", "neutral", "Exécution budgétaire mensuelle",
     "Recettes et dépenses du budget général de l’État, cumulées mois par mois sur l’année en cours : le suivi le plus récent de l’exécution budgétaire.", adaptMonthly),
 ];

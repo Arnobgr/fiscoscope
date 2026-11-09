@@ -762,3 +762,72 @@ section below, then commit.
       Eurostat and OECD sources, cron schedule, no more references to the
       retired COFOG bucketing or `cofog.py`, and the clone URL now uses the
       repo's new name (`Arnobgr/fiscoscope`).
+- **Session I (2026-11-09) — roadmap 3.1 (State performance scorecard).**
+    - **Re-verification (Part 5.8).** Every query matched the brief: summary
+      18 rows 2007–2024 (no 2025 yet), detail 2022–2024 = 6,338 rows with the
+      same category counts, RAP 2025 = 2,140 rows. `performance-de-la-depense`
+      (RAP 2024) was re-modified 2026-06-09 but its fields are unchanged. The
+      catalog search returns each dataset's `fields`, so vintages are
+      discovered from the `atteinte_de_la_cible_YYYY` field directly.
+      `column_30`/`column_31` of the RAP 2025 are empty in all rows.
+    - **Owner's decisions (Part 5.5).** KPI card + drill-down page; drill-down
+      2022–2025 with a year selector, one file per year; per-mission counts,
+      alphabetical, uncoloured, never ranked; polarity `neutral`; **headline =
+      official series only** — no Fiscoscope-computed 2025 point (it shows up
+      when the ministry publishes it).
+    - **Caveats answered (Part 5.6).** "amélioration": not defined on the
+      dataset pages; on the RAP 2025, 141 of 174 numerically comparable rows
+      are "target missed, result better than the previous year", so the copy
+      keeps the ministry's wording and makes no further claim. Mission vs
+      programme: ~half of the Mission rows repeat a Programme indicator, but
+      neither the `(Indicateur du Pxxx)` tag nor the labels match reliably, so
+      both levels are shown and counted, as in the official series (said on
+      the page and in the methodology). B's `commentaire` and the RAP's
+      `abs_exec_YYYY` both give the reason a result is missing ("Non
+      déterminé", "Sans objet"…): both map to `comment`.
+    - **`fetchers/performance.py`** — step `performance`: summary
+      (`fetch_ods_records`), 2022–2024 detail and each later RAP vintage
+      (`/exports/json`, one request each). Raw sources `performance_summary`,
+      `performance_detail`, `performance_rap_YYYY` (wrapped with its
+      `dataset_id`). Vintages whose year the detail dataset already covers are
+      skipped (today the RAP 2024); no vintage found, or two datasets for one
+      year, raises.
+    - **`processors/kpi_performance.py`** — step `kpi_performance`: one schema
+      for every vintage (column aliases: `code_externe_indicateur` /
+      `code_indicateur`, `ordre_ssi` / `code_interne_sous_indicateur` /
+      `code_sous_indicateur`); an unknown attainment category raises. Values
+      are kept as published (the RAP 2025 stores them as strings such as
+      "26 500 000"; whole floats from the detail dataset become ints). Counting
+      rule from Part 5.3; a recount drifting > 1.5 pt from the published share
+      on a year present in both raises (the drill-down counts would be
+      inconsistent with the headline). Outputs: `kpi_performance.json` (france
+      = published share met, `categories` = the four published shares,
+      `detail_years`) and `performance_detail_YYYY.json`, nested mission →
+      programme (mission-level indicators first) → objective → indicator,
+      missions sorted accent-insensitively. The detail files are written
+      compact (`write_output(..., compact=True)`, new option): ~560 KB each
+      instead of ~1.1 MB indented — the API does not gzip.
+    - **Frontend**: registry entry `performance` ("Part des cibles de
+      performance atteintes", theme Dépenses & résultats, neutral);
+      `adaptPerformance` (secondary chart of the four categories,
+      `PERFORMANCE_STATUS` labels shared with the page); new
+      `KpiView.drilldown` link rendered under the chart; page
+      `pages/PerformanceDetail.tsx` at `/performance?annee=YYYY` — the app's
+      first table: one `<table>` per programme labelled by its heading, row and
+      column headers, objective and multi-row indicator group rows; filters
+      "Objectifs manqués" (improved + not improved) and "Résultats non
+      renseignés"; stacked cards under 620 px. `api.ts` now lazy-loads
+      fixtures (`import.meta.glob` without `eager`): each fixture is its own
+      chunk, so the four ~0.5 MB drill-down fixtures never reach the main
+      bundle. Methodology page names the performance data.
+    - **Tests**: `backend/tests/test_performance.py` (both vintage schemas plus
+      the RAP 2024 aliases, ambiguous vintage, unknown category, counting rule,
+      1.5-pt drift guard, end-to-end incl. a stale RAP raw being ignored);
+      `PerformanceDetail.test.tsx` (latest-year default, `?annee=`,
+      alphabetical missions, filter = 292 not-reported rows in 2025, link from
+      the KPI page). Lint unchanged at the 11 pre-existing errors.
+    - **Deploy**: VPS pull → `docker compose up -d --build api` →
+      `docker compose run --rm --entrypoint python pipeline -m fetchers.performance`
+      then `… -m processors.kpi_performance` (or the annual run) → check
+      `/api/kpi/kpi_performance` and `/api/kpi/performance_detail_2025` → push
+      `main`.

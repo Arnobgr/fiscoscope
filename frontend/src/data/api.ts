@@ -4,15 +4,17 @@ const BASE = import.meta.env.VITE_API_BASE ?? "";
 const ALL_APP_IDS = [
   "kpi_overhead_rate", "kpi_admin_overhead", "kpi_friction_ratio", "kpi_productive_spend", "kpi_public_employment", "kpi_wage_ratio",
   "kpi_tax_burden", "kpi_sustainability", "kpi_deficit_subsector", "kpi_debt_service", "kpi_pension_investment",
-  "kpi_pensions", "kpi_outcomes", "kpi_tax_expenditure", "kpi_monthly_execution",
+  "kpi_pensions", "kpi_outcomes", "kpi_performance", "kpi_tax_expenditure", "kpi_monthly_execution",
 ];
 
-// Eagerly import fixtures so they bundle for dev/test (used when BASE is empty).
-const fixtures = import.meta.glob("../fixtures/*.json", { eager: true }) as Record<string, { default: unknown }>;
-function fixture(name: string): unknown {
+// Fixtures for dev/test (used when BASE is empty). Lazy: each is its own chunk,
+// loaded on first use, so the ~0.5 MB performance drill-down files never weigh
+// on the main bundle.
+const fixtures = import.meta.glob("../fixtures/*.json", { import: "default" }) as Record<string, () => Promise<unknown>>;
+async function fixture(name: string): Promise<unknown> {
   const hit = fixtures[`../fixtures/${name}.json`];
   if (!hit) throw new Error(`fixture not found: ${name}`);
-  return hit.default;
+  return hit();
 }
 
 let cache = new Map<string, unknown>();
@@ -25,7 +27,7 @@ async function load(name: string, apiPath: string): Promise<unknown> {
         if (!r.ok) throw new Error(`${apiPath} -> ${r.status}`);
         return r.json();
       })
-    : fixture(name);
+    : await fixture(name);
   cache.set(name, value);
   return value;
 }

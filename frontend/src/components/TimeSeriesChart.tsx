@@ -14,6 +14,7 @@ const SERIES_COLORS: Record<string, string> = {
   DEU: "#5F8A78", ESP: "#B8894A", ITA: "#A06A5E", NLD: "#C08A9A", GBR: "#8A6C93", SWE: "#7D8A45",
   local: "#CC785C", social_security: "#5F8A78", total: "#4A4740",
   central_bank: "#CC785C", other_residents: "#8A6C93",
+  improved: "#5F8A78", not_improved: "#CC785C", not_reported: "#8A8576",
 };
 
 function merge(seriesList: ViewSeries[]): Record<string, number | string>[] {

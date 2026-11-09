@@ -13,6 +13,6 @@ describe("Overview", () => {
     expect(screen.getByText("Dépenses & résultats")).toBeInTheDocument();
     const cards = await screen.findAllByRole("link");
     // 10 KPI cards (theme headings are not links)
-    expect(cards.filter((c) => c.getAttribute("href")?.startsWith("/kpi/")).length).toBe(15);
+    expect(cards.filter((c) => c.getAttribute("href")?.startsWith("/kpi/")).length).toBe(16);
   });
 });

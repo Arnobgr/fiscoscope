@@ -1,6 +1,7 @@
 import type {
   KpiView, ViewSeries, Unit, RawPoint, StdSeriesKpi, SustainabilityKpi,
   OutcomesKpi, TaxExpenditureKpi, MonthlyKpi, PensionsKpi, DeficitSubsectorKpi,
+  PerformanceKpi, PerfStatus,
 } from "./types";
 import type { Polarity } from "./format";
 
@@ -114,6 +115,36 @@ export function adaptDeficitSubsector(raw: DeficitSubsectorKpi, b: AdaptBase): K
     secondary: { title: "En milliards d’euros courants", unit: "eur_bn", series: lines("eur_bn") },
     latest: latestFrom(raw.france, "percent", raw.latest),
     ...meta(raw),
+  };
+}
+
+// Attainment categories of the State's performance indicators, in the ministry's
+// own terms. Shared by the KPI chart and the drill-down page.
+export const PERFORMANCE_STATUS: Record<PerfStatus | "unassessed", string> = {
+  met: "Cible atteinte",
+  improved: "Cible non atteinte, en amélioration",
+  not_improved: "Cible non atteinte, sans amélioration",
+  not_reported: "Résultat non renseigné",
+  not_retained: "Indicateur non retenu",
+  unassessed: "Non évalué",
+};
+const PERFORMANCE_LINES = ["met", "improved", "not_improved", "not_reported"] as const;
+export function adaptPerformance(raw: PerformanceKpi, b: AdaptBase): KpiView {
+  const years = raw.detail_years;
+  return {
+    ...adaptStandard(raw, b),
+    series: [{ id: "france", label: PERFORMANCE_STATUS.met, role: "france", points: yearPoints(raw.france) }],
+    secondary: {
+      title: "Répartition des indicateurs (% du total)", unit: "percent",
+      note: "Les indicateurs « non retenus » par le ministère sont exclus du total.",
+      series: PERFORMANCE_LINES.map((key, i) => ({
+        id: key, label: PERFORMANCE_STATUS[key], role: i === 0 ? "france" as const : "secondary" as const,
+        points: yearPoints(raw.categories[key]),
+      })),
+    },
+    drilldown: years.length
+      ? { to: "/performance", label: `Voir chaque indicateur : cible, résultat, mission par mission (${years[0]}–${years[years.length - 1]})` }
+      : undefined,
   };
 }
 

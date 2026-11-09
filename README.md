@@ -41,6 +41,7 @@ No institutional backing. The code and the methodology are in this repo.
 | Economic Affairs, Environment & Housing Share | Share of expenditure on COFOG GF04–GF06 (economic affairs, environmental protection, housing & community amenities) |
 | Old-Age Expenditure | Pensions and old-age care (COFOG GF1002) as % of public spending and of GDP |
 | Spend vs. Outcome (health) | Public health spend (% of GDP) and life expectancy at birth, shown as two parallel series (education/PISA not yet available) |
+| State Performance Targets Met | Share of the State budget's performance indicators whose target was met, per annual performance report since 2007 (the ministry's own targets and results), with a page listing every indicator's target and result, mission by mission, for 2022–2025 |
 | Tax Expenditure Cost | Cost of *niches fiscales* (GTED estimate; lower than the official PLF figure) as % of revenue |
 | Monthly Budget Execution | Live cumulative revenues, spending, and balance for the current year |
 
@@ -118,7 +119,7 @@ Requirements: Python 3.11+. No secrets needed because all data sources are publi
 | Mode | What it runs | Cadence |
 |---|---|---|
 | `--mode monthly` | Budget execution, Urssaf, France Travail | 1st of each month |
-| `--mode annual` | INSEE, Eurostat, OECD, GTED, PLRG, structural KPIs | 1st February, June and November (June and November follow Eurostat's April and October updates) |
+| `--mode annual` | INSEE, Eurostat, OECD, GTED, PLRG, State performance indicators, structural KPIs | 1st February, June and November (June and November follow Eurostat's April and October updates) |
 | `--mode full` | Both | Initial setup or manual refresh |
 
 ### API endpoints

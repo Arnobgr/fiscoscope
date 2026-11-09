@@ -66,7 +66,8 @@ efficiency of the French public administration using publicly available fiscal d
 
 Backend is **feature-complete**: all 8 PRD KPIs (§5.2–5.9) plus 2 extra (wage
 ratio, debt service) compute `status: ok`, and roadmap Phase 1 (Eurostat/OECD
-foundation, 2026-11-08) added 5 more — see `docs/roadmap.md`; `budget_plrg` is the only by-design
+foundation, 2026-11-08) added 5 more, roadmap 3.1 (2026-11-09) the State
+performance scorecard — see `docs/roadmap.md`; `budget_plrg` is the only by-design
 `skipped` step. Output is served by `backend/api.py` (FastAPI; the old R2 upload
 was retired in Session E).
 
@@ -111,6 +112,7 @@ french-efficiency-dashboard/
 │   │   ├── budget_execution.py        # data.economie.gouv.fr monthly execution
 │   │   ├── oecd.py                    # OECD Data Explorer SDMX API
 │   │   ├── eurostat.py                # Eurostat JSON-stat API (COFOG, sub-sectors, debt holders)
+│   │   ├── performance.py             # data.economie.gouv.fr State performance indicators (PAP/RAP)
 │   │   ├── urssaf.py                  # open.urssaf.fr private wage bill
 │   │   └── france_travail.py          # data.gouv.fr France Travail unemployment
 │   ├── processors/
@@ -121,6 +123,7 @@ french-efficiency-dashboard/
 │   │   ├── kpi_sustainability.py      # Fiscal Deficit Trend (+ debt holders) + deficit by sub-sector
 │   │   ├── kpi_tax_burden.py          # Tax-to-GDP (OECD Revenue Statistics)
 │   │   ├── kpi_public_employment.py   # Public employment share (OECD GaaG)
+│   │   ├── kpi_performance.py         # State performance targets met + per-year drill-down files
 │   │   └── kpi_monthly.py             # Monthly Budget Execution
 │   ├── api.py                         # FastAPI read-only server for data/output/*.json
 │   ├── data/

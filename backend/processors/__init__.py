@@ -100,12 +100,13 @@ def build_latest(france: list[dict]) -> dict | None:
     return latest
 
 
-def write_output(filename: str, payload: dict) -> Path:
-    """Write a KPI payload to data/output/{filename} as indented JSON."""
+def write_output(filename: str, payload: dict, compact: bool = False) -> Path:
+    """Write a KPI payload to data/output/{filename} as indented JSON (compact: no whitespace)."""
     out_dir = Path(OUTPUT_DATA_DIR)
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / filename
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+    layout = {"separators": (",", ":")} if compact else {"indent": 2}
+    path.write_text(json.dumps(payload, ensure_ascii=False, **layout))
     if "france" in payload:
         log.info(f"Wrote {filename} ({len(payload['france'])} France data points)")
     else:

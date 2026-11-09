@@ -1,22 +1,24 @@
 # Roadmap — Fiscoscope for citizens: transparency & accountability
 
-Written 2026-10-26, last updated 2026-11-08. This is the forward plan;
+Written 2026-10-26, last updated 2026-11-09. This is the forward plan;
 `known-gaps.md` stays the reference for what is blocked and
 `runtime-discoveries.md` for why existing KPIs are built the way they are.
 
-**Status (2026-11-08).** Phase 0 and Phase 1 are done and live (15 KPIs on
-the site). **The next item is 3.1, the State performance scorecard; its
-self-contained brief is Part 5.**
+**Status (2026-11-09).** Phase 0 and Phase 1 are done and live (15 KPIs on
+the site); 3.1, the State performance scorecard (16th KPI + drill-down page),
+is built and tested on `dev` (Session I) and goes live once the VPS has run
+its new steps (Part 4.6). **The next items are 2.1 and 2.4** (no brief yet:
+write one from Part 2, as Part 5 was for 3.1).
 
 **Start here (new session).**
 1. Read this file top to bottom, then `known-gaps.md`. No other context is
    needed: Part 4 holds the repo conventions, environments and shipping steps,
    Part 5 the brief for the next item.
-2. Take the next unchecked item from Part 3 (today: 3.1 → Part 5).
-3. Before writing code, re-run that source's queries (Part 5.8 for 3.1, the
-   appendix for the others): dataset IDs and columns drift (Part 4.1).
-4. Settle the open decisions listed in the brief with the owner before
-   building (Part 5.5 for 3.1).
+2. Take the next unchecked item from Part 3 (today: 2.1, then 2.4).
+3. Before writing code, re-run that source's queries (the appendix; Part 5.8
+   for the performance datasets): dataset IDs and columns drift (Part 4.1).
+4. Settle the open decisions with the owner before building (Part 5.5 shows
+   the format used for 3.1).
 5. When done, follow "After each item" at the end of Part 3.
 
 Figures quoted in Parts 1–2 are as of 2026-10-26 unless dated otherwise; Part 5
@@ -332,7 +334,7 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 
 | # | Item | Data | Done when |
 |---|------|------|-----------|
-| 3.1 | ▶ **NEXT — brief in Part 5.** **Tableau de bord de la performance de l'État**: share of targets met per year since 2007 (incl. "non renseigné"); drill-down by mission → programme → indicator with target vs result; filter "objectifs manqués", "non renseignés" | S7 | Fetcher discovers yearly vintages via catalog search; per-vintage column normalisation tested; consistent denominator documented |
+| 3.1 | **Tableau de bord de la performance de l'État** (brief in Part 5): share of targets met per year since 2007 (incl. "non renseigné"); drill-down by mission → programme → indicator with target vs result; filter "objectifs manqués", "non renseignés" | S7 | Fetcher discovers yearly vintages via catalog search; per-vintage column normalisation tested; consistent denominator documented ✅ 2026-11-09 — `kpi_performance.json` (official series only, 2007–2024) + `performance_detail_YYYY.json` 2022–2025, page `/performance`; live after the VPS run |
 | 3.2 | **Prévisions vs réalité**: for each year, the deficit/interest/debt the government planned (April EDP notification) vs final outturn; forecast error in pp of GDP | S8 | Auto-capture new notifications; one-time archive backfill committed with URLs; parser tests on ≥ 3 vintages |
 | 3.3 | **Factual timeline bands** on long series: crises (2008, 2020), governments and finance ministers with dates — same treatment for every government | Static, sourced list (Légifrance/gouvernement.fr dates) | Bands toggleable; no colour coding by party |
 | 3.4 | Monthly execution: add same-month-last-year line and, when the LFI credits dataset exists for the year, the voted annual total | existing + S15 | Shows "à fin mars, X % des dépenses votées" when data allows |
@@ -374,10 +376,10 @@ processor **and** a regenerated `backend/data/output/*.json` on the VPS.
 1. ~~**Phase 0** in full (one session) — protects everything else.~~ ✅ 2026-11-04
 2. ~~**1.1–1.4** — one Eurostat fetcher closes most of `known-gaps.md` and gives
    the honest overhead KPI.~~ ✅ 2026-11-08, with the rest of Phase 1.
-3. ▶ **NEXT — 3.1** (performance scorecard) — highest accountability value per
-   effort; data is clean and official. **Brief: Part 5.**
-4. **2.1, 2.4** — per-capita/constant euros and auto context sentences raise
-   readability of every existing KPI.
+3. ~~**3.1** (performance scorecard) — highest accountability value per
+   effort; data is clean and official. Brief: Part 5.~~ ✅ 2026-11-09
+4. ▶ **NEXT — 2.1, 2.4** — per-capita/constant euros and auto context
+   sentences raise readability of every existing KPI.
 5. **Phase 4** — largest new audience (local relevance).
 6. **3.2, 5.1**, then the rest of Phases 2, 5 and 6.
 
@@ -387,8 +389,8 @@ one block yet: 2.5 needs S8 (the source of 3.2) and S15 (latest vintage PLF
 
 After each item: tick it in this file (append "✅ YYYY-MM-DD" to its "Done
 when" cell), update `known-gaps.md` (remove closed gaps, add new ones), append
-a session entry to `runtime-discoveries.md` (Session I, J, … — Session H was
-Phase 1), update the README's KPI table if a KPI was added, and move the
+a session entry to `runtime-discoveries.md` (Session J, K, … — Session H was
+Phase 1, Session I item 3.1), update the README's KPI table if a KPI was added, and move the
 "▶ NEXT" marker above.
 
 ---
@@ -515,12 +517,15 @@ Filters are repeated query params (`geo=FR&geo=DE`); `sinceTimePeriod=1995`.
    (`components/TimeSeriesChart.tsx`). Examples: `adaptPensions`,
    `adaptDeficitSubsector`, `adaptSustainability` (debt-holders panel).
 5. Update the KPI counts in `src/data/registry.test.ts` and
-   `src/pages/Overview.test.tsx` (15 today).
+   `src/pages/Overview.test.tsx` (16 today).
 6. New page → route in `frontend/src/App.tsx` (routes today: `/`,
-   `/kpi/:slug`, `/methodologie`) and a link to it (header nav in
-   `components/AppShell.tsx`, or from a KPI page). There is no table component
-   yet. Any new source must be named on `pages/Methodology.tsx` and in the
-   footer line of `AppShell.tsx`.
+   `/kpi/:slug`, `/methodologie`, `/performance`) and a link to it (header nav
+   in `components/AppShell.tsx`, or from a KPI page via `KpiView.drilldown`).
+   The only table is the performance drill-down (`pages/PerformanceDetail.tsx`:
+   semantic table, stacked cards under 620 px); reuse its pattern. Any new
+   source must be named on `pages/Methodology.tsx` and in the footer line of
+   `AppShell.tsx`. Fixtures are lazy-loaded (`import.meta.glob` without
+   `eager`), so large fixtures don't weigh on the bundle.
 7. Fixtures must be real pipeline output. If an input can only be fetched on
    the production server, copy its raw file from the server's
    `backend/data/raw/` into the local `backend/data/raw/` and run the
@@ -568,8 +573,9 @@ Filters are repeated query params (`geo=FR&geo=DE`); `sinceTimePeriod=1995`.
 
 ## Part 5 — Brief for the next item: 3.1 Tableau de bord de la performance de l'État
 
-**Status:** not started. Data re-verified 2026-11-08 (5.2–5.3); re-run the
-queries in 5.8 before coding. Roadmap row: Phase 3, item 3.1.
+**Status:** ✅ built 2026-11-09 (Session I in `runtime-discoveries.md`, which
+records the decisions taken on 5.5 and the answers to 5.6). Kept as the
+reference for the performance datasets and as a model brief.
 
 ### 5.1 Goal
 Every State budget programme publishes objectives and indicators, each with a

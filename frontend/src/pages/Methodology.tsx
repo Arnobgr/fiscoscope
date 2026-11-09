@@ -17,7 +17,7 @@ export function Methodology() {
         <li><strong>OCDE</strong> — Government at a Glance 2025 (dont l’emploi public), Revenue Statistics (impôts et cotisations) et statistiques de santé, pour les pays comparés (Allemagne, Espagne, Italie, Pays-Bas, Royaume-Uni, Suède), la moyenne de l’OCDE et l’espérance de vie.</li>
         <li><strong>GTED</strong> — Global Tax Expenditures Database (CC-BY-4.0), pour les dépenses fiscales.</li>
         <li><strong>Urssaf</strong> — masse salariale du secteur privé (open.urssaf.fr), pour le ratio masse salariale public / privé.</li>
-        <li><strong>Ministère de l’Économie et des Finances</strong> — situation mensuelle du budget de l’État (data.economie.gouv.fr), pour l’exécution budgétaire mensuelle.</li>
+        <li><strong>Ministère de l’Économie et des Finances</strong> — situation mensuelle du budget de l’État (data.economie.gouv.fr), pour l’exécution budgétaire mensuelle ; indicateurs de performance des programmes du budget de l’État (cibles et résultats publiés dans les rapports annuels de performance, et part des cibles atteintes depuis 2007), pour les cibles de performance.</li>
       </ul>
       <h2>Limites</h2>
       <p>
