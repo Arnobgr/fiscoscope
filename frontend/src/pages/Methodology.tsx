@@ -12,7 +12,7 @@ export function Methodology() {
       </p>
       <h2>Sources</h2>
       <ul>
-        <li><strong>INSEE</strong> — comptes nationaux (séries BDM), pour les agrégats des administrations publiques et le PIB.</li>
+        <li><strong>INSEE</strong> — comptes nationaux (séries BDM), pour les agrégats des administrations publiques et le PIB ; population moyenne et indice des prix à la consommation, pour les montants en euros par habitant.</li>
         <li><strong>Eurostat</strong> — comptes des administrations publiques (dépenses par fonction COFOG, soldes par sous-secteur, intérêts, recettes, détenteurs de la dette), pour la France et les pays comparés (Allemagne, Espagne, Italie, Pays-Bas, Suède) et la moyenne de l’Union européenne.</li>
         <li><strong>OCDE</strong> — Government at a Glance 2025 (dont l’emploi public), Revenue Statistics (impôts et cotisations) et statistiques de santé, pour les pays comparés (Allemagne, Espagne, Italie, Pays-Bas, Royaume-Uni, Suède), la moyenne de l’OCDE et l’espérance de vie.</li>
         <li><strong>GTED</strong> — Global Tax Expenditures Database (CC-BY-4.0), pour les dépenses fiscales.</li>
@@ -28,6 +28,15 @@ export function Methodology() {
         l’OCDE incluent le Royaume-Uni mais débutent en 2007 (1965 pour les impôts et cotisations) ; la
         « moyenne des 6 pays » qui accompagne certaines d’entre elles est la moyenne simple (non pondérée) des six pays comparés, et non la moyenne de
         l’ensemble des pays de l’OCDE. Les dernières années de certaines séries sont des prévisions.
+      </p>
+      <h2>Euros par habitant</h2>
+      <p>
+        Pour les indicateurs exprimés en euros ou en part du PIB, une seconde vue donne le montant
+        par habitant : le montant annuel en euros courants est divisé par la population moyenne de
+        l’année (INSEE, France entière), puis converti en euros constants de la dernière année
+        complète avec l’indice des prix à la consommation de l’INSEE, disponible depuis 1996. Cette
+        vue porte sur la France seule : comparer des euros par habitant entre pays demanderait de
+        corriger les écarts de prix, les comparaisons internationales restent donc exprimées en ratios.
       </p>
     </article>
   );

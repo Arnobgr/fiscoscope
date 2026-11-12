@@ -1,11 +1,14 @@
 // ---- Raw JSON (as served by the backend) -------------------------------
 export interface RawPoint { year: number; value: number; source?: string }
+// € per inhabitant in constant euros of base_year, France only (roadmap 2.1).
+export interface PerCapitaRaw { base_year: number; series: Record<string, RawPoint[]> }
 export interface StdSeriesKpi {            // overhead, admin_overhead, friction, productive, debt_service, pension_investment, wage_ratio
   kpi_id: string; kpi_name: string; description: string; unit: string;
   source: string; methodology: string; last_updated: string;
   france: RawPoint[];
   peers?: Record<string, RawPoint[]>;      // ISO3 country keys + at most one average (OECD_AVG, EU27_AVG or OECD_REP)
   latest?: { year: number; value: number; yoy_change?: number };
+  per_capita?: PerCapitaRaw;
 }
 export interface SustainabilityKpi extends StdSeriesKpi {
   debt: { france: RawPoint[] };
@@ -42,6 +45,7 @@ export interface OutcomesKpi {
   health: { spend_pct_gdp: RawPoint[]; life_expectancy_years: RawPoint[] };
   education: null; peers: Record<string, never>;
   latest?: Record<string, unknown>;
+  per_capita?: PerCapitaRaw;
 }
 export interface TaxExpRow {
   year: number; total_cost_eur_bn: number; count: number;
@@ -52,6 +56,7 @@ export interface TaxExpenditureKpi {
   source: string; methodology: string; last_updated: string;
   france: TaxExpRow[]; peers: Record<string, never>;
   latest?: Record<string, unknown>;
+  per_capita?: PerCapitaRaw;
 }
 export interface MonthlyBlock { months: string[]; [series: string]: number[] | string[] }
 export interface MonthlyKpi {
@@ -66,11 +71,18 @@ export interface Meta {
 
 // ---- Normalized view model (what components consume) --------------------
 import type { Polarity } from "./format";
-export type Unit = "percent" | "eur_bn" | "years" | "eur" | "ratio" | "mixed";
+export type Unit = "percent" | "eur_bn" | "years" | "eur" | "eur_hab" | "ratio" | "mixed";
 export type XKind = "year" | "month";
 export interface ViewPoint { x: number | string; y: number; projection?: boolean }
 export interface ViewSeries { id: string; label: string; role: "france" | "oecd" | "peer" | "secondary"; points: ViewPoint[] }
 export interface SecondaryBlock { title: string; unit: Unit; series: ViewSeries[]; comparison?: ViewSeries; peers?: ViewSeries[]; note?: string }
+// Replaces the ratio charts when the reader picks "€ par habitant": France only.
+export interface PerCapitaView {
+  label: string;        // toggle label, e.g. "€ par habitant (euros 2025)"
+  ratioLabel: string;   // label of the default view, e.g. "% du PIB"
+  blocks: SecondaryBlock[];
+  latest?: LatestStat;
+}
 export interface LatestStat { year: number | string; value: number; unit: Unit; yoy?: number }
 export interface KpiView {
   slug: string;            // route slug, e.g. "overhead_rate"
@@ -86,6 +98,7 @@ export interface KpiView {
   secondary?: SecondaryBlock;  // e.g. debt (sustainability), life expectancy (outcomes)
   panels?: SecondaryBlock[];   // further detail charts below the secondary one (e.g. debt holders)
   drilldown?: { to: string; label: string }; // link to a dedicated detail page (e.g. performance indicators)
+  perCapita?: PerCapitaView;   // alternative "€ par habitant" view of the page (roadmap 2.1)
   latest?: LatestStat;
   source: string;              // from JSON (empty for monthly)
   methodology: string;         // from JSON (empty for monthly)

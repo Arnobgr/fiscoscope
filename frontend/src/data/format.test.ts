@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { fmtPercent, fmtEurBn, fmtYears, fmtRatio, fmtNumber, fmtDateFr, fmtYoy, yoySentiment, fmtValue, fmtAxis } from "./format";
+import { fmtPercent, fmtEurBn, fmtEurHab, fmtYears, fmtRatio, fmtNumber, fmtDateFr, fmtYoy, yoySentiment, fmtValue, fmtAxis } from "./format";
 
 const NB = " "; // narrow no-break space — fr-FR thousands grouping
 const MIN = "−"; // U+2212 minus sign (not ASCII hyphen)
@@ -56,5 +56,18 @@ describe("french formatters", () => {
     // neutral (outcomes, monthly) and flat are always neutral
     expect(yoySentiment("up", "neutral")).toBe("neutral");
     expect(yoySentiment("flat", "higher_bad")).toBe("neutral");
+  });
+});
+
+describe("euros per inhabitant (roadmap 2.1)", () => {
+  it("formats whole euros, with a k€ axis for large values", () => {
+    expect(fmtEurHab(50170.4)).toBe(`50${NB}170 €`);
+    expect(fmtValue(-2198, "eur_hab")).toBe(`${MIN}2${NB}198 €`);
+    expect(fmtAxis(52000, "eur_hab")).toBe("52 k€");
+    expect(fmtAxis(950, "eur_hab")).toBe("950 €");
+  });
+  it("shows a year-on-year change in euros, not in %", () => {
+    expect(fmtYoy(68, "eur_hab")).toEqual({ text: "+68 €", dir: "up" });
+    expect(fmtYoy(-120, "eur_hab").text).toBe(`${MIN}120 €`);
   });
 });

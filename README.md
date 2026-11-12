@@ -160,6 +160,8 @@ fiscoscope/
 
 The project tries not to tell you whether a number is good or bad. Each KPI is named after what it measures — usually a COFOG function or a national-accounts aggregate — rather than a judgement like "productive" or "administrative", and the year-on-year arrow is coloured only where a rise is uncontroversially better or worse.
 
+KPIs in euros or in % of GDP (deficit and debt, deficit by sub-sector, debt interest, pensions, health spending, tax burden, tax expenditure) also have a "€ par habitant" view: the annual amount divided by INSEE's average population and converted to constant euros of the latest full year with INSEE's consumer price index (from 1996). That view is France-only, because comparing euros per head across countries would need purchasing-power corrections; cross-country comparisons stay on the ratios.
+
 Functional breakdowns (COFOG) come from Eurostat on a single basis from 1995, for France and its peers alike, so long series have no change of source. Each KPI's sources and methodology are shown on its page and repeated in its JSON output (`source`, `methodology`), so anyone reading the data sees what was assumed.
 
 For per-KPI methodology decisions and the reasoning behind them, see [`docs/runtime-discoveries.md`](docs/runtime-discoveries.md). For things we tried and couldn't make work, see [`docs/known-gaps.md`](docs/known-gaps.md).

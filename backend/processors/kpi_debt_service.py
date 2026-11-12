@@ -14,11 +14,14 @@ from processors import (
     EU27_AVG_KEY,
     EUROSTAT_PEER_NOTE,
     EUROSTAT_PEERS,
+    PER_CAPITA_SOURCE,
     annual_values,
     build_latest,
     load_eurostat_long,
     load_insee_series,
     now_iso,
+    per_capita_block,
+    per_capita_note,
     pick,
     ratio,
     series_by_country,
@@ -45,6 +48,7 @@ def compute_debt_service() -> dict:
     s13 = main[(main["unit"] == "MIO_EUR") & (main["sector"] == "S13")]
     peer_ratio = ratio(pick(s13, na_item="D41PAY"), pick(s13, na_item="TR"))
     peers = series_by_country(peer_ratio, [*EUROSTAT_PEERS, EU27_AVG_KEY])
+    per_capita = per_capita_block({"france": {y: v * 1e6 for y, v in interest.items()}})
 
     payload = {
         "kpi_id": "debt_service",
@@ -56,7 +60,7 @@ def compute_debt_service() -> dict:
         "unit": "percent",
         "source": (
             "INSEE BDM — CNT-2020-CSI (D41_S13, OTE_S13, B9NF_S13) ; pays comparés : "
-            "Eurostat — gov_10a_main (D41PAY, TR)"
+            "Eurostat — gov_10a_main (D41PAY, TR)" + PER_CAPITA_SOURCE
         ),
         "methodology": (
             "D41_S13 (intérêts versés, ensemble des APU) / total des recettes "
@@ -67,9 +71,12 @@ def compute_debt_service() -> dict:
             "courants ; calculé de la même façon pour la France, ce ratio Eurostat "
             "s'écarte de moins de 0,1 point de la série INSEE. "
             + EUROSTAT_PEER_NOTE
+            + " Par habitant : intérêts versés (D41_S13) seuls."
+            + per_capita_note(per_capita["base_year"])
         ),
         "last_updated": now_iso(),
         "france": france,
+        "per_capita": per_capita,
         "peers": peers,
         "latest": build_latest(france),
     }

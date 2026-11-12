@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { adaptStandard, adaptSustainability } from "./adapters";
+import { adaptStandard, adaptSustainability, perCapitaView, withPerCapita } from "./adapters";
 import overhead from "../fixtures/kpi_overhead_rate.json";
 import sustainability from "../fixtures/kpi_sustainability.json";
+import debtService from "../fixtures/kpi_debt_service.json";
 
 const base = { slug: "overhead_rate", title: "T", explainer: "E", unit: "percent" as const, polarity: "higher_bad" as const };
 
@@ -31,7 +32,7 @@ describe("adaptSustainability", () => {
   const v = adaptSustainability(sustainability as any,
     { slug: "sustainability", title: "T", explainer: "E", unit: "percent", polarity: "higher_good" });
   it("primary = deficit, comparison = OECD_AVG deficit", () => {
-    expect(v.series[0].points.find((p) => p.x === 2024)?.y).toBe(-5.79);
+    expect(v.series[0].points.find((p) => p.x === 2024)?.y).toBe(-5.76);
     expect(v.comparison?.role).toBe("oecd");
   });
   it("secondary = debt with its own OECD comparison", () => {
@@ -136,5 +137,31 @@ describe("OECD-based KPIs (roadmap 1.5, 1.7)", () => {
     const v = adaptStandard(publicEmployment as unknown as StdSeriesKpi, { ...base, slug: "public_employment" });
     expect(v.comparison).toBeUndefined();
     expect(v.peers?.map((p) => p.id)).toContain("GBR");
+  });
+});
+
+describe("€ par habitant view (roadmap 2.1)", () => {
+  it("builds a France-only block in constant euros with its own headline figure", () => {
+    const pc = adaptPensions(pensions as unknown as PensionsKpi, { ...base, slug: "pensions" }).perCapita!;
+    expect(pc.label).toBe("€ par habitant (euros 2025)");
+    expect(pc.ratioLabel).toBe("% de la dépense et du PIB");
+    expect(pc.blocks).toHaveLength(1);
+    expect(pc.blocks[0]).toMatchObject({ title: "Dépenses de vieillesse par habitant, en euros 2025", unit: "eur_hab" });
+    expect(pc.blocks[0].comparison).toBeUndefined();
+    expect(pc.blocks[0].peers).toBeUndefined();
+    expect(pc.blocks[0].note).toMatch(/^France seule/);
+    expect(pc.blocks[0].series[0].points[0].x).toBe(1996);
+    expect(pc.latest?.unit).toBe("eur_hab");
+    expect(pc.latest?.value).toBe(pensions.per_capita.series.france.at(-1)!.value);
+  });
+  it("keeps every sub-sector line", () => {
+    const pc = adaptDeficitSubsector(deficitSubsector as unknown as DeficitSubsectorKpi, { ...base, slug: "deficit_subsector" }).perCapita!;
+    expect(pc.blocks[0].series.map((s) => s.id)).toEqual(["central", "local", "social_security", "total"]);
+  });
+  it("is added to standard KPIs by withPerCapita, and absent without per_capita data", () => {
+    const adapt = withPerCapita(adaptStandard, "% des recettes", [{ title: "Intérêts", lines: [["france", "France"]] }]);
+    expect(adapt(debtService, { ...base, slug: "debt_service" }).perCapita?.ratioLabel).toBe("% des recettes");
+    expect(adapt(overhead, base).perCapita).toBeUndefined();
+    expect(perCapitaView(undefined, "% du PIB", [])).toBeUndefined();
   });
 });

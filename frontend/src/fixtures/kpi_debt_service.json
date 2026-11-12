@@ -3,9 +3,9 @@
   "kpi_name": "Debt Service Burden",
   "description": "Interest paid on public debt as a percentage of total government revenue. A rising burden crowds out service delivery.",
   "unit": "percent",
-  "source": "INSEE BDM — CNT-2020-CSI (D41_S13, OTE_S13, B9NF_S13) ; pays comparés : Eurostat — gov_10a_main (D41PAY, TR)",
-  "methodology": "D41_S13 (intérêts versés, ensemble des APU) / total des recettes publiques, où recette = dépense totale des APU (OTE) + solde public (B9NF). Le tout issu des comptes trimestriels CNT-2020-CSI cumulés sur l'année. Pays comparés : intérêts payables (D41PAY) / recettes totales (TR) des APU, Eurostat gov_10a_main, en millions d'euros courants ; calculé de la même façon pour la France, ce ratio Eurostat s'écarte de moins de 0,1 point de la série INSEE. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction).",
-  "last_updated": "2026-11-08T17:27:56Z",
+  "source": "INSEE BDM — CNT-2020-CSI (D41_S13, OTE_S13, B9NF_S13) ; pays comparés : Eurostat — gov_10a_main (D41PAY, TR) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
+  "methodology": "D41_S13 (intérêts versés, ensemble des APU) / total des recettes publiques, où recette = dépense totale des APU (OTE) + solde public (B9NF). Le tout issu des comptes trimestriels CNT-2020-CSI cumulés sur l'année. Pays comparés : intérêts payables (D41PAY) / recettes totales (TR) des APU, Eurostat gov_10a_main, en millions d'euros courants ; calculé de la même façon pour la France, ce ratio Eurostat s'écarte de moins de 0,1 point de la série INSEE. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction). Par habitant : intérêts versés (D41_S13) seuls. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
+  "last_updated": "2026-11-12T19:25:19Z",
   "france": [
     {
       "year": 1995,
@@ -113,7 +113,7 @@
     },
     {
       "year": 2021,
-      "value": 2.62
+      "value": 2.63
     },
     {
       "year": 2022,
@@ -121,17 +121,144 @@
     },
     {
       "year": 2023,
-      "value": 3.63
+      "value": 3.67
     },
     {
       "year": 2024,
-      "value": 4.01
+      "value": 4.0
     },
     {
       "year": 2025,
-      "value": 4.15
+      "value": 4.2
     }
   ],
+  "per_capita": {
+    "base_year": 2025,
+    "series": {
+      "france": [
+        {
+          "year": 1996,
+          "value": 1190
+        },
+        {
+          "year": 1997,
+          "value": 1190
+        },
+        {
+          "year": 1998,
+          "value": 1171
+        },
+        {
+          "year": 1999,
+          "value": 1090
+        },
+        {
+          "year": 2000,
+          "value": 1083
+        },
+        {
+          "year": 2001,
+          "value": 1135
+        },
+        {
+          "year": 2002,
+          "value": 1131
+        },
+        {
+          "year": 2003,
+          "value": 1073
+        },
+        {
+          "year": 2004,
+          "value": 1061
+        },
+        {
+          "year": 2005,
+          "value": 1040
+        },
+        {
+          "year": 2006,
+          "value": 1018
+        },
+        {
+          "year": 2007,
+          "value": 1078
+        },
+        {
+          "year": 2008,
+          "value": 1145
+        },
+        {
+          "year": 2009,
+          "value": 979
+        },
+        {
+          "year": 2010,
+          "value": 987
+        },
+        {
+          "year": 2011,
+          "value": 1064
+        },
+        {
+          "year": 2012,
+          "value": 1019
+        },
+        {
+          "year": 2013,
+          "value": 904
+        },
+        {
+          "year": 2014,
+          "value": 853
+        },
+        {
+          "year": 2015,
+          "value": 802
+        },
+        {
+          "year": 2016,
+          "value": 758
+        },
+        {
+          "year": 2017,
+          "value": 724
+        },
+        {
+          "year": 2018,
+          "value": 721
+        },
+        {
+          "year": 2019,
+          "value": 630
+        },
+        {
+          "year": 2020,
+          "value": 504
+        },
+        {
+          "year": 2021,
+          "value": 578
+        },
+        {
+          "year": 2022,
+          "value": 805
+        },
+        {
+          "year": 2023,
+          "value": 804
+        },
+        {
+          "year": 2024,
+          "value": 885
+        },
+        {
+          "year": 2025,
+          "value": 953
+        }
+      ]
+    }
+  },
   "peers": {
     "DEU": [
       {
@@ -892,7 +1019,7 @@
   },
   "latest": {
     "year": 2025,
-    "value": 4.15,
-    "yoy_change": 0.14
+    "value": 4.2,
+    "yoy_change": 0.2
   }
 }

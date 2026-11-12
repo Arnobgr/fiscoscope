@@ -25,11 +25,15 @@ import logging
 import pandas as pd
 
 from processors import (
+    PER_CAPITA_SOURCE,
     annual_values,
+    france_values,
     latest_raw,
     load_eurostat_long,
     load_insee_series,
     now_iso,
+    per_capita_block,
+    per_capita_note,
     pick,
     series_by_country,
     write_output,
@@ -66,6 +70,8 @@ def compute_outcomes() -> dict:
     gf07 = pick(exp, unit="PC_GDP", cofog99="GF07", na_item="TE")
     health_spend = series_by_country(gf07, ["FRA"]).get("FRA", [])
     life_expectancy = _life_expectancy_france()
+    gf07_eur = pick(exp, unit="MIO_EUR", cofog99="GF07", na_item="TE")
+    per_capita = per_capita_block({"france": {y: v * 1e6 for y, v in france_values(gf07_eur).items()}})
 
     latest = None
     if health_spend and life_expectancy:
@@ -91,6 +97,7 @@ def compute_outcomes() -> dict:
         "source": (
             "Eurostat — gov_10a_exp (dépense publique de santé, % du PIB) ; "
             "OCDE — statistiques de santé (espérance de vie à la naissance)"
+            + PER_CAPITA_SOURCE
         ),
         "methodology": (
             "Bloc santé : dépense COFOG GF07 (santé) de l'ensemble des APU en % "
@@ -103,6 +110,7 @@ def compute_outcomes() -> dict:
             "L'éducation (dépense vs. PISA) est omise — PISA n'est pas "
             "disponible via l'API SDMX de l'OCDE. Comparaison entre pays "
             "reportée."
+            + per_capita_note(per_capita["base_year"])
         ),
         "last_updated": now_iso(),
         "health": {
@@ -110,6 +118,7 @@ def compute_outcomes() -> dict:
             "life_expectancy_years": life_expectancy,
         },
         "education": None,
+        "per_capita": per_capita,
         "peers": {},
         "latest": latest,
     }
@@ -142,10 +151,11 @@ def compute_tax_expenditure() -> dict:
     balance = annual_values(series["fiscal_balance"])
     revenue = {y: expenditure[y] + balance[y] for y in set(expenditure) & set(balance)}
 
-    france = []
+    france, amounts = [], {}
     for year in sorted(df["Year"].unique()):
         grp = df[df["Year"] == year]
         total_eur = float(grp["RF (LCU)"].sum())
+        amounts[int(year)] = total_eur
         total_bn = round(total_eur / 1e9, 2)
         entry = {
             "year": int(year),
@@ -164,6 +174,7 @@ def compute_tax_expenditure() -> dict:
             if prev:
                 entry["yoy_change_pct"] = round((total_bn - prev) / prev * 100, 2)
         france.append(entry)
+    per_capita = per_capita_block({"france": amounts})
 
     payload = {
         "kpi_id": "tax_expenditure",
@@ -180,7 +191,7 @@ def compute_tax_expenditure() -> dict:
             "Global Tax Expenditures Database (GTED), Tax Expenditures Lab — "
             "Redonda, von Haldenwang & Aliu, CC-BY-4.0, concept DOI "
             "10.5281/zenodo.5940165; revenue denominator from INSEE BDM "
-            "CNT-2020-CSI (OTE_S13 + B9NF_S13)."
+            "CNT-2020-CSI (OTE_S13 + B9NF_S13)" + PER_CAPITA_SOURCE + "."
         ),
         "methodology": (
             "Par année : total_cost_eur_bn = Σ des recettes auxquelles l'État "
@@ -196,9 +207,11 @@ def compute_tax_expenditure() -> dict:
             "et Moyens » du PLF français ; son décompte des dispositifs et sa "
             "définition des recettes non perçues diffèrent légèrement de "
             "l'annexe officielle."
+            + per_capita_note(per_capita["base_year"])
         ),
         "last_updated": now_iso(),
         "france": france,
+        "per_capita": per_capita,
         "peers": {},
         "latest": dict(france[-1]) if france else None,
     }

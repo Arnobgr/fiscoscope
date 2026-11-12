@@ -7,7 +7,8 @@ import os
 #
 # Logical series names used throughout the pipeline:
 #   wage_bill_apu, social_benefits, fiscal_balance, debt_interest,
-#   total_apu_expenditure, gdp_nominal, cpi, public_debt_ratio
+#   total_apu_expenditure, gdp_nominal, cpi, population, public_debt_ratio,
+#   public_debt_eur
 # COFOG (functional) series come from Eurostat — see fetchers/eurostat.py.
 
 # OECD

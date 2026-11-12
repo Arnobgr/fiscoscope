@@ -18,6 +18,9 @@ export function fmtYears(v: number): string {
 export function fmtRatio(v: number): string {
   return `${num(v, 1, 1)}×`;
 }
+export function fmtEurHab(v: number): string {
+  return `${num(v, 0, 0)} €`;
+}
 export function fmtNumber(v: number): string {
   return num(v, 0, 0);
 }
@@ -27,6 +30,7 @@ export function fmtValue(v: number, unit: string): string {
     case "percent": return fmtPercent(v);
     case "eur_bn": return fmtEurBn(v);
     case "eur": return fmtEurBn(v / 1e9);
+    case "eur_hab": return fmtEurHab(v);
     case "years": return fmtYears(v);
     case "ratio": return fmtRatio(v);
     default: return num(v, 0, 2);
@@ -38,6 +42,7 @@ export function fmtAxis(v: number, unit: string): string {
     case "percent": return `${num(v, 0, 1)} %`;
     case "eur_bn": return `${num(v, 0, 0)} Md€`;
     case "eur": return `${num(v / 1e9, 0, 0)} Md€`;
+    case "eur_hab": return Math.abs(v) >= 10000 ? `${num(v / 1000, 0, 1)} k€` : `${num(v, 0, 0)} €`;
     case "years": return `${num(v, 0, 0)} ans`;
     case "ratio": return `${num(v, 0, 1)}×`;
     default: return num(v, 0, 1);
@@ -48,10 +53,12 @@ export function fmtDateFr(iso: string): string {
     .format(new Date(iso));
 }
 export type YoyDir = "up" | "down" | "flat";
-// `unit` "ratio" → YoY is a delta of multiples (×), shown without a "%" suffix.
+// `unit` "ratio" → YoY is a delta of multiples (×), shown without a "%" suffix;
+// "eur_hab" → a delta in euros per inhabitant.
 export function fmtYoy(v: number, unit?: string): { text: string; dir: YoyDir } {
   const dir: YoyDir = v > 0 ? "up" : v < 0 ? "down" : "flat";
   const sign = v > 0 ? "+" : ""; // negatives carry U+2212 via num()
+  if (unit === "eur_hab") return { text: `${sign}${fmtEurHab(v)}`, dir };
   const suffix = unit === "ratio" ? "×" : " %";
   return { text: `${sign}${num(v, 1, 2)}${suffix}`, dir }; // 1–2 decimals (e.g. +1,2 / −0,41)
 }

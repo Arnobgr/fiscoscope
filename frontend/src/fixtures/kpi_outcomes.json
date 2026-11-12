@@ -3,9 +3,9 @@
   "kpi_name": "Spend vs. Outcome — Health",
   "description": "France public health spend (COFOG GF07) as % of GDP set against life expectancy at birth, as two parallel time series for the reader to judge. Life expectancy reflects the whole health system (public and private) and non-health factors, not public spend alone, so the two series are shown side by side rather than as a causal efficiency verdict.",
   "unit": "mixed",
-  "source": "Eurostat — gov_10a_exp (dépense publique de santé, % du PIB) ; OCDE — statistiques de santé (espérance de vie à la naissance)",
-  "methodology": "Bloc santé : dépense COFOG GF07 (santé) de l'ensemble des APU en % du PIB, valeur publiée par Eurostat (arrondie au dixième). Espérance de vie à la naissance, population totale, issue des statistiques de santé de l'OCDE (DF_LE). L'espérance de vie dépend de l'ensemble du système de santé (public et privé) et de facteurs hors santé, et non de la seule dépense publique GF07 : les deux séries sont présentées en parallèle, sans en déduire un lien de causalité. L'éducation (dépense vs. PISA) est omise — PISA n'est pas disponible via l'API SDMX de l'OCDE. Comparaison entre pays reportée.",
-  "last_updated": "2026-11-08T17:27:56Z",
+  "source": "Eurostat — gov_10a_exp (dépense publique de santé, % du PIB) ; OCDE — statistiques de santé (espérance de vie à la naissance) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
+  "methodology": "Bloc santé : dépense COFOG GF07 (santé) de l'ensemble des APU en % du PIB, valeur publiée par Eurostat (arrondie au dixième). Espérance de vie à la naissance, population totale, issue des statistiques de santé de l'OCDE (DF_LE). L'espérance de vie dépend de l'ensemble du système de santé (public et privé) et de facteurs hors santé, et non de la seule dépense publique GF07 : les deux séries sont présentées en parallèle, sans en déduire un lien de causalité. L'éducation (dépense vs. PISA) est omise — PISA n'est pas disponible via l'API SDMX de l'OCDE. Comparaison entre pays reportée. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
+  "last_updated": "2026-11-12T19:39:30Z",
   "health": {
     "spend_pct_gdp": [
       {
@@ -208,52 +208,179 @@
       },
       {
         "year": 2014,
-        "value": 82.9
+        "value": 82.4
       },
       {
         "year": 2015,
-        "value": 82.4
+        "value": 82.1
       },
       {
         "year": 2016,
-        "value": 82.7
-      },
-      {
-        "year": 2017,
-        "value": 82.7
-      },
-      {
-        "year": 2018,
-        "value": 82.8
-      },
-      {
-        "year": 2019,
-        "value": 83.0
-      },
-      {
-        "year": 2020,
-        "value": 82.3
-      },
-      {
-        "year": 2021,
         "value": 82.4
       },
       {
+        "year": 2017,
+        "value": 82.4
+      },
+      {
+        "year": 2018,
+        "value": 82.6
+      },
+      {
+        "year": 2019,
+        "value": 82.7
+      },
+      {
+        "year": 2020,
+        "value": 82.2
+      },
+      {
+        "year": 2021,
+        "value": 82.2
+      },
+      {
         "year": 2022,
-        "value": 82.3
+        "value": 82.2
       },
       {
         "year": 2023,
+        "value": 82.9
+      },
+      {
+        "year": 2024,
         "value": 83.0
       }
     ]
   },
   "education": null,
+  "per_capita": {
+    "base_year": 2025,
+    "series": {
+      "france": [
+        {
+          "year": 1996,
+          "value": 2337
+        },
+        {
+          "year": 1997,
+          "value": 2294
+        },
+        {
+          "year": 1998,
+          "value": 2359
+        },
+        {
+          "year": 1999,
+          "value": 2417
+        },
+        {
+          "year": 2000,
+          "value": 2527
+        },
+        {
+          "year": 2001,
+          "value": 2603
+        },
+        {
+          "year": 2002,
+          "value": 2721
+        },
+        {
+          "year": 2003,
+          "value": 2817
+        },
+        {
+          "year": 2004,
+          "value": 2887
+        },
+        {
+          "year": 2005,
+          "value": 2987
+        },
+        {
+          "year": 2006,
+          "value": 3009
+        },
+        {
+          "year": 2007,
+          "value": 3046
+        },
+        {
+          "year": 2008,
+          "value": 3019
+        },
+        {
+          "year": 2009,
+          "value": 3127
+        },
+        {
+          "year": 2010,
+          "value": 3164
+        },
+        {
+          "year": 2011,
+          "value": 3182
+        },
+        {
+          "year": 2012,
+          "value": 3164
+        },
+        {
+          "year": 2013,
+          "value": 3188
+        },
+        {
+          "year": 2014,
+          "value": 3238
+        },
+        {
+          "year": 2015,
+          "value": 3247
+        },
+        {
+          "year": 2016,
+          "value": 3297
+        },
+        {
+          "year": 2017,
+          "value": 3353
+        },
+        {
+          "year": 2018,
+          "value": 3351
+        },
+        {
+          "year": 2019,
+          "value": 3385
+        },
+        {
+          "year": 2020,
+          "value": 3525
+        },
+        {
+          "year": 2021,
+          "value": 3900
+        },
+        {
+          "year": 2022,
+          "value": 3806
+        },
+        {
+          "year": 2023,
+          "value": 3761
+        },
+        {
+          "year": 2024,
+          "value": 3842
+        }
+      ]
+    }
+  },
   "peers": {},
   "latest": {
     "spend_year": 2024,
     "spend_pct_gdp": 8.9,
-    "life_expectancy_year": 2023,
+    "life_expectancy_year": 2024,
     "life_expectancy_years": 83.0
   }
 }

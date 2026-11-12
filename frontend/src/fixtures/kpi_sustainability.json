@@ -3,9 +3,9 @@
   "kpi_name": "Fiscal Deficit Trend",
   "description": "General government fiscal balance as % of GDP (negative values are deficits) plus the Maastricht public-debt-to-GDP ratio. Tracks whether public finances are sustainable over time, benchmarked against OECD peers.",
   "unit": "percent",
-  "source": "INSEE BDM — CNT-2020-CSI + CNA-2020-PIB + DETTE-TRIM-APU-2020 (Maastricht debt); peers OECD GIP 2025 (DSD_GOV, % of GDP)",
-  "methodology": "Déficit : B9NF_S13 (capacité/besoin de financement, ensemble des APU) cumulé sur l'année / PIB nominal × 100. Dette : ratio dette publique/PIB au sens de Maastricht (DETTE-TRIM-APU-2020, base 2020), relevé au dernier trimestre de l'année (T4) puisque la dette est un stock. Pays comparés : OCDE GIP 2025, capacité/besoin de financement (GNLB) et dette brute de Maastricht (GGDM), en % du PIB de part et d'autre — la « moyenne des 6 pays » (clé OECD_AVG) est la moyenne non pondérée de DEU/GBR/ITA/ESP/NLD/SWE, et non la moyenne de l'OCDE ; les séries des pays comparés débutent en 2007. Détenteurs de la dette (depuis 2020) : Eurostat gov_10dd_ggd, dette consolidée au sens de Maastricht en % du PIB, par secteur détenteur — non-résidents (S2), Banque de France (S121, titres acquis pour l'essentiel dans le cadre des programmes d'achats de l'Eurosystème) et autres résidents (banques, assurances, fonds, ménages…), ces derniers obtenus par différence entre le total et les deux autres. La ventilation par détenteur n'est publiée qu'à partir de 2020 pour la France.",
-  "last_updated": "2026-05-21T10:03:35Z",
+  "source": "INSEE BDM — CNT-2020-CSI + CNA-2020-PIB + DETTE-TRIM-APU-2020 (Maastricht debt); peers OECD GIP 2025 (DSD_GOV, % of GDP) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
+  "methodology": "Déficit : B9NF_S13 (capacité/besoin de financement, ensemble des APU) cumulé sur l'année / PIB nominal × 100. Dette : ratio dette publique/PIB au sens de Maastricht (DETTE-TRIM-APU-2020, base 2020), relevé au dernier trimestre de l'année (T4) puisque la dette est un stock. Pays comparés : OCDE GIP 2025, capacité/besoin de financement (GNLB) et dette brute de Maastricht (GGDM), en % du PIB de part et d'autre — la « moyenne des 6 pays » (clé OECD_AVG) est la moyenne non pondérée de DEU/GBR/ITA/ESP/NLD/SWE, et non la moyenne de l'OCDE ; les séries des pays comparés débutent en 2007. Détenteurs de la dette (depuis 2020) : Eurostat gov_10dd_ggd, dette consolidée au sens de Maastricht en % du PIB, par secteur détenteur — non-résidents (S2), Banque de France (S121, titres acquis pour l'essentiel dans le cadre des programmes d'achats de l'Eurosystème) et autres résidents (banques, assurances, fonds, ménages…), ces derniers obtenus par différence entre le total et les deux autres. La ventilation par détenteur n'est publiée qu'à partir de 2020 pour la France. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios. La dette, un stock relevé en fin d'année, est rapportée de la même façon à la population et aux prix moyens de l'année.",
+  "last_updated": "2026-11-12T19:39:29Z",
   "france": [
     {
       "year": 1995,
@@ -33,7 +33,7 @@
     },
     {
       "year": 2001,
-      "value": -1.41
+      "value": -1.42
     },
     {
       "year": 2002,
@@ -41,7 +41,7 @@
     },
     {
       "year": 2003,
-      "value": -4.07
+      "value": -4.08
     },
     {
       "year": 2004,
@@ -53,7 +53,7 @@
     },
     {
       "year": 2006,
-      "value": -2.66
+      "value": -2.65
     },
     {
       "year": 2007,
@@ -89,7 +89,7 @@
     },
     {
       "year": 2015,
-      "value": -3.9
+      "value": -3.89
     },
     {
       "year": 2016,
@@ -121,11 +121,15 @@
     },
     {
       "year": 2023,
-      "value": -5.38
+      "value": -5.36
     },
     {
       "year": 2024,
-      "value": -5.79
+      "value": -5.76
+    },
+    {
+      "year": 2025,
+      "value": -5.07
     }
   ],
   "debt": {
@@ -252,7 +256,7 @@
       },
       {
         "year": 2025,
-        "value": 115.6
+        "value": 115.7
       }
     ]
   },
@@ -334,6 +338,255 @@
         {
           "year": 2025,
           "value": 33.7
+        }
+      ]
+    }
+  },
+  "per_capita": {
+    "base_year": 2025,
+    "series": {
+      "deficit": [
+        {
+          "year": 1996,
+          "value": -1283
+        },
+        {
+          "year": 1997,
+          "value": -1242
+        },
+        {
+          "year": 1998,
+          "value": -825
+        },
+        {
+          "year": 1999,
+          "value": -541
+        },
+        {
+          "year": 2000,
+          "value": -481
+        },
+        {
+          "year": 2001,
+          "value": -527
+        },
+        {
+          "year": 2002,
+          "value": -1183
+        },
+        {
+          "year": 2003,
+          "value": -1520
+        },
+        {
+          "year": 2004,
+          "value": -1346
+        },
+        {
+          "year": 2005,
+          "value": -1342
+        },
+        {
+          "year": 2006,
+          "value": -1038
+        },
+        {
+          "year": 2007,
+          "value": -1199
+        },
+        {
+          "year": 2008,
+          "value": -1394
+        },
+        {
+          "year": 2009,
+          "value": -2835
+        },
+        {
+          "year": 2010,
+          "value": -2778
+        },
+        {
+          "year": 2011,
+          "value": -2079
+        },
+        {
+          "year": 2012,
+          "value": -2004
+        },
+        {
+          "year": 2013,
+          "value": -1916
+        },
+        {
+          "year": 2014,
+          "value": -1775
+        },
+        {
+          "year": 2015,
+          "value": -1538
+        },
+        {
+          "year": 2016,
+          "value": -1502
+        },
+        {
+          "year": 2017,
+          "value": -1359
+        },
+        {
+          "year": 2018,
+          "value": -946
+        },
+        {
+          "year": 2019,
+          "value": -995
+        },
+        {
+          "year": 2020,
+          "value": -3510
+        },
+        {
+          "year": 2021,
+          "value": -2744
+        },
+        {
+          "year": 2022,
+          "value": -1992
+        },
+        {
+          "year": 2023,
+          "value": -2289
+        },
+        {
+          "year": 2024,
+          "value": -2489
+        },
+        {
+          "year": 2025,
+          "value": -2198
+        }
+      ],
+      "debt": [
+        {
+          "year": 1996,
+          "value": 19941
+        },
+        {
+          "year": 1997,
+          "value": 20768
+        },
+        {
+          "year": 1998,
+          "value": 21470
+        },
+        {
+          "year": 1999,
+          "value": 21742
+        },
+        {
+          "year": 2000,
+          "value": 21860
+        },
+        {
+          "year": 2001,
+          "value": 22059
+        },
+        {
+          "year": 2002,
+          "value": 22871
+        },
+        {
+          "year": 2003,
+          "value": 24379
+        },
+        {
+          "year": 2004,
+          "value": 25327
+        },
+        {
+          "year": 2005,
+          "value": 26112
+        },
+        {
+          "year": 2006,
+          "value": 25569
+        },
+        {
+          "year": 2007,
+          "value": 26262
+        },
+        {
+          "year": 2008,
+          "value": 27837
+        },
+        {
+          "year": 2009,
+          "value": 32323
+        },
+        {
+          "year": 2010,
+          "value": 33528
+        },
+        {
+          "year": 2011,
+          "value": 34767
+        },
+        {
+          "year": 2012,
+          "value": 35542
+        },
+        {
+          "year": 2013,
+          "value": 36656
+        },
+        {
+          "year": 2014,
+          "value": 37340
+        },
+        {
+          "year": 2015,
+          "value": 38306
+        },
+        {
+          "year": 2016,
+          "value": 39120
+        },
+        {
+          "year": 2017,
+          "value": 39938
+        },
+        {
+          "year": 2018,
+          "value": 40177
+        },
+        {
+          "year": 2019,
+          "value": 40780
+        },
+        {
+          "year": 2020,
+          "value": 45146
+        },
+        {
+          "year": 2021,
+          "value": 47006
+        },
+        {
+          "year": 2022,
+          "value": 46723
+        },
+        {
+          "year": 2023,
+          "value": 46742
+        },
+        {
+          "year": 2024,
+          "value": 48639
+        },
+        {
+          "year": 2025,
+          "value": 50170
         }
       ]
     }
@@ -1381,8 +1634,8 @@
     }
   },
   "latest": {
-    "year": 2024,
-    "value": -5.79,
-    "yoy_change": -0.41
+    "year": 2025,
+    "value": -5.07,
+    "yoy_change": 0.69
   }
 }

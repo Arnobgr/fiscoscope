@@ -18,7 +18,6 @@ feature-complete; deployment (first live run of the FastAPI app) and the fronten
 | Input | Blocker | Unblock path |
 |-------|---------|--------------|
 | `social_benefits` (D62_S13) | **None** — just unwired. Resolved for PRD §5.3's original friction formula; the shipped friction diverged to admin-COFOG / revenue. | Design choice: wire into a redesigned friction or a new transfers KPI. No new data needed. |
-| `cpi` | **None technical** — it's a utility, not a KPI; nothing has asked for constant-euro framing. `cpi` is monthly and `annual_values()` rejects monthly, so a monthly→annual step is also needed. | Build when a KPI wants real-terms values (Session D candidate #4). |
 | France Travail (`france_travail_allocataires`) | **Real data gap** — gives an indemnisés *count* (a level), not benefit *spend*, so no efficiency ratio is possible. | Acquire a paired spend series: COFOG GF10.5 unemployment sub-function (EUR) or a France-Travail expenditure/montant file → € per recipient (Session D candidate #3). |
 | `budget_plrg` raw | PLRG mission/program tabular export **discontinued, PDF-only**. | By-design `skipped`; no KPI consumes it. Revisit only if a PLRG-based KPI is wanted (would need PDF parsing). |
 

@@ -246,3 +246,67 @@ EUROSTAT_PEER_NOTE = (
     "l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 "
     "pour les dépenses par fonction)."
 )
+
+
+# --- € per inhabitant in constant euros (roadmap 2.1) -------------------------
+# France only: comparing euros per head across countries would need purchasing-
+# power parities; peers stay on the ratio view.
+_MONTHLY_DATE_RE = re.compile(r"^\d{4}-\d{2}$")
+
+
+def cpi_annual(df: pd.DataFrame) -> dict[int, float]:
+    """Annual mean of a monthly ('YYYY-MM') index; years with fewer than 12 months are dropped."""
+    tmp = df.dropna(subset=["value"])
+    dates = tmp["date"].astype(str)
+    if not dates.str.match(_MONTHLY_DATE_RE).all():
+        raise ValueError(f"cpi_annual: expected 'YYYY-MM' dates, got e.g. {sorted(set(dates))[:3]}")
+    tmp = tmp.assign(year=dates.map(to_year))
+    grouped = tmp.groupby("year")["value"]
+    means = grouped.mean()[grouped.size() == 12]
+    return {int(y): float(v) for y, v in means.items()}
+
+
+def france_values(df: pd.DataFrame) -> dict[int, float]:
+    """{year: value} of the France rows of a long country/year/value frame."""
+    fr = df[df["country"] == "FRA"]
+    return {int(y): float(v) for y, v in zip(fr["year"], fr["value"])}
+
+
+def per_capita_block(amounts_eur: dict[str, dict[int, float]]) -> dict:
+    """
+    Turn yearly amounts in current euros into € per inhabitant in constant
+    euros of the latest complete CPI year: amount / average population (INSEE)
+    × CPI[base] / CPI[year]. Returns {"base_year", "series": {name: [{year, value}]}},
+    values rounded to the euro; years without population or a full CPI year are dropped.
+    """
+    insee = load_insee_series()
+    population = annual_values(insee["population"])
+    cpi = cpi_annual(insee["cpi"])
+    base = max(cpi)
+    return {
+        "base_year": base,
+        "series": {
+            name: [
+                {"year": y, "value": round(v / population[y] * cpi[base] / cpi[y])}
+                for y, v in sorted(by_year.items())
+                if population.get(y) and y in cpi
+            ]
+            for name, by_year in amounts_eur.items()
+        },
+    }
+
+
+PER_CAPITA_SOURCE = " ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)"
+
+
+def per_capita_note(base_year: int) -> str:
+    """Methodology sentence for the € per inhabitant view (shown to users, in French)."""
+    return (
+        " En euros par habitant (France seule) : montant annuel en euros courants "
+        "divisé par la population moyenne de l'année (INSEE, France entière), puis "
+        f"exprimé en euros constants de {base_year} avec l'indice des prix à la "
+        "consommation de l'INSEE (moyenne des douze mois de chaque année), "
+        "disponible depuis 1996. Les montants par habitant de pays différents ne "
+        "sont pas comparés : il faudrait corriger les écarts de prix entre pays ; "
+        "la comparaison se fait sur les ratios."
+    )

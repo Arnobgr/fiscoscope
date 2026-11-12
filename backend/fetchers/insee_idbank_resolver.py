@@ -96,6 +96,23 @@ SERIES_SEARCH_RULES = {
         ("ZONE_GEO", "FE"),
         ("CORRECTION", "BRUT"),
     ],
+    # --- Average population, France incl. overseas (roadmap 2.1, € per inhabitant) ---
+    "population": [
+        ("famille", "POPULATION-STRUCTURE"),
+        ("PERIODICITE", "A"),
+        ("INDICATEUR", "POPULATION_MOYENNE"),
+        ("ZONE_GEO", "FE"),
+    ],
+    # --- Maastricht public debt in euros (year-end stock; roadmap 2.1) ---
+    "public_debt_eur": [
+        ("famille", "DETTE-TRIM-APU-2020"),
+        ("PERIODICITE", "T"),
+        ("INDICATEUR", "DETTE_MAASTRICHT"),
+        ("SECT-INST", "S13"),
+        ("DETTE_MAASTRICHT_INTRUMENTS", "F"),
+        ("NATURE", "VALEUR_ABSOLUE"),
+        ("UNITE", "EUROS"),
+    ],
     # --- Maastricht public debt as % of GDP (DETTE-TRIM-APU-2020, quarterly) ---
     # NATURE=PROPORTION + UNITE=POURCENT gives the debt ratio directly (no division).
     # Debt is a STOCK: the annual figure is the year-end (Q4) quarter, not a sum.

@@ -14,10 +14,14 @@ from processors import (
     EU27_AVG_KEY,
     EUROSTAT_PEER_NOTE,
     EUROSTAT_PEERS,
+    PER_CAPITA_SOURCE,
     build_latest,
     france_and_peers,
+    france_values,
     load_eurostat_long,
     now_iso,
+    per_capita_block,
+    per_capita_note,
     pick,
     ratio,
     write_output,
@@ -121,6 +125,8 @@ def compute_pensions() -> dict:
     france, peers = france_and_peers(shares, PEER_CODES)
     pct_gdp = pick(exp, unit="PC_GDP", cofog99="GF1002", na_item="TE")
     gdp_france, gdp_peers = france_and_peers(pct_gdp, PEER_CODES)
+    old_age_eur = pick(eur, cofog99="GF1002", na_item="TE")
+    per_capita = per_capita_block({"france": {y: v * 1e6 for y, v in france_values(old_age_eur).items()}})
 
     payload = {
         "kpi_id": "pensions",
@@ -130,7 +136,8 @@ def compute_pensions() -> dict:
             "the elderly) as % of total public expenditure, and as % of GDP."
         ),
         "unit": "percent",
-        "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG, niveau 2)",
+        "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG, niveau 2)"
+        + PER_CAPITA_SOURCE,
         "methodology": (
             "Fonction COFOG GF1002 « vieillesse », ensemble des APU : pensions de "
             "retraite (régimes de base et complémentaires, retraites des "
@@ -141,11 +148,13 @@ def compute_pensions() -> dict:
             "sont pas comprises. Part de la dépense : GF1002 / dépense publique "
             "totale × 100, en millions d'euros courants. En % du PIB : valeur "
             "publiée par Eurostat (arrondie au dixième). " + EUROSTAT_PEER_NOTE
+            + per_capita_note(per_capita["base_year"])
         ),
         "last_updated": now_iso(),
         "france": france,
         "peers": peers,
         "pct_gdp": {"france": gdp_france, "peers": gdp_peers},
+        "per_capita": per_capita,
         "latest": build_latest(france),
     }
     write_output("kpi_pensions.json", payload)

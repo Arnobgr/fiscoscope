@@ -3,9 +3,9 @@
   "kpi_name": "Old-Age Expenditure",
   "description": "Public expenditure on old age (COFOG GF1002: pensions and care for the elderly) as % of total public expenditure, and as % of GDP.",
   "unit": "percent",
-  "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG, niveau 2)",
-  "methodology": "Fonction COFOG GF1002 « vieillesse », ensemble des APU : pensions de retraite (régimes de base et complémentaires, retraites des fonctionnaires) et prestations liées à la perte d'autonomie des personnes âgées (allocation personnalisée d'autonomie, aide sociale à l'hébergement). Les pensions de réversion relèvent de GF1003 « survivants » et ne sont pas comprises. Part de la dépense : GF1002 / dépense publique totale × 100, en millions d'euros courants. En % du PIB : valeur publiée par Eurostat (arrondie au dixième). Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction).",
-  "last_updated": "2026-11-08T17:26:50Z",
+  "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG, niveau 2) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
+  "methodology": "Fonction COFOG GF1002 « vieillesse », ensemble des APU : pensions de retraite (régimes de base et complémentaires, retraites des fonctionnaires) et prestations liées à la perte d'autonomie des personnes âgées (allocation personnalisée d'autonomie, aide sociale à l'hébergement). Les pensions de réversion relèvent de GF1003 « survivants » et ne sont pas comprises. Part de la dépense : GF1002 / dépense publique totale × 100, en millions d'euros courants. En % du PIB : valeur publiée par Eurostat (arrondie au dixième). Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction). En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
+  "last_updated": "2026-11-12T19:25:19Z",
   "france": [
     {
       "year": 1995,
@@ -1460,6 +1460,129 @@
         {
           "year": 2024,
           "value": 10.6
+        }
+      ]
+    }
+  },
+  "per_capita": {
+    "base_year": 2025,
+    "series": {
+      "france": [
+        {
+          "year": 1996,
+          "value": 3627
+        },
+        {
+          "year": 1997,
+          "value": 3665
+        },
+        {
+          "year": 1998,
+          "value": 3738
+        },
+        {
+          "year": 1999,
+          "value": 3847
+        },
+        {
+          "year": 2000,
+          "value": 3872
+        },
+        {
+          "year": 2001,
+          "value": 3946
+        },
+        {
+          "year": 2002,
+          "value": 3995
+        },
+        {
+          "year": 2003,
+          "value": 4081
+        },
+        {
+          "year": 2004,
+          "value": 4266
+        },
+        {
+          "year": 2005,
+          "value": 4358
+        },
+        {
+          "year": 2006,
+          "value": 4564
+        },
+        {
+          "year": 2007,
+          "value": 4710
+        },
+        {
+          "year": 2008,
+          "value": 4815
+        },
+        {
+          "year": 2009,
+          "value": 4969
+        },
+        {
+          "year": 2010,
+          "value": 5035
+        },
+        {
+          "year": 2011,
+          "value": 5130
+        },
+        {
+          "year": 2012,
+          "value": 5175
+        },
+        {
+          "year": 2013,
+          "value": 5236
+        },
+        {
+          "year": 2014,
+          "value": 5278
+        },
+        {
+          "year": 2015,
+          "value": 5338
+        },
+        {
+          "year": 2016,
+          "value": 5403
+        },
+        {
+          "year": 2017,
+          "value": 5476
+        },
+        {
+          "year": 2018,
+          "value": 5495
+        },
+        {
+          "year": 2019,
+          "value": 5548
+        },
+        {
+          "year": 2020,
+          "value": 5632
+        },
+        {
+          "year": 2021,
+          "value": 5593
+        },
+        {
+          "year": 2022,
+          "value": 5543
+        },
+        {
+          "year": 2023,
+          "value": 5559
+        },
+        {
+          "year": 2024,
+          "value": 5766
         }
       ]
     }

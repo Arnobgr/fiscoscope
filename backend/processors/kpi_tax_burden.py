@@ -9,10 +9,16 @@ import logging
 
 from processors import (
     OECD_PEERS,
+    PER_CAPITA_SOURCE,
+    annual_values,
     build_latest,
     france_and_peers,
+    france_values,
+    load_insee_series,
     load_oecd_long,
     now_iso,
+    per_capita_block,
+    per_capita_note,
     write_output,
 )
 
@@ -35,6 +41,13 @@ def compute_tax_burden() -> dict:
     df = one_per_year(df[(df["measure"] == "TAX_REV") & (df["unit_measure"] == "PT_B1GQ")])
     france, peers = france_and_peers(df, [*OECD_PEERS, OECD_REP_KEY])
 
+    # € per inhabitant (roadmap 2.1): the OECD raw holds % of GDP only, so the
+    # euro amount is that rate × INSEE nominal GDP (M€).
+    gdp = annual_values(load_insee_series()["gdp_nominal"])
+    per_capita = per_capita_block({
+        "france": {y: r / 100 * gdp[y] * 1e6 for y, r in france_values(df).items() if y in gdp}
+    })
+
     payload = {
         "kpi_id": "tax_burden",
         "kpi_name": "Tax Burden",
@@ -43,7 +56,10 @@ def compute_tax_burden() -> dict:
             "contributions, as % of GDP (OECD Revenue Statistics)."
         ),
         "unit": "percent",
-        "source": "OCDE — Revenue Statistics (DF_RSOECD), recettes fiscales totales en % du PIB",
+        "source": (
+            "OCDE — Revenue Statistics (DF_RSOECD), recettes fiscales totales en % du PIB"
+            "; PIB nominal : INSEE BDM (CNA-2020-PIB)" + PER_CAPITA_SOURCE
+        ),
         "methodology": (
             "Recettes fiscales totales de l'ensemble des administrations publiques "
             "(impôts et cotisations sociales effectives) en % du PIB, selon la "
@@ -55,9 +71,15 @@ def compute_tax_burden() -> dict:
             "comparés. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas, "
             "Royaume-Uni et Suède. La « moyenne OCDE » (clé OECD_REP) est la "
             "moyenne des pays membres publiée par l'OCDE (« OECD average »)."
+            " Montant en euros (pour la vue par habitant) : taux de l'OCDE × PIB "
+            "nominal publié par l'INSEE ; l'OCDE ne fournit ici que le taux, et "
+            "son PIB de référence peut différer très légèrement du dernier PIB "
+            "publié par l'INSEE."
+            + per_capita_note(per_capita["base_year"])
         ),
         "last_updated": now_iso(),
         "france": france,
+        "per_capita": per_capita,
         "peers": peers,
         "latest": build_latest(france),
     }

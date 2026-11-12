@@ -18,13 +18,17 @@ local government and social security, Eurostat gov_10a_main, 1995 onwards.
 import logging
 
 from processors import (
+    PER_CAPITA_SOURCE,
     annual_values,
     build_latest,
+    france_values,
     load_eurostat_long,
     load_insee_series,
     load_oecd_long,
     now_iso,
     peer_series,
+    per_capita_block,
+    per_capita_note,
     pick,
     series_by_country,
     write_output,
@@ -91,6 +95,13 @@ def compute_fiscal_sustainability() -> dict:
         "debt": peer_series(debt_peers[["country", "year", "value"]]),
     }
 
+    # € per inhabitant (roadmap 2.1): balance in M€, Maastricht debt in Md€.
+    debt_eur = year_end_value(series["public_debt_eur"])
+    per_capita = per_capita_block({
+        "deficit": {y: v * 1e6 for y, v in balance.items()},
+        "debt": {y: v * 1e9 for y, v in debt_eur.items()},
+    })
+
     payload = {
         "kpi_id": "sustainability",
         "kpi_name": "Fiscal Deficit Trend",
@@ -104,6 +115,7 @@ def compute_fiscal_sustainability() -> dict:
         "source": (
             "INSEE BDM — CNT-2020-CSI + CNA-2020-PIB + DETTE-TRIM-APU-2020 "
             "(Maastricht debt); peers OECD GIP 2025 (DSD_GOV, % of GDP)"
+            + PER_CAPITA_SOURCE
         ),
         "methodology": (
             "Déficit : B9NF_S13 (capacité/besoin de financement, ensemble des "
@@ -116,11 +128,15 @@ def compute_fiscal_sustainability() -> dict:
             "pondérée de DEU/GBR/ITA/ESP/NLD/SWE, et non la moyenne de l'OCDE ; "
             "les séries des pays comparés débutent en 2007."
             + DEBT_HOLDERS_METHODOLOGY
+            + per_capita_note(per_capita["base_year"])
+            + " La dette, un stock relevé en fin d'année, est rapportée de la "
+            "même façon à la population et aux prix moyens de l'année."
         ),
         "last_updated": now_iso(),
         "france": france,
         "debt": {"france": debt_france},
         "debt_holders": debt_holders(),
+        "per_capita": per_capita,
         "peers": peers,
         "latest": build_latest(france),
     }
@@ -139,16 +155,18 @@ SUBSECTORS = {
 def compute_deficit_subsector() -> dict:
     """Compute the Deficit by Sub-sector and write kpi_deficit_subsector.json."""
     main = load_eurostat_long("eurostat_main")
-    subsectors = {}
+    subsectors, amounts = {}, {}
     for key, code in SUBSECTORS.items():
         pct = pick(main, unit="PC_GDP", sector=code, na_item="B9")
         eur = pick(main, unit="MIO_EUR", sector=code, na_item="B9")
+        amounts[key] = {y: v * 1e6 for y, v in france_values(eur).items()}
         eur = eur.assign(value=eur["value"] / 1000)  # M€ → Md€
         subsectors[key] = {
             "pct_gdp": series_by_country(pct, ["FRA"]).get("FRA", []),
             "eur_bn": series_by_country(eur, ["FRA"]).get("FRA", []),
         }
     france = subsectors["central"]["pct_gdp"]
+    per_capita = per_capita_block(amounts)
 
     payload = {
         "kpi_id": "deficit_subsector",
@@ -159,7 +177,7 @@ def compute_deficit_subsector() -> dict:
             "GDP and in EUR bn. The headline figure is central government."
         ),
         "unit": "percent",
-        "source": "Eurostat — gov_10a_main (comptes des APU par sous-secteur)",
+        "source": "Eurostat — gov_10a_main (comptes des APU par sous-secteur)" + PER_CAPITA_SOURCE,
         "methodology": (
             "Capacité (+) ou besoin (−) de financement (B9) de chaque sous-secteur "
             "des administrations publiques : administrations centrales (S1311 — "
@@ -176,10 +194,12 @@ def compute_deficit_subsector() -> dict:
             "Les collectivités locales ne peuvent emprunter que pour investir "
             "(règle d'or). En % du PIB : valeurs publiées par Eurostat (arrondies "
             "au dixième) ; en milliards d'euros courants : millions d'euros / 1 000."
+            + per_capita_note(per_capita["base_year"])
         ),
         "last_updated": now_iso(),
         "france": france,
         "subsectors": subsectors,
+        "per_capita": per_capita,
         "peers": {},
         "latest": build_latest(france),
     }

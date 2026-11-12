@@ -3,9 +3,9 @@
   "kpi_name": "Tax Burden",
   "description": "Total tax revenue of general government, including social security contributions, as % of GDP (OECD Revenue Statistics).",
   "unit": "percent",
-  "source": "OCDE — Revenue Statistics (DF_RSOECD), recettes fiscales totales en % du PIB",
-  "methodology": "Recettes fiscales totales de l'ensemble des administrations publiques (impôts et cotisations sociales effectives) en % du PIB, selon la définition harmonisée de l'OCDE (Revenue Statistics). Ce taux diffère légèrement du taux de prélèvements obligatoires publié par l'INSEE et de l'agrégat d'Eurostat (périmètre des cotisations imputées, impôts versés à l'Union européenne, impôts dus mais non recouvrés) : une seule définition est utilisée ici, pour la France comme pour les pays comparés. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas, Royaume-Uni et Suède. La « moyenne OCDE » (clé OECD_REP) est la moyenne des pays membres publiée par l'OCDE (« OECD average »).",
-  "last_updated": "2026-11-08T17:46:40Z",
+  "source": "OCDE — Revenue Statistics (DF_RSOECD), recettes fiscales totales en % du PIB; PIB nominal : INSEE BDM (CNA-2020-PIB) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
+  "methodology": "Recettes fiscales totales de l'ensemble des administrations publiques (impôts et cotisations sociales effectives) en % du PIB, selon la définition harmonisée de l'OCDE (Revenue Statistics). Ce taux diffère légèrement du taux de prélèvements obligatoires publié par l'INSEE et de l'agrégat d'Eurostat (périmètre des cotisations imputées, impôts versés à l'Union européenne, impôts dus mais non recouvrés) : une seule définition est utilisée ici, pour la France comme pour les pays comparés. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas, Royaume-Uni et Suède. La « moyenne OCDE » (clé OECD_REP) est la moyenne des pays membres publiée par l'OCDE (« OECD average »). Montant en euros (pour la vue par habitant) : taux de l'OCDE × PIB nominal publié par l'INSEE ; l'OCDE ne fournit ici que le taux, et son PIB de référence peut différer très légèrement du dernier PIB publié par l'INSEE. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
+  "last_updated": "2026-11-12T19:25:19Z",
   "france": [
     {
       "year": 1965,
@@ -248,6 +248,129 @@
       "value": 43.46
     }
   ],
+  "per_capita": {
+    "base_year": 2025,
+    "series": {
+      "france": [
+        {
+          "year": 1996,
+          "value": 14424
+        },
+        {
+          "year": 1997,
+          "value": 14730
+        },
+        {
+          "year": 1998,
+          "value": 15141
+        },
+        {
+          "year": 1999,
+          "value": 15758
+        },
+        {
+          "year": 2000,
+          "value": 15983
+        },
+        {
+          "year": 2001,
+          "value": 16193
+        },
+        {
+          "year": 2002,
+          "value": 16000
+        },
+        {
+          "year": 2003,
+          "value": 15911
+        },
+        {
+          "year": 2004,
+          "value": 16214
+        },
+        {
+          "year": 2005,
+          "value": 16521
+        },
+        {
+          "year": 2006,
+          "value": 17016
+        },
+        {
+          "year": 2007,
+          "value": 17214
+        },
+        {
+          "year": 2008,
+          "value": 17039
+        },
+        {
+          "year": 2009,
+          "value": 16193
+        },
+        {
+          "year": 2010,
+          "value": 16414
+        },
+        {
+          "year": 2011,
+          "value": 16970
+        },
+        {
+          "year": 2012,
+          "value": 17225
+        },
+        {
+          "year": 2013,
+          "value": 17572
+        },
+        {
+          "year": 2014,
+          "value": 17631
+        },
+        {
+          "year": 2015,
+          "value": 17918
+        },
+        {
+          "year": 2016,
+          "value": 18094
+        },
+        {
+          "year": 2017,
+          "value": 18698
+        },
+        {
+          "year": 2018,
+          "value": 18767
+        },
+        {
+          "year": 2019,
+          "value": 18705
+        },
+        {
+          "year": 2020,
+          "value": 17774
+        },
+        {
+          "year": 2021,
+          "value": 18779
+        },
+        {
+          "year": 2022,
+          "value": 19239
+        },
+        {
+          "year": 2023,
+          "value": 18719
+        },
+        {
+          "year": 2024,
+          "value": 18768
+        }
+      ]
+    }
+  },
   "peers": {
     "DEU": [
       {

@@ -99,9 +99,12 @@ def _oecd_row(area, year, value, measure, unit):
             "MEASURE": measure, "UNIT_MEASURE": unit}
 
 
-def test_tax_burden_keeps_oecd_aggregate_under_its_own_key(raw_dir):
+def test_tax_burden_keeps_oecd_aggregate_under_its_own_key(raw_dir, insee_raw):
+    from conftest import months
     from processors.kpi_tax_burden import compute_tax_burden
 
+    insee_raw({"gdp_nominal": {"2024": 2_000.0}, "population": {"2024": 10_000.0},
+               "cpi": months(2024, 100.0)})
     raw_dir("oecd_tax_revenue", [
         _oecd_row("FRA", 2024, 43.5, "TAX_REV", "PT_B1GQ"),
         _oecd_row("GBR", 2024, 34.4, "TAX_REV", "PT_B1GQ"),
@@ -110,6 +113,8 @@ def test_tax_burden_keeps_oecd_aggregate_under_its_own_key(raw_dir):
     out = compute_tax_burden()
     assert out["france"] == [{"year": 2024, "value": 43.5}]
     assert set(out["peers"]) == {"GBR", "OECD_REP"}
+    # € per inhabitant: 43.5 % × 2,000 M€ GDP / 10,000 inhabitants = 87,000 €
+    assert out["per_capita"]["series"]["france"] == [{"year": 2024, "value": 87000}]
 
 
 def test_public_employment_filters_measure_and_rejects_duplicates(raw_dir):

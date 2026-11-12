@@ -3,6 +3,7 @@ import type { Polarity } from "./format";
 import {
   type AdaptBase, adaptStandard, adaptSustainability, adaptOutcomes,
   adaptTaxExpenditure, adaptMonthly, adaptPensions, adaptDeficitSubsector, adaptPerformance,
+  withPerCapita,
 } from "./adapters";
 
 export type ThemeId = "efficacite" | "soutenabilite" | "depenses";
@@ -35,13 +36,15 @@ export const REGISTRY: Entry[] = [
   e("wage_ratio", "efficacite", "percent", "higher_bad", "Masse salariale public / privé",
     "Masse salariale publique rapportée à la masse salariale privée : mesure le poids relatif de l’emploi public dans la rémunération du pays.", adaptStandard),
   e("tax_burden", "soutenabilite", "percent", "neutral", "Impôts et cotisations (% du PIB)",
-    "Ensemble des impôts et cotisations sociales perçus par les administrations publiques, en % du PIB, selon la définition harmonisée de l’OCDE (Revenue Statistics), qui permet de comparer les pays sur la même base depuis 1965. Ce taux diffère légèrement du « taux de prélèvements obligatoires » publié par l’INSEE et de celui d’Eurostat, dont les périmètres ne sont pas tout à fait les mêmes.", adaptStandard),
+    "Ensemble des impôts et cotisations sociales perçus par les administrations publiques, en % du PIB, selon la définition harmonisée de l’OCDE (Revenue Statistics), qui permet de comparer les pays sur la même base depuis 1965. Ce taux diffère légèrement du « taux de prélèvements obligatoires » publié par l’INSEE et de celui d’Eurostat, dont les périmètres ne sont pas tout à fait les mêmes.",
+    withPerCapita(adaptStandard, "% du PIB", [{ title: "Impôts et cotisations par habitant", lines: [["france", "France"]] }])),
   e("sustainability", "soutenabilite", "percent", "higher_good", "Déficit public & dette",
     "Solde public (déficit ou excédent) en % du PIB, accompagné de la dette publique au sens de Maastricht. Indique si les finances publiques sont soutenables dans la durée.", adaptSustainability),
   e("deficit_subsector", "soutenabilite", "percent", "higher_good", "Déficit : État, collectivités, Sécurité sociale",
     "Solde (déficit ou excédent) de chacune des trois composantes des administrations publiques, en % du PIB : l’État et les organismes centraux, les collectivités locales, les administrations de sécurité sociale (régimes de base et complémentaires, assurance chômage, hôpitaux). Le chiffre mis en avant est celui de l’État. Chaque solde s’entend après les transferts entre administrations : l’État finance une partie des ressources des collectivités et de la Sécurité sociale. Les collectivités ne peuvent emprunter que pour investir.", adaptDeficitSubsector),
   e("debt_service", "soutenabilite", "percent", "higher_bad", "Charge de la dette",
-    "Intérêts de la dette publique rapportés aux recettes : la part des recettes absorbée par le seul service de la dette, avant toute dépense.", adaptStandard),
+    "Intérêts de la dette publique rapportés aux recettes : la part des recettes absorbée par le seul service de la dette, avant toute dépense.",
+    withPerCapita(adaptStandard, "% des recettes", [{ title: "Intérêts de la dette par habitant", lines: [["france", "France"]] }])),
   e("pension_investment", "soutenabilite", "ratio", "higher_bad", "Protection sociale vs investissement",
     "Dépenses de protection sociale (retraites, chômage, famille, maladie, etc.) rapportées à l’investissement public : combien de fois l’État dépense en transferts sociaux ce qu’il investit pour l’avenir.", adaptStandard),
   e("pensions", "depenses", "percent", "neutral", "Dépenses de vieillesse (retraites)",

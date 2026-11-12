@@ -831,3 +831,57 @@ section below, then commit.
       then `… -m processors.kpi_performance` (or the annual run) → check
       `/api/kpi/kpi_performance` and `/api/kpi/performance_detail_2025` → push
       `main`.
+- **Session J (2026-11-12) — roadmap 2.1 (€ per inhabitant, constant euros).**
+    - **Decisions (owner, 2026-11-12).** Seven KPIs get the view: deficit +
+      debt, deficit by sub-sector, debt interest (€/hab of interest, next to
+      the % of revenue), pensions, health spending, tax burden, tax
+      expenditure. Shares of spending (wage bill, overhead, friction…) and the
+      in-year monthly execution don't. **France only** in €/hab mode — euros
+      per head across countries would need PPS; peers stay on the ratios
+      (principle 5). Taxes in euros = **OECD rate × INSEE nominal GDP** (the
+      OECD raw only holds % of GDP; said in the methodology). Series start in
+      **1996** (first year of the CPI below), no splice with older CPI bases.
+    - **Inputs.** Two new resolver rules: `population` =
+      POPULATION-STRUCTURE, annual `POPULATION_MOYENNE`, `ZONE_GEO=FE`
+      (France incl. overseas, idBank 001641584 on 2026-11-12, 1990–2025;
+      `FM` is metropolitan France); `public_debt_eur` = DETTE-TRIM-APU-2020
+      Maastricht debt `VALEUR_ABSOLUE`/`EUROS` (010777616, quarterly, **in
+      Md€** — the CNT flows and CNA GDP are in M€). The orphaned `cpi`
+      (IPC-2025, monthly, 2025 = 100) starts January 1996.
+    - **Rule.** `per_capita_block`: current euros / average population of the
+      year × CPI[base] / CPI[year], CPI = mean of 12 months (incomplete years
+      dropped), base = latest complete CPI year (2025 today; the label follows
+      automatically next year), values rounded to the euro. The debt, a
+      year-end stock, uses the same average population and annual CPI (said
+      in the methodology). Euro sources: INSEE B9NF and D41 (M€), INSEE
+      Maastricht debt (Md€), Eurostat `MIO_EUR` for B9 by sub-sector, GF1002
+      and GF07, GTED RF (euros). Checks: total deficit 2025 −151.6 Md€ /
+      68.97 M = −2,198 €; interest 2025 65.7 Md€ → 953 €; old age 2024
+      392 Md€ → 5,766 € of 2025.
+    - **Payload.** Each of the 7 outputs gains `per_capita: {base_year,
+      series: {key: [{year, value}]}}` (keys: `deficit`/`debt`; the four
+      sub-sectors; `france` elsewhere), `source` gains the INSEE inputs and
+      `methodology` a shared sentence (`per_capita_note`).
+    - **Frontend.** Unit `eur_hab` (`1 234 €`, axis `52 k€`, YoY in euros);
+      `KpiView.perCapita` (`label`, `ratioLabel`, `blocks`, `latest`);
+      `KpiDetail` shows an "Afficher" radio switch when set, kept in the URL
+      as `?vue=habitant`; in €/hab mode the ratio charts and panels give way
+      to the €/hab blocks (France only, with a note saying why), except the
+      life-expectancy chart, which stays next to health spending. Overview
+      cards are unchanged. Methodology page has a "Euros par habitant"
+      section.
+    - **GTED** published a newer vintage (now to 2026, 2024 no longer a
+      projection): the tax-expenditure fixture picked it up. The INSEE
+      refetch also brought a revision: deficit 2024 −5.79 → −5.76 % of GDP,
+      2025 added (−5.07 %), debt 2025 115.6 → 115.7 %; the sustainability
+      fixture and its adapter test follow.
+    - **Tests**: `backend/tests/test_per_capita.py` (CPI annualisation, the
+      rule, deficit by sub-sector end-to-end), tax-burden test extended,
+      `insee_raw` fixture in `tests/conftest.py`; frontend adapters, format
+      and `KpiDetail` (switch, `?vue=habitant`, no switch on ratio KPIs).
+      Lint unchanged at the 11 pre-existing errors.
+    - **Deploy**: VPS pull → `docker compose up -d --build api` → annual run
+      (the resolver must pick up the two new series before the INSEE fetch:
+      `docker compose run --rm pipeline --mode annual`) → check `per_capita`
+      in `/api/kpi/kpi_sustainability` → push `main`. The frontend copes with
+      outputs that lack `per_capita` (no switch), so the order is not critical.
