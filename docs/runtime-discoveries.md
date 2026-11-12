@@ -885,3 +885,6 @@ section below, then commit.
       `docker compose run --rm pipeline --mode annual`) → check `per_capita`
       in `/api/kpi/kpi_sustainability` → push `main`. The frontend copes with
       outputs that lack `per_capita` (no switch), so the order is not critical.
+      Done 2026-11-12 (commit `8ba1cf2`): annual run all `ok` but the
+      by-design `budget_plrg` skip; live values match the local run (debt
+      50,170 €/hab, deficit −2,198 €/hab in 2025).

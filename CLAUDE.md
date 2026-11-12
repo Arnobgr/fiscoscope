@@ -67,7 +67,8 @@ efficiency of the French public administration using publicly available fiscal d
 Backend is **feature-complete**: all 8 PRD KPIs (§5.2–5.9) plus 2 extra (wage
 ratio, debt service) compute `status: ok`, and roadmap Phase 1 (Eurostat/OECD
 foundation, 2026-11-08) added 5 more, roadmap 3.1 (2026-11-09) the State
-performance scorecard — see `docs/roadmap.md`; `budget_plrg` is the only by-design
+performance scorecard, roadmap 2.1 (2026-11-12) a € per inhabitant view on 7
+KPIs — see `docs/roadmap.md` (next item: 2.4, starting point in its Part 6); `budget_plrg` is the only by-design
 `skipped` step. Output is served by `backend/api.py` (FastAPI; the old R2 upload
 was retired in Session E).
 
