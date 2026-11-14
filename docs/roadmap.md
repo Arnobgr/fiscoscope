@@ -7,23 +7,25 @@ Written 2026-10-26, last updated 2026-11-14. This is the forward plan;
 **Status (2026-11-14).** Phase 0, Phase 1, 3.1 (State performance
 scorecard + drill-down page), 2.1 (€ per inhabitant in constant euros on
 7 KPIs, Session J) and 2.4 (automatic context sentence on 14 cards,
-Session K; Part 6) are done — 2.4 is built and tested locally, not yet
-deployed (Session K lists the deploy steps): 16 KPIs on the site. **The next item is
-Phase 4** ("Ma commune", starting with 4.1, the OFGL fetcher). There is no
-brief yet: write one in the format of Part 5 from S9 (Part 1.2) and the
-appendix query.
+Session K; Part 6) are done and live: 16 KPIs on the site. **The next
+item is Phase 4** ("Ma commune", starting with 4.1, the OFGL fetcher).
+There is no brief yet: Part 7 gathers its starting point (source
+re-checked 2026-11-14, volumes, pitfalls, decisions to settle); turn it
+into a brief in the format of Part 5.
 
 **Start here (new session).**
 1. Read this file top to bottom, then `known-gaps.md`. No other context is
    needed: Part 4 holds the repo conventions, environments and shipping steps,
    Part 5 the 3.1 brief (kept as the model brief and the reference for the
    performance datasets), Part 6 the decisions behind 2.4 (context
-   sentences).
+   sentences), Part 7 the starting point for Phase 4.
 2. Take the next unchecked item from Part 3 (today: Phase 4, item 4.1).
-3. Before writing code, re-run that source's queries (the appendix; Part 5.8
-   for the performance datasets): dataset IDs and columns drift (Part 4.1).
+3. Before writing code, re-run that source's queries (the appendix and
+   Part 7.6 for OFGL; Part 5.8 for the performance datasets): dataset IDs
+   and columns drift (Part 4.1).
 4. Settle the open decisions with the owner before building (Part 5.5 shows
-   the format used for 3.1, Part 6.4 the one used for 2.4).
+   the format used for 3.1, Part 6.4 the one used for 2.4, Part 7.5 lists
+   those for Phase 4).
 5. When done, follow "After each item" at the end of Part 3.
 
 Figures quoted in Parts 1–2 are as of 2026-10-26 unless dated otherwise; Part 5
@@ -759,7 +761,7 @@ GET {base}/performance-de-la-depense-rap-2025/records
 
 ## Part 6 — 2.4 context sentences (done)
 
-**Status:** ✅ built 2026-11-14 (Session K in `runtime-discoveries.md`).
+**Status:** ✅ live 2026-11-14 (Session K in `runtime-discoveries.md`).
 6.1–6.3 are the starting point as written on 2026-11-12; 6.4 records the
 owner's answers and 6.5 what was built.
 
@@ -865,6 +867,144 @@ Principle 2 applies: state a fact, never a verdict.
 - `KpiView.context` (string) on the card (`kpi-card__context`, under the
   figure) and in `StatCallout`; Methodology page section "Phrases de
   contexte".
+
+---
+
+## Part 7 — Starting point for the next item: Phase 4 "Ma commune"
+
+**Status:** not started, no brief yet. This part records the source as
+re-checked on 2026-11-14 and the code it will plug into, so the brief can
+be written without re-exploring. Write the brief in the format of Part 5
+(goal, data, deliverables, decisions, caveats, done when, queries), settle
+7.5 with the owner, then build 4.1 → 4.2 → 4.3 (4.4 reuses the template).
+
+### 7.1 Goal (from Part 2)
+Let a citizen find their commune (name or postcode) and see its finances
+over 2018–2025 in € per inhabitant (debt, staff costs, capital spending,
+gross savings, local taxes) next to the median of communes of the same
+population band, with the debt-repayment period ("durée de désendettement"
+= debt ÷ gross savings, in years) as the headline solvency ratio. Then the
+same for départements and régions (2012–2025). Principle 2: medians of
+comparable communes, never a ranking of communes.
+
+### 7.2 Source re-checked (2026-11-14)
+`https://data.ofgl.fr/api/explore/v2.1/catalog/datasets/{id}` (OpenDataSoft,
+Licence Ouverte v2.0 Etalab). No API key.
+
+| Dataset id | Modified | Rows | Years |
+|------------|----------|------|-------|
+| `ofgl-base-communes-consolidee` | 2026-07-28 | 13.5 M | 2018–2025 (~1.69 M rows/year) |
+| `ofgl-base-communes` (budget principal only) | 2026-07-29 | 21.9 M | 2018–2025 |
+| `ofgl-base-gfp` (intercommunalités) | 2026-07-22 | 3.1 M | 2018–2025 |
+| `ofgl-base-departements` | 2026-08-05 | 319 k | 2012–2025 |
+| `ofgl-base-regions` | 2026-07-17 | 24.5 k | 2012–2025 |
+
+- **Use the consolidated communes base** (budget principal + budgets
+  annexes, cross-flows neutralised): it is what the roadmap's Lyon sample
+  used and what compares communes that run services in annex budgets.
+- **Fields** (communes consolidée): `exer` (date, `exer=date'2025'` in
+  `where`), `insee` / `com_code` (INSEE code 2025), `com_name`, `categ`
+  (`Commune`, or `PARIS`), `dep_code`, `dep_name`, `reg_code`, `epci_code`,
+  `epci_name`, `tranche_population` (stratum **as of 1 Jan 2025**, codes
+  `0`–`10`: 0 < 100 hab, 1 100–199, 2 200–499, 3 500–1,999, 4 2,000–3,499,
+  5 3,500–4,999, 6 5,000–9,999, 7 10,000–19,999, 8–10 the larger bands —
+  read the full field description for their bounds), `rural`, `montagne`,
+  `touristique`, `qpv`, `tranche_revenu_imposable_par_habitant`, `agregat`,
+  `montant` (€), `ptot` (population of the year), `euros_par_habitant`,
+  `presence_budget`, plus `montant_bp`/`_ba`/`_flux`, `ordre_analyse*`.
+- **53 aggregates** in 2025, including the five of 4.2 under these exact
+  names: `Encours de dette`, `Frais de personnel`, `Dépenses d'équipement`,
+  `Epargne brute`, `Impôts locaux` (also `Annuité de la dette`,
+  `Recettes de fonctionnement`, `Dépenses totales`…).
+- **Coverage 2025:** 34,778 communes (strata counts: 0: 3,260 · 1: 5,326 ·
+  2: 9,396 · 3: 11,212 · 4: 2,286 · 5: 1,021 · 6: 1,216 · 7: 568 · 8: 359 ·
+  9: 92 · 10: 42). 101 `dep_code` values, of which `2A`, `2B`, `971`–`974`,
+  `976` are not two digits; the largest département has 887 communes.
+  The dataset page says **97 communes have no 2025 accounts yet** (e.g.
+  Mende, Gaillard), to be added late December with the DGFiP final
+  balances.
+- **Sample (Lyon `69123`, 2025):** debt 730 €/hab (384.6 M€, `ptot`
+  526,912), gross savings 166 €/hab — same as on 2026-10-26.
+
+### 7.3 Volume (measured 2026-11-14)
+`/exports/csv` with `select=exer,insee,agregat,montant,euros_par_habitant,ptot`
+and `where=exer=date'2025' and agregat='Encours de dette'`: 34,778 rows,
+**2.1 MB, 3.6 s**. Hence 5 aggregates × 8 years ≈ 84 MB of CSV, and 10
+aggregates ≈ 170 MB — over the "< 100 MB total" of 4.1. Ways to fit:
+one request per aggregate (drop the `agregat` column), keep
+`euros_par_habitant` only and recompute nothing, round to whole euros, store
+commune attributes (name, département, stratum…) once from a single
+export rather than on every row, and compress the cached raw. The
+records endpoint (100 rows per page) does not suit this (Part 4.2).
+
+### 7.4 What exists and pitfalls
+- **Backend:** `fetch_ods_records` (small datasets only) and `save_raw` in
+  `fetchers/__init__.py`; `save_raw` writes one JSON per source and day —
+  check whether that suits ~80 MB, or save a gzip and document the
+  exception. `api.py` serves any name matching `^[a-z0-9_]+$` from
+  `data/output/` at `/api/kpi/<name>`: shard names must be lower case
+  (`2A` → `2a`). The annual cron (1 Feb, 1 Jun, 1 Nov) catches the
+  mid-year OFGL release; the late-December 2025 completion lands on 1 Feb.
+- **Frontend:** routes in `App.tsx` (`/`, `/kpi/:slug`, `/methodologie`,
+  `/performance`); the only table and the mobile card pattern are in
+  `pages/PerformanceDetail.tsx`; fixtures are lazy-loaded
+  (`import.meta.glob`), so per-département fixtures don't weigh on the
+  bundle. OFGL must be named on `Methodology.tsx` and in the footer of
+  `AppShell.tsx`.
+- **Postcodes are not in OFGL.** Search by postcode needs a second source
+  (e.g. the La Poste postcode base on data.gouv.fr, or geo.api.gouv.fr at
+  build time — never a runtime call to a third party without deciding it).
+  One postcode maps to several communes and vice versa.
+- **Paris** (`categ = PARIS`, `75056`) carries département functions since
+  2019: its debt is 5,383 €/hab in 2025, not comparable with any stratum.
+  Lyon is in the Métropole de Lyon, which also holds département powers
+  at the EPCI level. Overseas communes may need their own comparison.
+- **Communes change:** mergers (communes nouvelles) change INSEE codes and
+  populations across 2018–2025; the stratum is the 2025 one for every year.
+- **Debt-repayment period** is undefined or meaningless when gross savings
+  are ≤ 0: show "épargne brute négative" rather than a negative number of
+  years. Tiny communes (stratum 0) have volatile per-head values.
+- **Medians per stratum** must be computed by the processor (OFGL does not
+  publish them in these datasets) over communes with accounts that year.
+
+### 7.5 Decisions to settle with the owner
+1. **Scope of the first delivery:** communes only (4.1–4.3), with
+   départements/régions (4.4) later, or all levels together?
+2. **Aggregates:** the five of 4.2 plus the debt-repayment period, or more
+   (operating revenue, total spending, debt annuity)? Drives the raw size
+   (7.3).
+3. **Comparison group:** population stratum only (4.2), or also
+   `rural`/`montagne`/`touristique` filters?
+4. **Search:** name only first, or name + postcode (needs the second source
+   above and its own fetcher)?
+5. **Sharding:** one JSON per département (≤ 887 communes × 8 years ×
+   ~6 values) plus a small search index (name, code, département), or one
+   file per commune?
+6. **Paris and Lyon:** show with a note and no stratum median, or exclude
+   from medians only?
+7. **Raw caching exception:** compressed raw for this source, or keep JSON
+   and accept the size?
+
+### 7.6 Re-verification queries (run before coding)
+URL-encode the parameters (`curl -G --data-urlencode` does it). Base
+`B=https://data.ofgl.fr/api/explore/v2.1/catalog/datasets`.
+```text
+# 1. Vintage: modified date and row count of each base
+GET {B}/ofgl-base-communes-consolidee   (and -gfp, -departements, -regions)
+    → metas.default.modified, metas.default.records_count, fields[].name
+
+# 2. Years and rows per year
+GET {B}/ofgl-base-communes-consolidee/records?select=exer, count(*) as n&group_by=exer&order_by=exer
+
+# 3. Aggregate names (exact spelling matters in `where`)
+GET {B}/ofgl-base-communes-consolidee/records?select=agregat, count(*) as n&group_by=agregat&where=exer=date'2025'&limit=100
+
+# 4. Strata counts
+GET …/records?select=tranche_population, count(*) as n&group_by=tranche_population&where=exer=date'2025' and agregat='Encours de dette'
+
+# 5. Volume of one aggregate-year
+GET {B}/ofgl-base-communes-consolidee/exports/csv?select=exer,insee,agregat,montant,euros_par_habitant,ptot&where=exer=date'2025' and agregat='Encours de dette'
+```
 
 ---
 

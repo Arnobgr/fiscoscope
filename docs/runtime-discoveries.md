@@ -934,3 +934,10 @@ section below, then commit.
       the order is not critical. VPS pull → `docker compose up -d --build
       api` → `docker compose run --rm pipeline --mode annual` → check
       `context` in `/api/kpi/kpi_tax_burden` → push `main`.
+      Done 2026-11-14 (commit `d754927`): annual run all `ok` but the
+      by-design `budget_plrg` skip; `wage_ratio` runs in the **monthly**
+      pipeline, so its step was run on its own
+      (`docker compose run --rm --entrypoint python pipeline -m
+      processors.kpi_wage_ratio`). Live data had been revised since the
+      fixtures: overhead_rate 2025 21.45 → 21.58 % (10-year change −1.0 →
+      −0.9 pt), wage_ratio −4.4 → −4.2 pts; fixtures not refreshed.
