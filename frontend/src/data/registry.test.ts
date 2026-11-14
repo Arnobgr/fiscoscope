@@ -28,4 +28,15 @@ describe("registry", () => {
     expect(title).toBe("Affaires économiques, environnement et logement");
     expect(title).not.toMatch(/productiv/i);
   });
+  it("every KPI with a yearly history gets a context sentence (roadmap 2.4)", async () => {
+    // performance: the indicator set changes every year; monthly_execution: no yearly history.
+    const without = new Set(["performance", "monthly_execution"]);
+    for (const e of REGISTRY) {
+      const raw = (await import(`../fixtures/${e.apiId}.json`)).default;
+      const view = buildView(e.slug, raw);
+      if (without.has(e.slug)) expect(view.context).toBeUndefined();
+      else expect(view.context, e.slug).toMatch(/\.$/);
+    }
+  });
 });
+

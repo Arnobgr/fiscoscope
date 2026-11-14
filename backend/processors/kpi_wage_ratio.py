@@ -12,6 +12,7 @@ import pandas as pd
 
 from processors import (
     annual_values,
+    build_context,
     build_latest,
     latest_raw,
     load_insee_series,
@@ -73,6 +74,7 @@ def compute_wage_ratio() -> dict:
         "france": france,
         "peers": {},
         "latest": build_latest(france),
+        "context": build_context(france),
     }
     write_output("kpi_wage_ratio.json", payload)
     return payload

@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "OCDE — Government at a Glance 2025 (DF_GOV_EMPPS_REP_2025)",
   "methodology": "Emploi dans les administrations publiques (État, collectivités locales, hôpitaux publics, sécurité sociale) en % de l'emploi total, selon la définition harmonisée de l'OCDE (Government at a Glance 2025). Le périmètre suit les comptes nationaux : un même service (santé, éducation, transports) peut être assuré par des agents publics dans un pays et par des entreprises ou associations financées sur fonds publics dans un autre, ce qui limite la comparaison des niveaux. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas, Royaume-Uni et Suède ; l'OCDE ne publie pas de moyenne pour cette série.",
-  "last_updated": "2026-11-08T17:46:40Z",
+  "last_updated": "2026-11-14T12:11:45Z",
   "france": [
     {
       "year": 2007,
@@ -502,5 +502,16 @@
     "year": 2023,
     "value": 20.74,
     "yoy_change": -0.16
+  },
+  "context": {
+    "history": {
+      "direction": "low",
+      "since": 2007,
+      "record": true
+    },
+    "change_10y": {
+      "from_year": 2013,
+      "change": -1.66
+    }
   }
 }

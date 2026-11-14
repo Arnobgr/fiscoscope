@@ -5,7 +5,7 @@
   "unit": "mixed",
   "source": "Eurostat — gov_10a_exp (dépense publique de santé, % du PIB) ; OCDE — statistiques de santé (espérance de vie à la naissance) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
   "methodology": "Bloc santé : dépense COFOG GF07 (santé) de l'ensemble des APU en % du PIB, valeur publiée par Eurostat (arrondie au dixième). Espérance de vie à la naissance, population totale, issue des statistiques de santé de l'OCDE (DF_LE). L'espérance de vie dépend de l'ensemble du système de santé (public et privé) et de facteurs hors santé, et non de la seule dépense publique GF07 : les deux séries sont présentées en parallèle, sans en déduire un lien de causalité. L'éducation (dépense vs. PISA) est omise — PISA n'est pas disponible via l'API SDMX de l'OCDE. Comparaison entre pays reportée. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
-  "last_updated": "2026-11-12T19:39:30Z",
+  "last_updated": "2026-11-14T12:11:46Z",
   "health": {
     "spend_pct_gdp": [
       {
@@ -382,5 +382,11 @@
     "spend_pct_gdp": 8.9,
     "life_expectancy_year": 2024,
     "life_expectancy_years": 83.0
+  },
+  "context": {
+    "change_10y": {
+      "from_year": 2014,
+      "change": 0.6
+    }
   }
 }

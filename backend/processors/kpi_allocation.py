@@ -15,6 +15,7 @@ from processors import (
     EUROSTAT_PEER_NOTE,
     EUROSTAT_PEERS,
     PER_CAPITA_SOURCE,
+    build_context,
     build_latest,
     france_and_peers,
     france_values,
@@ -71,6 +72,7 @@ def compute_productive_spend() -> dict:
         "france": france,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_productive_spend.json", payload)
     return payload
@@ -110,6 +112,7 @@ def compute_pension_investment() -> dict:
         "france": france,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_pension_investment.json", payload)
     return payload
@@ -156,6 +159,7 @@ def compute_pensions() -> dict:
         "pct_gdp": {"france": gdp_france, "peers": gdp_peers},
         "per_capita": per_capita,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_pensions.json", payload)
     return payload

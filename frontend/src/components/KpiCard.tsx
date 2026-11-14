@@ -44,6 +44,7 @@ export function KpiCard({ view, index = 0 }: { view: KpiView; index?: number }) 
           </span>
         )}
       </div>
+      {view.context && <span data-testid="kpi-context" className="kpi-card__context">{view.context}</span>}
       {spark?.points.length ? <Sparkline series={spark} /> : null}
       {view.latest && (
         <span className="kpi-card__asof">données jusqu’à {view.latest.year}</span>

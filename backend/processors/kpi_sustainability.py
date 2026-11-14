@@ -20,6 +20,7 @@ import logging
 from processors import (
     PER_CAPITA_SOURCE,
     annual_values,
+    build_context,
     build_latest,
     france_values,
     load_eurostat_long,
@@ -139,6 +140,7 @@ def compute_fiscal_sustainability() -> dict:
         "per_capita": per_capita,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers["deficit"]),
     }
     write_output("kpi_sustainability.json", payload)
     return payload
@@ -202,6 +204,7 @@ def compute_deficit_subsector() -> dict:
         "per_capita": per_capita,
         "peers": {},
         "latest": build_latest(france),
+        "context": build_context(france),
     }
     write_output("kpi_deficit_subsector.json", payload)
     return payload

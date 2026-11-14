@@ -38,6 +38,18 @@ export function Methodology() {
         vue porte sur la France seule : comparer des euros par habitant entre pays demanderait de
         corriger les écarts de prix, les comparaisons internationales restent donc exprimées en ratios.
       </p>
+      <h2>Phrases de contexte</h2>
+      <p>
+        La phrase sous la valeur de chaque indicateur est calculée automatiquement à chaque mise à
+        jour des données, sur la série principale (en ratio, France). Elle retient le premier de ces
+        trois faits qui s’applique : la valeur la plus haute ou la plus basse depuis une année
+        remontant à cinq ans ou plus (« depuis le début de la série » si elle n’a jamais été atteinte,
+        pour une série d’au moins dix ans) ; la France au plus haut ou au plus bas des pays
+        comparés, l’année la plus récente où tous ont une valeur (les moyennes ne comptent pas comme
+        un pays) ; sinon, l’évolution sur dix ans. Les prévisions sont exclues. Les révisions des
+        années passées par l’INSEE ou Eurostat peuvent changer la phrase. Les cibles de performance
+        (liste d’indicateurs différente chaque année) et l’exécution mensuelle n’en ont pas.
+      </p>
     </article>
   );
 }

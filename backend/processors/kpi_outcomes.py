@@ -27,6 +27,7 @@ import pandas as pd
 from processors import (
     PER_CAPITA_SOURCE,
     annual_values,
+    build_context,
     france_values,
     latest_raw,
     load_eurostat_long,
@@ -121,6 +122,7 @@ def compute_outcomes() -> dict:
         "per_capita": per_capita,
         "peers": {},
         "latest": latest,
+        "context": build_context(health_spend),
     }
     write_output("kpi_outcomes.json", payload)
     return payload
@@ -214,6 +216,9 @@ def compute_tax_expenditure() -> dict:
         "per_capita": per_capita,
         "peers": {},
         "latest": dict(france[-1]) if france else None,
+        "context": build_context(
+            [{"year": r["year"], "value": r["total_cost_eur_bn"]} for r in france if not r["projection"]]
+        ),
     }
     write_output("kpi_tax_expenditure.json", payload)
     return payload

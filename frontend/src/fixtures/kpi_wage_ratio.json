@@ -129,5 +129,11 @@
     "year": 2025,
     "value": 49.77,
     "yoy_change": -0.07
+  },
+  "context": {
+    "change_10y": {
+      "from_year": 2015,
+      "change": -4.39
+    }
   }
 }

@@ -18,6 +18,7 @@ from processors import (
     EU27_AVG_KEY,
     EUROSTAT_PEER_NOTE,
     EUROSTAT_PEERS,
+    build_context,
     build_latest,
     france_and_peers,
     load_eurostat_long,
@@ -65,6 +66,7 @@ def compute_friction_ratio() -> dict:
         "france": france,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_friction_ratio.json", payload)
     return payload

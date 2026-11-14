@@ -46,7 +46,7 @@ export function KpiDetail() {
           ))}
         </fieldset>
       )}
-      <StatCallout view={perCapita ? { ...view, latest: perCapita.latest } : view} />
+      <StatCallout view={perCapita ? { ...view, latest: perCapita.latest, context: undefined } : view} />
       {!perCapita && <TimeSeriesChart view={view} />}
       {view.drilldown && (
         <p className="kpi-detail__drilldown"><Link to={view.drilldown.to}>{view.drilldown.label} →</Link></p>

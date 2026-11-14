@@ -18,6 +18,7 @@ from processors import (
     EUROSTAT_PEER_NOTE,
     EUROSTAT_PEERS,
     annual_values,
+    build_context,
     build_latest,
     france_and_peers,
     load_eurostat_long,
@@ -84,6 +85,7 @@ def compute_overhead_rate() -> dict:
         "france": france,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_overhead_rate.json", payload)
     return payload
@@ -125,6 +127,7 @@ def compute_admin_overhead() -> dict:
         "france": france,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_admin_overhead.json", payload)
     return payload

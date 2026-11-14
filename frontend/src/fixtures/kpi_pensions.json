@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG, niveau 2) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
   "methodology": "Fonction COFOG GF1002 « vieillesse », ensemble des APU : pensions de retraite (régimes de base et complémentaires, retraites des fonctionnaires) et prestations liées à la perte d'autonomie des personnes âgées (allocation personnalisée d'autonomie, aide sociale à l'hébergement). Les pensions de réversion relèvent de GF1003 « survivants » et ne sont pas comprises. Part de la dépense : GF1002 / dépense publique totale × 100, en millions d'euros courants. En % du PIB : valeur publiée par Eurostat (arrondie au dixième). Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction). En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
-  "last_updated": "2026-11-12T19:25:19Z",
+  "last_updated": "2026-11-14T12:11:44Z",
   "france": [
     {
       "year": 1995,
@@ -1591,5 +1591,16 @@
     "year": 2024,
     "value": 23.45,
     "yoy_change": 0.49
+  },
+  "context": {
+    "history": {
+      "direction": "high",
+      "since": 2019,
+      "record": false
+    },
+    "change_10y": {
+      "from_year": 2014,
+      "change": 0.17
+    }
   }
 }

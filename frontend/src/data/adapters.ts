@@ -3,7 +3,7 @@ import type {
   OutcomesKpi, TaxExpenditureKpi, MonthlyKpi, PensionsKpi, DeficitSubsectorKpi,
   PerformanceKpi, PerfStatus, PerCapitaRaw, PerCapitaView, SecondaryBlock,
 } from "./types";
-import type { Polarity } from "./format";
+import { type Polarity, fmtContext } from "./format";
 
 export interface AdaptBase { slug: string; title: string; explainer: string; unit: Unit; polarity: Polarity }
 
@@ -78,6 +78,7 @@ export function adaptStandard(raw: StdSeriesKpi, b: AdaptBase): KpiView {
     comparison: averageSeries(raw.peers),
     peers: peerSeries(raw.peers),
     latest: latestFrom(raw.france, b.unit, raw.latest),
+    context: fmtContext(raw.context, b.unit),
     ...meta(raw),
   };
 }
@@ -111,6 +112,7 @@ export function adaptSustainability(raw: SustainabilityKpi, b: AdaptBase): KpiVi
       { title: "Dette publique par habitant", lines: [["debt", "France"]] },
     ]),
     latest: latestFrom(raw.france, "percent", raw.latest),
+    context: fmtContext(raw.context, "percent", raw.france[raw.france.length - 1]),
     ...meta(raw),
   };
 }
@@ -145,6 +147,7 @@ export function adaptDeficitSubsector(raw: DeficitSubsectorKpi, b: AdaptBase): K
     secondary: { title: "En milliards d’euros courants", unit: "eur_bn", series: lines("eur_bn") },
     perCapita: perCapitaView(raw.per_capita, "% du PIB", [{ title: "Solde par habitant", lines: SUBSECTORS }]),
     latest: latestFrom(raw.france, "percent", raw.latest),
+    context: fmtContext(raw.context, "percent", raw.france[raw.france.length - 1]),
     ...meta(raw),
   };
 }
@@ -197,6 +200,7 @@ export function adaptOutcomes(raw: OutcomesKpi, b: AdaptBase): KpiView {
     // Life expectancy stays next to the spending in either view.
     perCapita: perCapita && { ...perCapita, blocks: [...perCapita.blocks, lifeBlock] },
     latest: latestFrom(spend, "percent"),
+    context: fmtContext(raw.context, "percent"),
     ...meta(raw),
   };
 }
@@ -223,6 +227,7 @@ export function adaptTaxExpenditure(raw: TaxExpenditureKpi, b: AdaptBase): KpiVi
       ? { year: last.year, value: last.total_cost_eur_bn, unit: "eur_bn",
           yoy: last.yoy_change_pct ?? (prev ? ((last.total_cost_eur_bn - prev.total_cost_eur_bn) / prev.total_cost_eur_bn) * 100 : undefined) }
       : undefined,
+    context: fmtContext(raw.context, "eur_bn"),
     ...meta(raw),
   };
 }

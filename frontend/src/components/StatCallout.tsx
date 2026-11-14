@@ -17,6 +17,7 @@ export function StatCallout({ view }: { view: KpiView }) {
       <span className="stat-callout__year">{unit === "eur_hab" ? "par habitant " : ""}en {year}</span>
       {y && <span className={`stat-callout__yoy yoy--${sentiment}`} data-dir={y.dir} data-sentiment={sentiment}>
         {y.dir === "up" ? "▲" : y.dir === "down" ? "▼" : "▬"} {y.text} sur un an</span>}
+      {view.context && <p data-testid="stat-context" className="stat-callout__context">{view.context}</p>}
     </div>
   );
 }

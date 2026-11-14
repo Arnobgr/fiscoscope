@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG et par opération)",
   "methodology": "Rémunération des salariés (D1) de la fonction COFOG GF01 « services publics généraux », ensemble des APU (S13), rapportée à la dépense publique totale (TE, toutes fonctions) × 100, en millions d'euros courants. GF01 regroupe les organes exécutifs et législatifs, l'administration financière et fiscale, les affaires étrangères et les services généraux de l'État, des collectivités locales et de la sécurité sociale. Les enseignants, soignants, policiers et militaires relèvent d'autres fonctions (GF09, GF07, GF03, GF02) et n'y sont pas comptés. Les intérêts de la dette (aussi rangés en GF01) ne sont pas des rémunérations et n'entrent pas dans le numérateur. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction).",
-  "last_updated": "2026-11-08T17:26:50Z",
+  "last_updated": "2026-11-14T12:11:56Z",
   "france": [
     {
       "year": 1995,
@@ -806,5 +806,16 @@
     "year": 2024,
     "value": 2.85,
     "yoy_change": -0.05
+  },
+  "context": {
+    "history": {
+      "direction": "low",
+      "since": 1995,
+      "record": true
+    },
+    "change_10y": {
+      "from_year": 2014,
+      "change": -0.37
+    }
   }
 }

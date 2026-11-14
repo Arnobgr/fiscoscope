@@ -888,3 +888,49 @@ section below, then commit.
       Done 2026-11-12 (commit `8ba1cf2`): annual run all `ok` but the
       by-design `budget_plrg` skip; live values match the local run (debt
       50,170 €/hab, deficit −2,198 €/hab in 2025).
+- **Session K (2026-11-14) — roadmap 2.4 (automatic context sentences).**
+    - **Decisions (owner, 2026-11-14)** — recorded in `roadmap.md` Part 6.4:
+      one sentence per card, "notable first" (history ≥ 5 years back or a
+      record → France at an extreme of the compared countries → 10-year
+      change); peers worded as extremes only, never an ordinal rank; card
+      and detail headline, ratio view only; facts computed by the
+      processors, French wording in the frontend.
+    - **Why the thresholds.** A first pass on the fixtures showed that a
+      literal "highest/lowest since" is trivial most years (overhead_rate
+      2025: highest since 2024). With a 5-year floor, 9 of the 14 cards
+      get a history sentence (friction and debt interest highest since
+      2013, tax burden lowest since 2011, admin overhead and public
+      employment lowest on record…) and 5 fall back to the 10-year change
+      (overhead_rate, wage_ratio, deficit, health spending, tax
+      expenditure). The only peer extreme today, tax burden "highest of
+      the 7 countries in 2024", is outranked by its history sentence.
+    - **Payload.** `context: {history?, peers?, change_10y?}` beside
+      `latest` (`build_context`). Peers counted are `OECD_PEERS` keys only,
+      so `OECD_AVG`/`EU27_AVG`/`OECD_REP` never count as a country; France
+      must be strictly the highest or lowest in the latest year France and
+      every peer have (2024 for the OECD-based KPIs whose France series ends
+      in 2025). Ties at the rounded 2 decimals count as "reached".
+    - **Wording** (`fmtContext`, `format.ts`). Percent changes are in
+      "point(s)" (plural from 2,0), not "%". Public balances (deficit,
+      deficit by sub-sector) are worded as deficits while negative, so
+      "highest" never reads as "largest deficit": "Déficit le plus faible
+      depuis 2019", "Déficit plus élevé de 1,2 point qu’en 2015" (the plain
+      signed change is kept if the earlier year was a surplus).
+    - **Tax expenditure** card headline is the GTED 2026 forecast while its
+      sentence is computed on outturn years (2014–2024): the sentence names
+      its years.
+    - **Fixtures.** 12 regenerated locally (data identical to the previous
+      fixtures, only `context` added). `overhead_rate` (OECD raw, VPS only)
+      and `wage_ratio` (Urssaf raw not on the Mac) got `context` from
+      `build_context` applied to their fixture series, which is what the
+      processor computes from the same data.
+    - **Tests**: `backend/tests/test_context.py` (5-year floor, ties,
+      record length, negative series, peers in the common year with
+      averages ignored, strict extremes, 10-year change); frontend
+      `fmtContext` wording cases in `format.test.ts`, and a registry test
+      that every fixture-backed KPI but performance and monthly has a
+      sentence. Lint unchanged at the 11 pre-existing errors.
+    - **Deploy**: the frontend shows nothing when `context` is missing, so
+      the order is not critical. VPS pull → `docker compose up -d --build
+      api` → `docker compose run --rm pipeline --mode annual` → check
+      `context` in `/api/kpi/kpi_tax_burden` → push `main`.

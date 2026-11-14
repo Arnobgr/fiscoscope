@@ -8,6 +8,7 @@ import logging
 
 from processors import (
     OECD_PEERS,
+    build_context,
     build_latest,
     france_and_peers,
     load_oecd_long,
@@ -49,6 +50,7 @@ def compute_public_employment() -> dict:
         "france": france,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_public_employment.json", payload)
     return payload

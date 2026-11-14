@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "Eurostat — gov_10a_main (comptes des APU par sous-secteur) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
   "methodology": "Capacité (+) ou besoin (−) de financement (B9) de chaque sous-secteur des administrations publiques : administrations centrales (S1311 — l'État et les organismes divers d'administration centrale), administrations locales (S1313 — collectivités territoriales et leurs établissements) et administrations de sécurité sociale (S1314 — régimes de sécurité sociale, de retraite complémentaire, assurance chômage, hôpitaux). La somme des trois égale le solde de l'ensemble des APU (S13). Chaque solde s'entend après les transferts entre administrations : l'État finance une partie des ressources des collectivités et de la sécurité sociale (dotations, compensation d'allègements de cotisations), si bien que le déficit de l'État reflète aussi des dépenses exécutées par les autres sous-secteurs. Les collectivités locales ne peuvent emprunter que pour investir (règle d'or). En % du PIB : valeurs publiées par Eurostat (arrondies au dixième) ; en milliards d'euros courants : millions d'euros / 1 000. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
-  "last_updated": "2026-11-12T19:25:19Z",
+  "last_updated": "2026-11-14T12:11:45Z",
   "france": [
     {
       "year": 1995,
@@ -1648,5 +1648,16 @@
     "year": 2025,
     "value": -4.4,
     "yoy_change": 0.8
+  },
+  "context": {
+    "history": {
+      "direction": "high",
+      "since": 2019,
+      "record": false
+    },
+    "change_10y": {
+      "from_year": 2015,
+      "change": -0.8
+    }
   }
 }

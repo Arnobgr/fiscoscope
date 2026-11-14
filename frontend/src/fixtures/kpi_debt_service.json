@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "INSEE BDM — CNT-2020-CSI (D41_S13, OTE_S13, B9NF_S13) ; pays comparés : Eurostat — gov_10a_main (D41PAY, TR) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
   "methodology": "D41_S13 (intérêts versés, ensemble des APU) / total des recettes publiques, où recette = dépense totale des APU (OTE) + solde public (B9NF). Le tout issu des comptes trimestriels CNT-2020-CSI cumulés sur l'année. Pays comparés : intérêts payables (D41PAY) / recettes totales (TR) des APU, Eurostat gov_10a_main, en millions d'euros courants ; calculé de la même façon pour la France, ce ratio Eurostat s'écarte de moins de 0,1 point de la série INSEE. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction). Par habitant : intérêts versés (D41_S13) seuls. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
-  "last_updated": "2026-11-12T19:25:19Z",
+  "last_updated": "2026-11-14T12:11:44Z",
   "france": [
     {
       "year": 1995,
@@ -1021,5 +1021,16 @@
     "year": 2025,
     "value": 4.2,
     "yoy_change": 0.2
+  },
+  "context": {
+    "history": {
+      "direction": "high",
+      "since": 2013,
+      "record": false
+    },
+    "change_10y": {
+      "from_year": 2015,
+      "change": 0.42
+    }
   }
 }

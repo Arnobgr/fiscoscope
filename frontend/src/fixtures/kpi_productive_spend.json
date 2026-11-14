@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "Eurostat — gov_10a_exp (dépenses des APU par fonction COFOG)",
   "methodology": "Fonctions COFOG GF04 (affaires économiques) + GF05 (protection de l'environnement) + GF06 (logement et équipements collectifs) / dépense publique totale (toutes fonctions) × 100, ensemble des APU, en millions d'euros courants. L'éducation (GF09) et la santé (GF07) n'en font pas partie. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction).",
-  "last_updated": "2026-11-08T17:26:50Z",
+  "last_updated": "2026-11-14T12:11:44Z",
   "france": [
     {
       "year": 1995,
@@ -806,5 +806,16 @@
     "year": 2024,
     "value": 14.27,
     "yoy_change": -0.8
+  },
+  "context": {
+    "history": {
+      "direction": "low",
+      "since": 2019,
+      "record": false
+    },
+    "change_10y": {
+      "from_year": 2014,
+      "change": -0.13
+    }
   }
 }

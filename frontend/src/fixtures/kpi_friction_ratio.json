@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "Eurostat — gov_10a_exp (dépenses par fonction COFOG) et gov_10a_main (recettes totales des APU)",
   "methodology": "Le bloc COFOG « fonctions support et régaliennes de base » (GF01 services publics généraux + GF02 défense + GF03 ordre et sécurité publics) rapporté aux recettes publiques totales (TR), ensemble des APU, en millions d'euros courants. Les intérêts de la dette sont compris dans GF01 et ne sont pas ajoutés séparément. Pays comparés : Allemagne, Espagne, Italie, Pays-Bas et Suède, même source et même définition que la France ; le Royaume-Uni n'est plus couvert par Eurostat depuis le Brexit. La « moyenne UE à 27 » (clé EU27_AVG) est l'agrégat de l'Union européenne publié par Eurostat (disponible depuis 2010 pour les dépenses par fonction).",
-  "last_updated": "2026-11-08T17:26:50Z",
+  "last_updated": "2026-11-14T12:11:44Z",
   "france": [
     {
       "year": 1995,
@@ -806,5 +806,16 @@
     "year": 2024,
     "value": 19.12,
     "yoy_change": 0.26
+  },
+  "context": {
+    "history": {
+      "direction": "high",
+      "since": 2013,
+      "record": false
+    },
+    "change_10y": {
+      "from_year": 2014,
+      "change": 0.09
+    }
   }
 }

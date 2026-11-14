@@ -272,6 +272,11 @@ ul {
 .kpi-card svg {
   overflow: visible;
 }
+.kpi-card__context {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
 .kpi-card__asof {
   font-size: 0.7rem;
   letter-spacing: 0.02em;
@@ -560,6 +565,12 @@ ul {
 }
 .stat-callout__yoy {
   font-size: 0.95rem;
+}
+.stat-callout__context {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
 }
 
 /* ---- Chart ----------------------------------------------------------- */

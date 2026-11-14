@@ -5,7 +5,7 @@
   "unit": "mixed",
   "source": "Global Tax Expenditures Database (GTED), Tax Expenditures Lab — Redonda, von Haldenwang & Aliu, CC-BY-4.0, concept DOI 10.5281/zenodo.5940165; revenue denominator from INSEE BDM CNT-2020-CSI (OTE_S13 + B9NF_S13) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation).",
   "methodology": "Par année : total_cost_eur_bn = Σ des recettes auxquelles l'État renonce sur l'ensemble des dispositifs français (GTED « RF (LCU) », en euros) ; count = nombre de dispositifs recensés cette année-là (y compris ceux chiffrés à zéro) ; ratio_to_revenue_pct = coût total / total des recettes publiques × 100, où recette = dépense totale des APU (OTE) + solde public (B9NF) issus de CNT-2020-CSI — calculé uniquement pour les années où la recette INSEE est disponible. Les deux années les plus récentes sont des projections GTED (projection: true) ; les années antérieures sont des estimations. Le GTED est une compilation tierce du tome II « Voies et Moyens » du PLF français ; son décompte des dispositifs et sa définition des recettes non perçues diffèrent légèrement de l'annexe officielle. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios.",
-  "last_updated": "2026-11-12T19:25:39Z",
+  "last_updated": "2026-11-14T12:12:04Z",
   "france": [
     {
       "year": 1999,
@@ -352,5 +352,11 @@
     "count": 397,
     "projection": true,
     "yoy_change_pct": -10.59
+  },
+  "context": {
+    "change_10y": {
+      "from_year": 2014,
+      "change": 12.27
+    }
   }
 }

@@ -16,6 +16,7 @@ from processors import (
     EUROSTAT_PEERS,
     PER_CAPITA_SOURCE,
     annual_values,
+    build_context,
     build_latest,
     load_eurostat_long,
     load_insee_series,
@@ -79,6 +80,7 @@ def compute_debt_service() -> dict:
         "per_capita": per_capita,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_debt_service.json", payload)
     return payload

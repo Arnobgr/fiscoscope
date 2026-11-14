@@ -1,3 +1,4 @@
+import type { ContextFacts } from "./types";
 const MINUS = "−"; // fr typographic minus sign (Intl emits ASCII "-" on some ICU builds)
 
 const nf = (min: number, max: number) =>
@@ -48,6 +49,39 @@ export function fmtAxis(v: number, unit: string): string {
     default: return num(v, 0, 1);
   }
 }
+// Context sentence (roadmap 2.4): the first fact present among history, peers,
+// change over 10 years. `balance` (public balances, negative = deficit) words
+// the extremes as deficits so "highest" never reads as "largest deficit".
+export function fmtContext(facts: ContextFacts | undefined, unit: string, balance?: { value: number }): string | undefined {
+  if (!facts) return undefined;
+  const deficit = balance && balance.value < 0;
+  const extreme = (high: boolean) => !balance
+    ? (high ? "la plus élevée" : "la plus basse")
+    : deficit ? (high ? "le plus faible" : "le plus élevé") : (high ? "le plus élevé" : "le plus bas");
+  const noun = !balance ? null : deficit ? "Déficit" : "Solde";
+  const { history: h, peers: p, change_10y: c } = facts;
+  if (h) {
+    const since = h.record ? `depuis le début de la série (${h.since})` : `depuis ${h.since}`;
+    if (!noun) return `Plus ${h.direction === "high" ? "haut" : "bas"} niveau ${since}.`;
+    return `${noun} ${extreme(h.direction === "high")} ${since}.`;
+  }
+  if (p) return `${noun ?? "Valeur"} ${extreme(p.position === "highest")} des ${p.of} pays comparés en ${p.year}.`;
+  if (c) {
+    const span = `en dix ans (${c.from_year}–${c.from_year + 10})`;
+    if (Math.abs(c.change) < 0.05) return `Quasiment inchangé ${span}.`;
+    const sign = c.change > 0 ? "+" : "";
+    if (deficit && balance.value - c.change < 0) { // a deficit both years: say which way it moved
+      const pts = `${num(Math.abs(c.change), 1, 1)} ${Math.round(Math.abs(c.change) * 10) >= 20 ? "points" : "point"}`;
+      return `Déficit ${c.change < 0 ? "plus élevé" : "plus faible"} de ${pts} qu’en ${c.from_year}.`;
+    }
+    const amount = unit === "eur_bn" ? fmtEurBn(c.change)
+      : unit === "ratio" ? `${num(c.change, 1, 1)}×`
+      : `${num(c.change, 1, 1)} ${Math.round(Math.abs(c.change) * 10) >= 20 ? "points" : "point"}`; // fr: plural from 2
+    return `${sign}${amount} ${span}.`;
+  }
+  return undefined;
+}
+
 export function fmtDateFr(iso: string): string {
   return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" })
     .format(new Date(iso));

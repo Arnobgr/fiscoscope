@@ -11,6 +11,7 @@ from processors import (
     OECD_PEERS,
     PER_CAPITA_SOURCE,
     annual_values,
+    build_context,
     build_latest,
     france_and_peers,
     france_values,
@@ -82,6 +83,7 @@ def compute_tax_burden() -> dict:
         "per_capita": per_capita,
         "peers": peers,
         "latest": build_latest(france),
+        "context": build_context(france, peers),
     }
     write_output("kpi_tax_burden.json", payload)
     return payload

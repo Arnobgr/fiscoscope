@@ -100,6 +100,50 @@ def build_latest(france: list[dict]) -> dict | None:
     return latest
 
 
+# Context facts (roadmap 2.4): the frontend words them in French and shows the
+# first one present, in this key order. Each fact is kept only when notable.
+CONTEXT_MIN_SPAN = 5      # "highest since Y" only when Y is at least 5 years back
+CONTEXT_MIN_RECORD = 10   # "record since the series began" only for ≥ 10 years of data
+
+
+def build_context(france: list[dict], peers: dict | None = None) -> dict:
+    """
+    Facts about the latest France value:
+    - history: {direction: high|low, since, record} — the last year with a value
+      at least as high (low); `since` is the series' first year when `record`.
+    - peers: {year, position: highest|lowest, of} — in the latest year France
+      and every peer country have; only when France is strictly the extreme.
+      Averages (OECD_AVG, EU27_AVG, OECD_REP) are never counted.
+    - change_10y: {from_year, change} — latest value minus the value 10 years before.
+    """
+    if not france:
+        return {}
+    year, value = france[-1]["year"], france[-1]["value"]
+    earlier = france[:-1]
+    out = {}
+    for direction, at_least in (("high", lambda v: v >= value), ("low", lambda v: v <= value)):
+        reached = [p["year"] for p in earlier if at_least(p["value"])]
+        if reached:
+            if max(reached) <= year - CONTEXT_MIN_SPAN:
+                out["history"] = {"direction": direction, "since": max(reached), "record": False}
+        elif len(france) >= CONTEXT_MIN_RECORD:
+            out["history"] = {"direction": direction, "since": france[0]["year"], "record": True}
+    countries = {k: {p["year"]: p["value"] for p in s} for k, s in (peers or {}).items() if k in OECD_PEERS and s}
+    if countries:
+        fr = {p["year"]: p["value"] for p in france}
+        common = [y for y in fr if all(y in c for c in countries.values())]
+        if common:
+            y = max(common)
+            others = [c[y] for c in countries.values()]
+            position = "highest" if fr[y] > max(others) else "lowest" if fr[y] < min(others) else None
+            if position:
+                out["peers"] = {"year": y, "position": position, "of": len(others) + 1}
+    past = next((p["value"] for p in earlier if p["year"] == year - 10), None)
+    if past is not None:
+        out["change_10y"] = {"from_year": year - 10, "change": round(value - past, 2)}
+    return out
+
+
 def write_output(filename: str, payload: dict, compact: bool = False) -> Path:
     """Write a KPI payload to data/output/{filename} as indented JSON (compact: no whitespace)."""
     out_dir = Path(OUTPUT_DATA_DIR)

@@ -5,7 +5,7 @@
   "unit": "percent",
   "source": "INSEE BDM — CNT-2020-CSI + CNA-2020-PIB + DETTE-TRIM-APU-2020 (Maastricht debt); peers OECD GIP 2025 (DSD_GOV, % of GDP) ; € par habitant : INSEE BDM (population moyenne, indice des prix à la consommation)",
   "methodology": "Déficit : B9NF_S13 (capacité/besoin de financement, ensemble des APU) cumulé sur l'année / PIB nominal × 100. Dette : ratio dette publique/PIB au sens de Maastricht (DETTE-TRIM-APU-2020, base 2020), relevé au dernier trimestre de l'année (T4) puisque la dette est un stock. Pays comparés : OCDE GIP 2025, capacité/besoin de financement (GNLB) et dette brute de Maastricht (GGDM), en % du PIB de part et d'autre — la « moyenne des 6 pays » (clé OECD_AVG) est la moyenne non pondérée de DEU/GBR/ITA/ESP/NLD/SWE, et non la moyenne de l'OCDE ; les séries des pays comparés débutent en 2007. Détenteurs de la dette (depuis 2020) : Eurostat gov_10dd_ggd, dette consolidée au sens de Maastricht en % du PIB, par secteur détenteur — non-résidents (S2), Banque de France (S121, titres acquis pour l'essentiel dans le cadre des programmes d'achats de l'Eurosystème) et autres résidents (banques, assurances, fonds, ménages…), ces derniers obtenus par différence entre le total et les deux autres. La ventilation par détenteur n'est publiée qu'à partir de 2020 pour la France. En euros par habitant (France seule) : montant annuel en euros courants divisé par la population moyenne de l'année (INSEE, France entière), puis exprimé en euros constants de 2025 avec l'indice des prix à la consommation de l'INSEE (moyenne des douze mois de chaque année), disponible depuis 1996. Les montants par habitant de pays différents ne sont pas comparés : il faudrait corriger les écarts de prix entre pays ; la comparaison se fait sur les ratios. La dette, un stock relevé en fin d'année, est rapportée de la même façon à la population et aux prix moyens de l'année.",
-  "last_updated": "2026-11-12T19:39:29Z",
+  "last_updated": "2026-11-14T12:11:45Z",
   "france": [
     {
       "year": 1995,
@@ -1637,5 +1637,11 @@
     "year": 2025,
     "value": -5.07,
     "yoy_change": 0.69
+  },
+  "context": {
+    "change_10y": {
+      "from_year": 2015,
+      "change": -1.18
+    }
   }
 }

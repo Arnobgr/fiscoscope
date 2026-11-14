@@ -2,6 +2,12 @@
 export interface RawPoint { year: number; value: number; source?: string }
 // € per inhabitant in constant euros of base_year, France only (roadmap 2.1).
 export interface PerCapitaRaw { base_year: number; series: Record<string, RawPoint[]> }
+// Notable facts about the latest France value, computed by the processors (roadmap 2.4).
+export interface ContextFacts {
+  history?: { direction: "high" | "low"; since: number; record: boolean };
+  peers?: { year: number; position: "highest" | "lowest"; of: number };
+  change_10y?: { from_year: number; change: number };
+}
 export interface StdSeriesKpi {            // overhead, admin_overhead, friction, productive, debt_service, pension_investment, wage_ratio
   kpi_id: string; kpi_name: string; description: string; unit: string;
   source: string; methodology: string; last_updated: string;
@@ -9,6 +15,7 @@ export interface StdSeriesKpi {            // overhead, admin_overhead, friction
   peers?: Record<string, RawPoint[]>;      // ISO3 country keys + at most one average (OECD_AVG, EU27_AVG or OECD_REP)
   latest?: { year: number; value: number; yoy_change?: number };
   per_capita?: PerCapitaRaw;
+  context?: ContextFacts;
 }
 export interface SustainabilityKpi extends StdSeriesKpi {
   debt: { france: RawPoint[] };
@@ -46,6 +53,7 @@ export interface OutcomesKpi {
   education: null; peers: Record<string, never>;
   latest?: Record<string, unknown>;
   per_capita?: PerCapitaRaw;
+  context?: ContextFacts;
 }
 export interface TaxExpRow {
   year: number; total_cost_eur_bn: number; count: number;
@@ -57,6 +65,7 @@ export interface TaxExpenditureKpi {
   france: TaxExpRow[]; peers: Record<string, never>;
   latest?: Record<string, unknown>;
   per_capita?: PerCapitaRaw;
+  context?: ContextFacts;
 }
 export interface MonthlyBlock { months: string[]; [series: string]: number[] | string[] }
 export interface MonthlyKpi {
@@ -100,6 +109,7 @@ export interface KpiView {
   drilldown?: { to: string; label: string }; // link to a dedicated detail page (e.g. performance indicators)
   perCapita?: PerCapitaView;   // alternative "€ par habitant" view of the page (roadmap 2.1)
   latest?: LatestStat;
+  context?: string;            // one fact about the latest value, worded from ContextFacts (roadmap 2.4)
   source: string;              // from JSON (empty for monthly)
   methodology: string;         // from JSON (empty for monthly)
 }
